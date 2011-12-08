@@ -1,3 +1,4 @@
+{-# LANGUAGE BangPatterns #-}
 module Main
 where
 
@@ -5,10 +6,8 @@ where
   import Test.QuickCheck
   import Test.QuickCheck.Monadic
   import qualified Data.IOMap as T
-  import Prelude hiding (catch)
-  import qualified Control.Exception as Exc
   import Control.Applicative ((<$>))
-  import Data.List (nub, sort, delete, intersect)
+  import Data.List (nub, sort, delete)
 
   ------------------------------------------------------------------------
   -- For debugging it's much nicer to work with digits
@@ -35,13 +34,14 @@ where
 
   els :: Int -> [Int] -> Gen [Int]
   els _ [] = return [] 
-  els n l  = nub <$> pickInd (max n ((length l) `div` 2)) l
-    where pickInd m is = 
-            if m == 0 then return []
-              else do
+  els n l  = let l' = nub l
+              in pickInd (min (abs n) ((length l') `div` 2)) l'
+    where pickInd m is 
+            | m == 0    = return []
+            | otherwise = do
                 i   <- choose (0, length is)
                 is' <- pickInd (m-1) is
-                return (i:is)
+                return (i:is')
 
   -- tests:
   -- when inserted it is in there
@@ -62,8 +62,8 @@ where
   -- toList == sort list
   ------------------------------------------------------------------------------
   prp_Order :: NonEmptyList Int -> Property
-  prp_Order (NonEmpty is) = collect (length $ nub is) $ monadicIO $ do
-    t <- run T.newTree
+  prp_Order (NonEmpty is) = {- collect (length $ nub is) $ -} monadicIO $ do
+    t <- run T.empty
     run $ mapM_ (\x -> T.insert t upd x ()) is
     let is' = sort $ nub is
     l <- run $ T.toKeyList t
@@ -73,8 +73,8 @@ where
   -- height <= 1 + log2 (length input-list)
   ------------------------------------------------------------------------------
   prp_heightLog2 :: NonEmptyList Int -> Property
-  prp_heightLog2 (NonEmpty is) = collect (length $ nub is) $ monadicIO $ do
-    t <- run T.newTree
+  prp_heightLog2 (NonEmpty is) = {- collect (length $ nub is) $ -} monadicIO $ do
+    t <- run T.empty
     run $ mapM_ (\x -> T.insert t upd x ()) is
     d <- run $ hDiff t
     assert $ d <= 1 
@@ -83,8 +83,8 @@ where
   -- toList == sort list
   ------------------------------------------------------------------------------
   prp_OrderDel :: Int -> NonEmptyList Int -> Property
-  prp_OrderDel m (NonEmpty is) = collect (length $ nub is) $ monadicIO $ do
-    t <- run T.newTree
+  prp_OrderDel m (NonEmpty is) = {- collect (length $ nub is) $ -} monadicIO $ do
+    t <- run T.empty
     run $ mapM_ (\x -> T.insert t upd x ()) is
     let is' = sort $ nub is
     ds <- pick (els m is')
@@ -97,12 +97,11 @@ where
   -- height <= 1 + log2 (length input-list)
   ------------------------------------------------------------------------------
   prp_heightLog2Del :: Int -> NonEmptyList Int -> Property
-  prp_heightLog2Del m (NonEmpty is) = collect (length $ nub is) $ monadicIO $ do
-    t <- run T.newTree
+  prp_heightLog2Del m (NonEmpty is) = {- collect (length $ nub is) $ -} monadicIO $ do
+    t <- run T.empty
     run $ mapM_ (\x -> T.insert t upd x ()) is
     let is' = sort $ nub is
     ds <- pick (els m is')
-    let dis = allDelete ds is'
     run $ mapM_ (T.delete t) ds
     d <- run $ hDiff t
     assert $ d <= 1 
@@ -118,6 +117,7 @@ where
   log2 :: Double -> Int
   log2 = ceiling . logBase 2
 
+  hDiff :: T.IOMap k a -> IO Int
   hDiff = T.fold2 (diff1 . abs) (-) 0
     where diff1 x = if x > 1 then x else 1
 

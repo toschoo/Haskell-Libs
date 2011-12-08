@@ -1,9 +1,47 @@
 {-# LANGUAGE BangPatterns #-}
+-------------------------------------------------------------------------------
+-- |
+-- Module     : Data/IOMap.hs
+-- Copyright  : (c) Tobias Schoofs
+-- License    : LGPL 
+-- Stability  : experimental
+-- Portability: not portable (bang patterns)
+--
+-- Maps from key to IO actions, similar to 'Data.Map'.
+-- Since many function names (but not the type name) 
+-- clash with Prelude names, this module is usually imported qualified, /e.g./
+--
+-- > import Data.IOMap (IOMap)
+-- > import qualified Data.IOMap as IOM
+-- 
+-- The implementation of 'IOMap' is based on /AVL/ trees.
+-- 
+-- Like 'Data.Map', 'IOMap' maintains key-value-pairs.
+-- Values, in contrast to 'Data.Map', 
+-- are protected by an 'MVar';
+-- All operations on values, therefore, are IO actions.
+-- Most operations on the structure of the 'IOMap',
+-- such as 'delete', 'fold', 'count', /etc./,
+-- are purely functional;
+-- some, however, such as 'insert', but also folds
+-- implying operation on the value, are IO actions.
+-- 
+-- The main motivation for 'IOMap'
+-- is programs working with huge sets of 
+-- values on which IO actions are operating concurrently, /e.g./
+-- servers managing connections in an 'IOMap'.
+--  
+-- The library provides some traditional interfaces
+-- to build and query maps ('insert', 'lookup', /etc./),
+-- but due to its purpose much more important are
+-- interface that allow for concurrent execution of IO actions
+-- on values in the 'IOMap' ('with' and 'withAll').
+-------------------------------------------------------------------------------
 module Data.IOMap (
-              -- * Map Type
+              -- * IOMap Type
               IOMap,
               -- * Construction
-              newTree, fromList,
+              empty, singleton, fromList,
               -- ** Insertion
               insert, insList,
               -- ** Deletion
@@ -13,6 +51,7 @@ module Data.IOMap (
               -- * Lookups
               with, with_, lookup,
               -- * Folds
+              -- $map_folds
               fold, fold2,
               fold', fold2',
               foldKey, foldKey2,
@@ -24,22 +63,21 @@ module Data.IOMap (
               -- * Inspection
               count, height, 
               -- * Copies and Conversions 
-              copy,
-              toKeyList, toValList, toPairList,
+              copy, copy',
+              toKeyList,  toValList,  toPairList,
+              toKeyList', toValList', toPairList',
               -- * Debugging
               tree2Lines
              )
-              
 where
 
   ----------------------------------------------
   -- todo
-  --  - map?
-  --  - withAll: force - timeout instead?
-  --  - IOMap a k -> IOMap k a
+  --  - count -> IOMap
+  --  - release
   ----------------------------------------------
 
-  import Control.Applicative
+  import Control.Applicative ((<$>))
   import Control.Concurrent
   import System.IO.Unsafe
   import System.Timeout
@@ -50,25 +88,130 @@ where
 
   import Graph
 
-  newtype IOMap a k = IOMap {runTree :: MVar (Tree a k)}
+  {- $map_folds
+
+     There is an (experimental) set of /folds/.
+     Some of them - and this is why they are said to be /experimental/ -
+     could be replaced by 'IOMap' being 'Foldable'.
+     There are basically four kinds of folds:
+
+      * /folds/ on the structure, without using key or value;
+
+      * /folds/ on key without using value;
+
+      * /folds/ on the value wihtout using the key;
+
+      * /folds/ on key-value-pairs.
+
+      For each of these sets of folds,
+      there is the basic fold:
+
+      > fold :: (b -> b -> b) -> b -> IOMap k a -> IO b
+
+      This /fold/ takes a function that transforms two /b/-type arguments
+      into one /b/-type result.
+      The two /b/-inputs corresponds to the two successors of each node.
+      The /b/-argument of fold is just the regular accumulator.
+
+      'count' could be implemented using fold as:
+
+      > count :: IOMap k a -> IO Int
+      > count = fold c 0
+      >  where c l r = 1 + (l + r)
+
+      'height' would be:
+
+      > height :: IOMap k a -> IO Int
+      > height = fold h 0
+      >  where h l r = 1 + max l r
+      
+      In many cases, it may be more convenient to separate
+      the combination of the successors results from the application 
+      of this result to the /main/ fold function.
+      For this reason, a second type of fold is provided:
+
+      > fold2 :: (b -> b) -> (b -> b -> b) -> b -> IOMap k a -> IO b
+
+      This /fold/ is very similar to the /fold/ from 'Foldable'
+      for /monoids/. Note that the combinator (/b -> b -> b/)
+      could be replaced by /mappend/, the accumulator by /mempty/.
+
+      Using 'fold2', 'count' can be implemented, much nicer, as:
+
+      > count :: IOMap k a -> IO Int
+      > count = fold2 (+1) (+) 0
+
+      'height', now, is:
+
+      > height :: IOMap k a -> IO Int
+      > height = fold2 (+1) max 0
+
+      Finally, for each of these variants, 
+      there is a lazy and a strict version, distinguished by /'/.
+
+      All /folds/ perform with /O(n)/.
+      
+  -}
 
   ------------------------------------------------------------------------
-  -- Constructors
+  -- | An IOMap from keys /k/ to values /a/
   ------------------------------------------------------------------------
-  newTree :: (Ord k, Show k) => IO (IOMap a k) 
-  newTree = IOMap <$> newMVar Nil
+  newtype IOMap k a = IOMap {runTree :: MVar (Tree a k)}
 
-  fromList :: (Ord k, Show k) => (a -> a -> IO a) -> [(k, a)] -> IO (IOMap a k)
-  fromList upd l = newTree >>= \t -> (insList t upd $! l) >>= \_ -> return t
+  data THead k a = THead {
+                     thTree  :: Tree a k,
+                     thCount :: Int} -- O(1) for count!
 
   ------------------------------------------------------------------------
-  -- insert
+  -- | Creates an empty IOMap; /O(1)/.
   ------------------------------------------------------------------------
-  insert :: (Ord k, Show k) => IOMap a k -> (a -> a -> IO a) -> k -> a -> IO ()
+  empty :: IO (IOMap k a) 
+  empty = IOMap <$> newMVar Nil
+
+  ------------------------------------------------------------------------
+  -- | Creates an IOMap with a single node /(k, a)/; /O(1)/.
+  ------------------------------------------------------------------------
+  singleton :: k -> a -> IO (IOMap k a)
+  singleton k x = newNode x k >>= \n -> IOMap <$> newMVar n
+
+  ------------------------------------------------------------------------
+  -- | Creates a new IOMap from a list of key-value pairs; 
+  -- /O(n*log n-i), for i = 1 .. n - 1/.
+  ------------------------------------------------------------------------
+  fromList :: (Ord k) => (a -> a -> IO a) -> [(k, a)] -> IO (IOMap k a)
+  fromList upd l = empty >>= \t -> (insList t upd $! l) >>= \_ -> return t
+
+  ------------------------------------------------------------------------
+  -- | Inserts a new key-value pair into an existing 'IOMap'; /O(log n)/.
+  --
+  --   If the key /k/ is already in the map,
+  --   the function /upd/ of type
+  --
+  --   > a -> a -> IO a
+  --
+  --   is used to update the correspondingn value.
+  --   The first argument of the function is the old value,
+  --   the second one is the new value.
+  --
+  --   'insert' may block waiting on other operations to finish.
+  --
+  --   'insert' is always strict.
+  ------------------------------------------------------------------------
+  insert :: (Ord k) => IOMap k a -> (a -> a -> IO a) -> k -> a -> IO ()
   insert t upd k x = modifyMVar_ (runTree t) ins 
     where ins n = inserT n upd k x >>= (\(t',_) -> return $! t')
 
-  insList :: (Ord k, Show k) => IOMap a k -> (a -> a -> IO a) -> [(k, a)] -> IO ()
+  ------------------------------------------------------------------------
+  -- | Maps 'insert' on a list of key-value pairs;
+  --   /O(n * log n-i), for i = 1 .. n - 1/.
+  --
+  --   The /upd/ function is used like in 'insert'.
+  --
+  --   'insList' may block waiting on other operations to finish.
+  --
+  --   'insList' is always strict.
+  ------------------------------------------------------------------------
+  insList :: (Ord k) => IOMap k a -> (a -> a -> IO a) -> [(k, a)] -> IO ()
   insList t upd l = modifyMVar_ (runTree t) (\n -> ins n $! l)
     where ins n [] = return n
           ins n ((k, x):xs) = do
@@ -76,14 +219,28 @@ where
             ins n' xs
 
   ------------------------------------------------------------------------
-  -- delete
+  -- | Deletes the node identified by 'k' from the 'IOMap'; /O(log n)/.
+  --
+  --   'delete' may block waiting on other operations to finish.
+  --
+  --   'delete' is always strict.
   ------------------------------------------------------------------------
-  delete :: (Ord k) => IOMap a k -> k -> IO ()
+  delete :: (Ord k) => IOMap k a -> k -> IO ()
   delete t k = modifyMVar_ (runTree t) del
     where del n = let (t',_) = deleTe n k 
                    in return $! t'
 
-  pop :: (Ord k) => IOMap a k -> k -> IO (Maybe a)
+  ------------------------------------------------------------------------
+  -- | Deletes the node identified by 'k' from the 'IOMap'
+  --   and returns 'Just' its value, if the 'k' was in the map,
+  --   'Nothing' otherwise.
+  --   /O(2 * log n)/.
+  --
+  --   'pop' may block waiting on other operations to finish.
+  --
+  --   'pop' is always strict.
+  ------------------------------------------------------------------------
+  pop :: (Ord k) => IOMap k a -> k -> IO (Maybe a)
   pop t k = lookup k t >>= \mbV ->
     case mbV of
       Nothing -> return Nothing
@@ -96,72 +253,137 @@ where
   -- strict folds, with, withAll
 
   ------------------------------------------------------------------------
-  -- folds
+  -- | Lazy /fold/ ignoring keys and values
   ------------------------------------------------------------------------
-  fold, fold' :: (b -> b -> b) -> b -> IOMap a k -> IO b
+  fold :: (b -> b -> b) -> b -> IOMap k a -> IO b
   fold f acc t = 
     withMVar (runTree t) (return . folT f acc)
 
+  ------------------------------------------------------------------------
+  -- | Strict /fold/ ignoring keys and values
+  ------------------------------------------------------------------------
+  fold' :: (b -> b -> b) -> b -> IOMap k a -> IO b
   fold' f acc t = 
     withMVar (runTree t) (\n -> return $! folT' f acc n)
 
-  fold2, fold2' :: (b -> b) -> (b -> b -> b) -> b -> IOMap a k -> IO b
+  ------------------------------------------------------------------------
+  -- | Lazy, monoid-style /fold/ ignoring keys and values
+  ------------------------------------------------------------------------
+  fold2 :: (b -> b) -> (b -> b -> b) -> b -> IOMap k a -> IO b
   fold2 f combine acc t = 
     withMVar (runTree t) (return . folT2 f combine acc)
 
+  ------------------------------------------------------------------------
+  -- | Strict, monoid-style /fold/ ignoring keys and values
+  ------------------------------------------------------------------------
+  fold2' :: (b -> b) -> (b -> b -> b) -> b -> IOMap k a -> IO b
   fold2' f combine acc t = 
     withMVar (runTree t) (\n -> return $! folT2' f combine acc n)
 
-  foldKey, foldKey' :: Ord k => (k -> b -> b -> b) -> b -> IOMap a k -> IO b
+  ------------------------------------------------------------------------
+  -- | Lazy , /fold/ on keys 
+  ------------------------------------------------------------------------
+  foldKey :: Ord k => (k -> b -> b -> b) -> b -> IOMap k a -> IO b
   foldKey f acc t = 
     withMVar (runTree t) (return . folTKey f acc)
 
+  ------------------------------------------------------------------------
+  -- | Strict, /fold/ on keys 
+  ------------------------------------------------------------------------
+  foldKey' :: Ord k => (k -> b -> b -> b) -> b -> IOMap k a -> IO b
   foldKey' f acc t = 
     withMVar (runTree t) (\n -> return $! folTKey' f acc n)
 
-  foldKey2, foldKey2' :: Ord k => (k -> b -> b) -> (b -> b -> b) -> b -> IOMap a k -> IO b
+  ------------------------------------------------------------------------
+  -- | Lazy, monoid-style /fold/ on keys 
+  ------------------------------------------------------------------------
+  foldKey2 :: Ord k => (k -> b -> b) -> (b -> b -> b) -> b -> IOMap k a -> IO b
   foldKey2 f combine acc t = 
     withMVar (runTree t) (return . folTKey2 f combine acc)
 
+  ------------------------------------------------------------------------
+  -- | Strict, monoid-style /fold/ on keys 
+  ------------------------------------------------------------------------
+  foldKey2' :: Ord k => (k -> b -> b) -> (b -> b -> b) -> b -> IOMap k a -> IO b
   foldKey2' f combine acc t = 
     withMVar (runTree t) (\n -> return $! folTKey2' f combine acc n)
 
-  foldVal, foldVal' :: (a -> b -> b -> IO b) -> b -> IOMap a k -> IO b
+  ------------------------------------------------------------------------
+  -- | Lazy /fold/ on values
+  ------------------------------------------------------------------------
+  foldVal :: (a -> b -> b -> IO b) -> b -> IOMap k a -> IO b
   foldVal f acc t =
     withMVar (runTree t) (folTVal f acc)
 
+  ------------------------------------------------------------------------
+  -- | Strict /fold/ on values
+  ------------------------------------------------------------------------
+  foldVal' :: (a -> b -> b -> IO b) -> b -> IOMap k a -> IO b
   foldVal' f acc t =
     withMVar (runTree t) (\n -> do !n' <- folTVal' f acc n
                                    return n')
 
-  foldVal2, foldVal2' :: (a -> b -> IO b) -> (b -> b -> IO b) -> b -> IOMap a k -> IO b
+  ------------------------------------------------------------------------
+  -- | Lazy, monoid-style /fold/ on values
+  ------------------------------------------------------------------------
+  foldVal2 :: (a -> b -> IO b) -> (b -> b -> IO b) -> b -> IOMap k a -> IO b
   foldVal2 f combine acc t =
     withMVar (runTree t) (folTVal2 f combine acc)
 
+  ------------------------------------------------------------------------
+  -- | Strict, monoid-style /fold/ on values
+  ------------------------------------------------------------------------
+  foldVal2' :: (a -> b -> IO b) -> (b -> b -> IO b) -> b -> IOMap k a -> IO b
   foldVal2' f combine acc t =
     withMVar (runTree t) (\n -> do !n' <- folTVal2' f combine acc n
                                    return n')
 
-  foldPair, foldPair' :: ((k, a) -> b -> b -> IO b) -> b -> IOMap a k -> IO b
+  ------------------------------------------------------------------------
+  -- | Lazy /fold/ on pairs
+  ------------------------------------------------------------------------
+  foldPair :: ((k, a) -> b -> b -> IO b) -> b -> IOMap k a -> IO b
   foldPair  f acc t = withMVar (runTree t) (folTPair f acc)
+
+  ------------------------------------------------------------------------
+  -- | Strict /fold/ on pairs
+  ------------------------------------------------------------------------
+  foldPair' :: ((k, a) -> b -> b -> IO b) -> b -> IOMap k a -> IO b
   foldPair' f acc t = withMVar (runTree t) (\n -> do !n' <- folTPair' f acc n
                                                      return n')
 
-  foldPair2, foldPair2' :: ((k, a) -> b -> IO b) -> (b -> b -> IO b) -> b -> IOMap a k -> IO b
+  ------------------------------------------------------------------------
+  -- | Lazy, monoid-style /fold/ on pairs
+  ------------------------------------------------------------------------
+  foldPair2 :: ((k, a) -> b -> IO b) -> (b -> b -> IO b) -> b -> 
+               IOMap k a -> IO b
   foldPair2 f combine acc t =
     withMVar (runTree t) (folTPair2 f combine acc)
 
+  ------------------------------------------------------------------------
+  -- | Strict, monoid-style /fold/ on pairs
+  ------------------------------------------------------------------------
+  foldPair2' :: ((k, a) -> b -> IO b) -> (b -> b -> IO b) -> b -> 
+                IOMap k a -> IO b
   foldPair2' f combine acc t =
     withMVar (runTree t) (\n -> do !n' <- folTPair2' f combine acc n
                                    return n')
 
-  height :: IOMap a k -> IO Int
+  ------------------------------------------------------------------------
+  -- | Height of the underlying /AVL/ tree; /O(n)/.
+  ------------------------------------------------------------------------
+  height :: IOMap k a -> IO Int
   height = fold2 (+1) max 0
 
-  count :: IOMap a k -> IO Int
+  ------------------------------------------------------------------------
+  -- | Number of nodes in the map; /O(n)/.
+  ------------------------------------------------------------------------
+  count :: IOMap k a -> IO Int
   count = fold2 (+1) (+) 0
 
-  copy :: IOMap a k -> IO (IOMap a k)
+  ------------------------------------------------------------------------
+  -- | Lazy copy; /O(n)/.
+  ------------------------------------------------------------------------
+  copy :: IOMap k a -> IO (IOMap k a)
   copy t = do
     n' <- foldPair mkT Nil t
     t' <- newMVar n'
@@ -180,52 +402,163 @@ where
               nLeft  = l,
               nRight = r}
 
-  toKeyList :: (Ord k) => IOMap a k -> IO [k]
+  ------------------------------------------------------------------------
+  -- | Strict copy; /O(n)/.
+  ------------------------------------------------------------------------
+  copy' :: IOMap k a -> IO (IOMap k a)
+  copy' t = do
+    !n' <- foldPair' mkT Nil t
+    !t' <- newMVar n'
+    return $! IOMap t'
+    where mkT (k, x) l r = do
+            !m <- newMVar x
+            let !lh = folT2 (+1) max 0 l
+            let !rh = folT2 (+1) max 0 r
+            let !b  | lh > rh   = -1
+                    | lh < rh   =  1
+                    | otherwise =  0
+            return $! Node {
+              nKey   = k,
+              nVal   = m,
+              nBal   = b,
+              nLeft  = l,
+              nRight = r}
+
+  ------------------------------------------------------------------------
+  -- | Lazy conversion IOMap into ordered list of key; /O(n)/.
+  ------------------------------------------------------------------------
+  toKeyList :: (Ord k) => IOMap k a -> IO [k]
   toKeyList = foldKey ins []
     where ins k l r = l ++ k:r
 
-  toValList :: IOMap a k -> IO [a]
+  ------------------------------------------------------------------------
+  -- | Strict conversion IOMap into ordered list of key; /O(n)/.
+  ------------------------------------------------------------------------
+  toKeyList' :: (Ord k) => IOMap k a -> IO [k]
+  toKeyList' = foldKey' ins []
+    where ins k l r = l ++ k:r
+
+  ------------------------------------------------------------------------
+  -- | Lazy conversion IOMap into list of values ordered by key; /O(n)/.
+  ------------------------------------------------------------------------
+  toValList :: IOMap k a -> IO [a]
   toValList = foldVal ins []
     where ins x l r = return (l ++ x:r)
 
-  toPairList :: (Ord k) => IOMap a k -> IO [(k,a)]
+  ------------------------------------------------------------------------
+  -- | Strict conversion IOMap into list of values ordered by key; /O(n)/.
+  ------------------------------------------------------------------------
+  toValList' :: IOMap k a -> IO [a]
+  toValList' = foldVal' ins []
+    where ins x l r = return (l ++ x:r)
+
+  ------------------------------------------------------------------------
+  -- | Lazy conversion IOMap into list of key-values pairs ordered by key; 
+  --   /O(n)/.
+  ------------------------------------------------------------------------
+  toPairList :: (Ord k) => IOMap k a -> IO [(k,a)]
   toPairList = foldPair ins []
     where ins (k, x) l r = return (l ++ (k, x):r)
 
   ------------------------------------------------------------------------
-  -- map-like
+  -- | Strict conversion IOMap into list of key-values pairs ordered by key; 
+  --   /O(n)/.
   ------------------------------------------------------------------------
-  withAll :: Bool -> IOMap a k -> (a -> IO a) -> IO ()
-  withAll force t upd = readMVar (runTree t) >>= \n -> wiThAll force n upd
+  toPairList' :: (Ord k) => IOMap k a -> IO [(k,a)]
+  toPairList' = foldPair' ins []
+    where ins (k, x) l r = return (l ++ (k, x):r)
 
   ------------------------------------------------------------------------
-  -- finds and actions on individual nodes
+  -- | Applies an IO action to all values in the map;
+  --   the function may block waiting on other operations to finish.
+  --   But it does not prevent other operations on the map,
+  --   once it has gathered the tree.
+  --   In consequence, the function may continue working 
+  --   on nodes that have been removed from the tree 
+  --   since the function had been started;
+  --   it will also miss all nodes that were added later.
+  --
+  --   The function may block on single values, when
+  --   another operation is currently taking place.
+  --   The 'Int' argument represents a timeout in microseconds
+  --   that limits the duration of one IO action and, hence,
+  --   the blocking time per single value. 
+  --   A negative timeout means \"wait indefinitely\".
+  --   (See 'System.Timeout' for details.)
+  --   Note that, if you need to prevent the timeout
+  --   from interrupting the IO action, 
+  --   you have to take precautions 
+  --   like blocking asynchronous exceptions yourself.
+  --
+  --   /O(n), for n = number of nodes * timeout/.
+  --   Note that there is no traditional /map/,
+  --   because it cannot be implemented with bounded time
+  --   and is hence against the /spirit/ of this library.
   ------------------------------------------------------------------------
-  lookup :: (Ord k) => k -> IOMap a k -> IO (Maybe a)
+  withAll :: Int -> IOMap k a -> (a -> IO a) -> IO ()
+  withAll tmo t upd = readMVar (runTree t) >>= \n -> wiThAll tmo n upd
+
+  ------------------------------------------------------------------------
+  -- | Returns the value of the node with the key /k/; /O(log n)/.
+  --   The function may block waiting on another operation -
+  --   on the map or on the value - to finish.
+  --
+  --   The following two sequences are semantically equal:
+  --
+  --   * One:
+  --
+  --     > lookup k m >>= \mbX -> 
+  --     >   case mbX of
+  --     >     Nothing -> return ()
+  --     >     Just x  -> upd x
+  --
+  --   * Two:
+  --
+  --     > with_ m k upd
+  ------------------------------------------------------------------------
+  lookup :: (Ord k) => k -> IOMap k a -> IO (Maybe a)
   lookup k t = do
     mbX <- withMVar (runTree t) (\n -> return $ finT n k)
     case mbX of
       Nothing -> return Nothing
       Just x  -> Just <$> readMVar x
 
-  with :: (Ord k) => IOMap a k -> k -> (a -> IO (a, b)) -> IO (Maybe b)
+  ------------------------------------------------------------------------
+  -- | Applies the IO action /a -> IO (a, b)/ to the node
+  --   with key /k/ and returns 'Just' the result of the operation;
+  --   if the key is in the map and 'Nothing' otherwise.
+  --   The function may block waiting for another operation to finish.
+  --   But it does not prevent other operations on the map,
+  --   once it has gathered the tree.
+  --   In consequence, the function may continue working 
+  --   on a node that was removed from the tree 
+  --   since the function had been started.
+  --
+  --   /O(log n)/.
+  ------------------------------------------------------------------------
+  with :: (Ord k) => IOMap k a -> k -> (a -> IO (a, b)) -> IO (Maybe b)
   with t k upd = do
-    mbX <- withMVar (runTree t) (\n -> return $ finT n k)
+    mbX <- withMVar (runTree t) (\n -> return $! finT n k)
     case mbX of
       Nothing -> return Nothing
       Just x  -> Just <$> modifyMVar x upd
 
-  with_ :: (Ord k) => IOMap a k -> k -> (a -> IO a) -> IO ()
+  ------------------------------------------------------------------------
+  -- | Variant of 'with' that does not return a value
+  ------------------------------------------------------------------------
+  with_ :: (Ord k) => IOMap k a -> k -> (a -> IO a) -> IO ()
   with_ t k upd = do
-    mbX <- withMVar (runTree t) (\n -> return $ finT n k)
+    mbX <- withMVar (runTree t) (\n -> return $! finT n k)
     case mbX of
       Nothing -> return ()
       Just x  -> modifyMVar_ x upd
 
   ------------------------------------------------------------------------
-  -- Debug
+  -- | Creates /lines/ between nodes with key and balance 
+  --   that can be visualised using the /op/ program,
+  --   which, in its turn, uses the SOE library.
   ------------------------------------------------------------------------
-  tree2Lines :: Show k => IOMap a k -> GPoint -> Int -> IO [GLine]
+  tree2Lines :: Show k => IOMap k a -> GPoint -> Int -> IO [GLine]
   tree2Lines t sp len = withMVar (runTree t) (treE2lines sp len) 
 
   ------------------------------------------------------------------------
@@ -291,7 +624,8 @@ where
   folTKey' f acc t =
     let !fl = folTKey' f acc (nLeft  t)
         !fr = folTKey' f acc (nRight t)
-     in f (nKey t) fl fr
+        !r  = f (nKey t) fl fr
+     in r
 
   folTKey2, folTKey2' :: Ord k => (k -> b -> b) -> (b -> b -> b) -> b -> Tree a k -> b
   folTKey2 _ _ acc Nil = acc
@@ -381,13 +715,12 @@ where
     mapT f (nLeft  n) 
     mapT f (nRight n) 
 
-  wiThAll :: Bool -> Tree a k -> (a -> IO a) -> IO ()
+  wiThAll :: Int -> Tree a k -> (a -> IO a) -> IO ()
   wiThAll _ Nil _ = return ()
-  wiThAll force n upd = do
-    if force then modifyMVar_ (nVal n) upd
-             else timeout 100 (modifyMVar_ (nVal n) upd) >>= \_ -> return ()
-    wiThAll force (nLeft  n) upd
-    wiThAll force (nRight n) upd
+  wiThAll tmo n upd = do
+    wiThAll tmo (nLeft  n) upd
+    _ <- timeout tmo (modifyMVar_ (nVal n) upd) 
+    wiThAll tmo (nRight n) upd
 
   finT :: (Ord k) => Tree a k -> k -> Maybe (MVar a)
   finT Nil _ = Nothing
@@ -400,7 +733,7 @@ where
                          Nothing -> Nothing
                          Just x  -> Just x
 
-  inserT :: (Ord k, Show k) => Tree a k -> (a -> a -> IO a) -> k -> a -> IO (Tree a k, Bool)
+  inserT :: (Ord k) => Tree a k -> (a -> a -> IO a) -> k -> a -> IO (Tree a k, Bool)
   inserT Nil _ k x = do !n <- newNode x k
                         return (n, True)
   inserT n upd k x = 
@@ -412,7 +745,7 @@ where
   updVal :: (a -> a -> IO a) -> Tree a k -> a -> IO ()
   updVal upd n x = modifyMVar_ (nVal n) (`upd` x)
 
-  nInsert :: (Ord k, Show k) => 
+  nInsert :: (Ord k) => 
              -- the kid where I am inserting
              (Tree a k -> Tree a k)             -> 
              -- the other kid 
@@ -566,7 +899,7 @@ where
              t   -> treeToLisT t
     return  (cns ++ v : cdr)
 
-  showTree :: Show k => IOMap a k -> IO ()
+  showTree :: Show k => IOMap k a -> IO ()
   showTree t = withMVar (runTree t) (showTreE "")
 
   showTreE :: Show k => String -> Tree a k -> IO ()

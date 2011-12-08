@@ -44,7 +44,7 @@ module Main where
                     "del" -> (Del i, unwords $ tail r)
                     _     -> error $ "not an op: " ++ o
 
-  applyOp :: T.IOMap () Int -> Op -> IO ()
+  applyOp :: T.IOMap Int () -> Op -> IO ()
   applyOp t op  =
     case op of
       Ins i -> T.insert t upd i ()
@@ -66,9 +66,9 @@ module Main where
     ls <- T.tree2Lines t startPoint startLength 
     drawLines ls
 
-  buildTree :: [Int] -> IO (T.IOMap () Int)
+  buildTree :: [Int] -> IO (T.IOMap Int ())
   buildTree ns = do
-    t <- T.newTree
+    t <- T.empty
     mapM_ (\k -> T.insert t upd k ()) ns
     return t
     where upd _ = return
