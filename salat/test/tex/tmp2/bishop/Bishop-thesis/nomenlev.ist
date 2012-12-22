@@ -1,0 +1,21 @@
+keyword      "\\nomentry"
+%preamble    "\\begin{thenomenclature} \n"%
+%postamble   "\n\n\\end{thenomenclature}\n" group_skip "\n"
+preamble     "\\nompreamble%"
+postamble    "\n\\nompostamble%\n"
+delim_0      ""
+item_0       "\n\\nomitem{"
+group_skip   "\n\\nomskip"
+encap_prefix "} %"
+encap_infix  ""
+encap_suffix ""
+
+%% The next lines will produce some warnings when
+%% running Makeindex as they try to cover two different
+%% versions of the program:
+%lethead_prefix "\n \\nomgroup{"
+%lethead_suffix "}\n"
+%lethead_flag   1
+heading_prefix "\n\\nomgroup{"
+heading_suffix "}"
+headings_flag  1 

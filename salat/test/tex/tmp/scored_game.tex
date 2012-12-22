@@ -1,0 +1,51 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Wrapper to produce a single file showing the scored game in
+% scorecard.mp.
+%
+% To use:
+%   $ mpost scorecard.mp
+%   $ mptopdf scorecard.1
+%   $ mptopdf scorecard.2
+%   $ pdftex scored_game.tex
+%
+% If you just want a blank scorecard:
+%   replace {scorecard-1.pdf} and {scorecard-2.pdf} with
+%       {scorecard-0.pdf} below
+%   $ mpost scorecard.mp
+%   $ mptopdf scorecard.0
+%   $ pdftex scored_game.tex
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Code Copyright (C) 2005, Christopher Swingley
+% Licensed under the terms of the GNU General Public Licence Version 2
+%
+% Please see the comments at the beginning of the scorecard.mp Metapost
+% file.
+%
+% contact cswingle@iarc.uaf.edu for more information or corrections
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+\pdfinfo
+  { /Creator        (Metapost, TeX)
+    /Author         (Christopher Swingley) }
+\pdfpagesattr
+  { /Rotate 90 }
+\input miniltx
+\input graphicx.sty
+\input eplain
+\resetatcatcode
+\paperheight 11 true in
+\paperwidth 8.5 true in
+\topmargin 0.75cm
+\bottommargin 0.75cm
+\leftmargin 1.20cm
+\rightmargin 0.55cm
+\nopagenumbers
+\parindent=0pt\parskip=8pt
+\vfill
+% Comment out the following two lines to get a single sided card
+\includegraphics[height=\hsize,angle=90]{scorecard-1.pdf}
+\vfill\eject
+\includegraphics[height=\hsize,angle=90]{scorecard-2.pdf}
+\vfill\eject
+\bye

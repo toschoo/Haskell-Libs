@@ -1,0 +1,288 @@
+% Preamble is a separate file not to clog the main thesis file and to allow precompiling a tex dump eg by latexdaemon
+%\RequirePackage[error]{snapshot}[2002/03/05 v1.14]
+\RequirePackage{fix-cm} % mostly fixes for cm-super
+\input{draftfinal.tex} % separate file cos it's gonna change frequently
+\documentclass[fleqn,russian,USenglish,\classoptions,\draftfinal]{book}
+\usepackage{ifdraft}
+%\input{Bishop-thesis.in-dep} % for \usepackage{snapshot}
+% improved hyphenation for American:
+\usepackage[USenglish=usenglishmax,russian=nohyphenation]{hyphsubst}
+\usepackage[OT2,T1]{fontenc} % OT2:cyrillic, T1:accents
+% Read the package docs for how to install MinionPro font. Or steal my local tree.
+\typeout{:?111101111}% <winedt-ignore-warnings>
+\usepackage[mathlf,opticals,fullfamily,openg]{MinionPro} % or [lf]? [footnotefigures]? others?
+%\usepackage[mathlf,openg]{MinionPro} % for arxiv?
+%\usepackage[osf]{mathpazo}\usepackage{fontaxes} % for arxiv?
+\typeout{:?111111111}% </winedt-ignore-warnings>
+% Nature uses Whitney from Hoefler and Frere-Jones as the sans serif...
+% I like Optima, there's a package for latex, but it doesn't print well on laser printers (could use it for lulu, but I don't):
+%\renewcommand*\sfdefault{uop}
+%I use Helvetica for headings, latin modern sans for everything else....
+%\usepackage[scaled]{helvet}
+\renewcommand{\sfdefault}{lmss} % use latin modern sans as sans serif font
+%\SetMathAlphabet{\mathsf}{normal}{OT1}{lmss}{m}{n} % use latin modern sans for maths
+\renewcommand{\ttdefault}{lmtt} % use latin modern for tt-font
+
+\makeatletter\newcommand{\inffig}{\@inferior@fig}\makeatother
+\usepackage[toc]{tabfigures} % [enum,eqno]? [debug] to check
+\usepackage{eucal}      % ams \mathcal{}, prettier, a little too light maybe?
+%\usepackage[ansinew]{inputenc}  % To allow ansi chars in the tex input
+\usepackage{pifont}     % for ornaments
+\usepackage{babel}      % after fontenc and inputenc
+\usepackage{fixltx2e}   % most relevant: fix for bottom margin w/equations @ page end
+\renewcommand{\eminnershape}{\sscshape} % emph inside emph we do with small caps.
+\usepackage{ragged2e}   % load early, so things pick it up. [newcommands] to replace old ver
+\usepackage{amsmath}    % amsmath equation env has funny spacing with hyperref :-( so...
+\let\equation\gather \let\endequation\endgather
+\usepackage{revsymb4-1,bm} % bm after loading fonts (minionpro)
+% override revsymb \openone with pazo:
+\DeclareMathAlphabet\PazoBB{U}{fplmbb}{m}{n} \renewcommand{\openone}{{\PazoBB 1}}
+\usepackage{eqparbox}
+\usepackage{nomenlev}\makenomen
+\usepackage[rgb]{xcolor} % or [cmyk] for journals
+\usepackage[final]{graphicx}
+    % \let\oldig=\includegraphics \renewcommand{\includegraphics}{\oldig[draft]}% force non-inclusion of graphics
+\usepackage{url}
+\usepackage[sort&compress,mcite]{natbib}
+\usepackage{bibentry}   % for permissions
+%choose cite formatting:
+\renewcommand*{\citenumfont}[1]{\liningfigures{#1}} % oldstyle looks wrong to me in brackets.
+\citestyle{plain}           % numbers in square brackets
+%\citestyle{nature}         % superscript.
+%choose a number formatting for the biblist:
+\renewcommand*{\bibnumfmt}[1]{\eqparbox[t]{bblnm}{\hfill#1.}}
+%\renewcommand*{\bibnumfmt}[1]{\figureversion{lf,tab}{[#1]}}
+%\renewcommand*{\bibnumfmt}[1]{\figureversion{tab}{#1.}}
+\usepackage{mathtools}      % fix amslatex, provide \smashoperator, \cramped, \adjustlimits
+\usepackage{bibunitsLSB}    % a problematic package. maybe matters whether before/after natbib?
+\usepackage[final]{pdfpages}
+\usepackage[mainaux,starttoc,partaux]{rerunfilecheck}
+
+% Directory structure organization
+%\usepackage{import} % directory-local importing
+\graphicspath{{figures/}}
+% Either include graphics files directly:
+%\let\levincludegraphics\includegraphics
+%...or take them from pages of a merged (and possibly optimized) file:
+\input{figures/figinput.tex}
+\newcommand*{\levincludegraphics}[1]{\includegraphics[page=\csname #1.pdfpage\endcsname]{\incfigurefile}}
+%\renewcommand{\incfigurefile}{figures/merged-pso-bwdk.pdf} % for lulu b/w version. Converted with acrobat...
+
+% Thesis-specific formatting
+\ifdblspc\usepackage{setspace} % before geometry, so that heightrounded works right.
+\else
+\newenvironment{singlespace}{}{}
+\newenvironment{singlespace*}{}{}
+\fi
+\usepackage[\geomoptions]{geometry} % showframe?
+\usepackage{tocbibind} % put things in the table of contents.
+\usepackage[perpage,marginal,bottom,symbol,splitrule]{footmisc} % must load after setspace
+\ifdblspc\addtolength{\footnotesep}{6pt} % GAS wants double-spacing between footnotes
+\else\addtolength{\footnotesep}{3pt}\fi
+% I prefer 6-pointed asterisks from computermodern to MnSymbol's 5-pointed:
+\DefineFNsymbolsTM*{bishop3}{%
+    {\fontfamily{lmr}\selectfont\textasteriskcentered}{\fontfamily{lmr}\selectfont *}%
+    \textdagger     \dagger
+    \textdaggerdbl  \ddagger
+    \textsection    \mathsection
+    \textbardbl     \|%
+    \textparagraph  \mathparagraph
+}%
+\setfnsymbol{bishop3}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% FORMATTING
+% I have lots of big figures, so allow pages with only a few lines of text
+\renewcommand{\topfraction}{0.9}
+\renewcommand{\bottomfraction}{0.6}
+\setcounter{topnumber}{2}
+\setcounter{bottomnumber}{2}
+\setcounter{totalnumber}{2}
+\renewcommand{\textfraction}{0.07}
+\renewcommand{\floatpagefraction}{0.7}
+\renewcommand{\dblfloatpagefraction}{0.7}
+% flushbottom is in principle better than raggedbottom for twoside, but my life is too short to try to make this kind of document (lots of figures, section headings, equations) layout properly in LaTeX with flushbottom. the stretchy topskip is a trick to get (slightly) better pagebreaks:
+\widowpenalty=10000 \raggedbottom  \addtolength{\topskip}{0pt plus 10pt}
+\usepackage{fnbreak}% warn about footnotes broken across pages, or:
+%\interfootnotelinepenalty=10000 % ...prevent split footnotes completely
+\usepackage{sectsty} % load before fncychap
+\sectionfont{\fontfamily{phv}\fontseries{m}\fontsize{15}{17}\selectfont}
+\subsectionfont{\fontfamily{phv}\fontseries{m}\fontsize{13}{15}\selectfont}
+\usepackage[Sonny]{fncychap} % only Sonny works?
+    \ChNameVar{\Large\fontfamily{phv}\selectfont}
+    \ChTitleVar{\Large\fontfamily{phv}\selectfont}
+\usepackage{emptypage} % no page numbers or headers on empty pages
+\usepackage[font={small},labelfont={bf},margin=15pt]{caption} % load after babel. also replaces hypcap.
+\usepackage{threeparttable}
+\usepackage{booktabs}
+%\usepackage{csquotes}
+\usepackage{textcase}
+\usepackage{fancyhdr}
+\DeclareRobustCommand*{\sclspaced}[1]{\textssc{\MakeTextLowercase{#1}}}
+\DeclareRobustCommand*{\scuspaced}[1]{\textssc{\MakeTextUppercase{\liningfigures{#1}}}}
+\fancyhf{}
+\setlength{\unitlength}{22mm}
+\newcommand{\doblob}{\rule[-.1\unitlength]{2\unitlength}{.5\unitlength}}
+\newcommand{\rblob}{%
+    \begin{picture}(0,0)
+        \put(1.05,-\value{thumbcount}){\blob}
+    \end{picture}}
+\newcommand\lblob{%
+    \begin{picture}(0,0)
+        \put(-3.05,-\value{thumbcount}){\blob}
+    \end{picture}
+}
+\newcounter{thumbcount}
+\makeatletter
+\newcommand\overview{}
+\newcommand*{\listofthumbs}{%
+    \cleardoublepage
+    \thispagestyle{overview}%
+    \@starttoc{thb}
+    \mbox{}\newpage}
+\makeatother
+\newcommand*{\thumbwrite}[2]{\addtocontents{thb}{\string\thumbitem{#1}{#2}}}
+\newcommand*{\thumbitem}[2]{\expandafter\gdef\expandafter\overview\expandafter{\overview
+    \begin{picture}(0,0)
+        \put(0.75,-#2){\llap{\Large{#1}}}
+        \put(1.05,-#2){\doblob}
+    \end{picture}}}
+\newcommand*{\thumb}[1]{%
+    \let\blob=\doblob
+    \stepcounter{thumbcount}%
+    \thumbwrite{#1}{\arabic{thumbcount}}}
+\newcommand*{\nothumb}{\let\blob=\relax}
+\nothumb
+\newcounter{lframe}
+\newcounter{rframe}
+\pagestyle{fancy} % use the fancy header
+\headfoot
+%%%    %\pagestyle{headings} % use ordinary header
+% Chapter headings in the list of figures:
+\newcommand{\lofchap}[1]{%
+    \addtocontents{lof}{\protect\addvspace{-10pt}}% Undo the unconditional 10pt skip from latex
+    \addcontentsline{lof}{lofchapter}{\protect\numberline{\thechapter}#1}%
+}
+\makeatletter
+    \newcommand*\l@lofchapter[2]{%
+    \addpenalty{-\@highpenalty}%
+    \vskip 1.0em \@plus\p@
+    \setlength\@tempdima{1.5em}%
+    \begingroup
+    \parindent \z@ \rightskip \@pnumwidth
+    \leavevmode \bfseries
+    \advance\leftskip\@tempdima
+    \hskip -\leftskip
+    #1\nobreak\par
+    \penalty\@highpenalty
+    \endgroup}
+\makeatother
+\ifdropcaps
+\usepackage{lettrine}  % dropped capitals. doesn't work so well with doublespacing?
+    %\renewcommand{\LettrineTextFont}{\sscshape}
+    \renewcommand{\DefaultLhang}{0.1}
+    \renewcommand{\DefaultOptionsFile}{\lettrineconffile}
+\fi
+    \providecommand*{\lettrine}[3][blah]{#2#3} % if we don't use
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% VERSIONING/CHANGE TRACKING
+\usepackage[shadow,obeyDraft,colorinlistoftodos,textsize=small]{todonotes}
+\usepackage{fixme}
+\newcommand*\levFXtodo[3]{\todo[caption={#2}]{\begin{singlespace}#2\end{singlespace}}}
+\FXRegisterLayout*[marginclue,marginnote,margin]{todo}{\levFXtodo}
+\fxsetup{todo}
+%\newcommand{\FXUser}[2]{\todo[caption={#2}]{\begin{singlespace}#2\end{singlespace}}}
+\newcommand*{\xxx}[1]{\fxnote{#1}}
+\newcommand*{\fixmelist}{\listoffixmes} % or listoftodos (nice color, missing figures)
+% svn-multi tracks revs of all the files (even graphics files), makes a nice table. (Set the 'svn:keywords' property on files to include 'Id')
+%I don't have the energy to make it work for the preamble, bibliography, figures, etc
+\usepackage[subgroups,table]{svn-multi} % [autokw] doesn't work for me :-(
+\svnid{$Id: preamble.tex 474 2010-07-23 01:07:53Z lsb $}%
+\usepackage[iso]{datetime}\let\thistime=\currenttime
+\usepackage[time]{prelim2e} % uses draft/final. Puts date footer. Time also with [scrtime], now broken...
+\renewcommand*{\PrelimWords}{Preliminary version -- svn: r\svnrev}
+% Must be after natbib.
+\ifdraft{%
+\usepackage{ocg}
+\newcommand*{\showkeyslabelformat}[1]{%
+    \begin{ocg}{labels}{lab}{1}\fbox{\normalfont\small\ttfamily#1}\end{ocg}}
+\usepackage[color,notref,notcite]{showkeys} % notref for cleverref compat
+\makeatletter
+\def\SK@@ref#1>#2\SK@{%
+    \leavevmode\vbox to\z@{%
+        \begin{ocg}{references}{refs}{0}%
+        \vss
+        \SK@refcolor
+        \rlap{\vrule\raise .75em%
+            \hbox{\underbar{\normalfont\footnotesize\ttfamily#2}}}%
+        \end{ocg}}}%
+\makeatother
+}{} % ifdraft
+
+%%%%%%%%%%%%%%%%%%%%%%
+%% MICROTYPOGRAPHY
+\usepackage[babel,final]{microtype} % must come after babel. uses draft/final. [selected]?
+%\usepackage{addlines} % replace \enlargethispage: fine tuning once everything else is done
+% see also \looseness=-1, \needspace, etc
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% HYPERLINKS/PDF
+%% these packages must come last:
+\PassOptionsToPackage{final,\hyperoptions hyperfootnotes=false,linktoc=all,pagebackref}{hyperref}
+\usepackage[a-1b]{pdfxLSB} % some bugs fixed/worked around by me. don't forget to update .xmpdata
+\let\oldphantomsection\phantomsection
+%%\let\phantomsection\relax% XXX To fixup tocbibind
+% Set up back references:
+    \backrefparscanfalse
+    \newcommand{\backrefnotcitedstring}{\relax}%(Not cited.)
+    \newcommand{\backrefcitedsinglestring}[1]{Cited on page~#1.}
+    \newcommand{\backrefcitedmultistring} [1]{Cited on pages~#1.}
+    \AtBeginDocument{% to override babel
+        \renewcommand{\backreftwosep}{~\&~}    % seperate 2 pages
+        \renewcommand{\backreflastsep}{~\&~}} % seperate last of longer list
+    \renewcommand*{\backref}[1]{}  % Disable standard
+    \renewcommand*{\backrefalt}[4]{% Detailed backref
+      \ifcase #1\backrefnotcitedstring%
+      \or\backrefcitedsinglestring{#2}%
+      \else\backrefcitedmultistring{#2}%
+      \fi}
+    % backrefentrycount broken with my hacked natbib.sty
+    %    \renewcommand*{\backrefentrycount}[2]{%
+    %        #1%
+    %        \ifnum#2>1 %
+    %        ~(#2)%
+    %        \fi
+    %    }
+    %\makeatletter\long\def\backrefxxx#1#2#3{\hyperlink{page.#1}{\inffig{#1}}}\makeatother
+% MnSymbol \textasteriskcentered isn't centered. Fix here because hyperref redefines:
+%\renewcommand{\textasteriskcentered}{$*$} % fix Minion, but this is incompatible with bishop3 footnotes, above
+
+% \usepackage[tight]{minitoc} % after hyperref
+
+\usepackage[english]{cleveref} % after hyperref
+\crefname{equation}{}{equations}
+\crefname{figure}{figure}{figures}
+\crefformat{equation}{(#2#1#3)}
+\Crefformat{equation}{Equation~(#2#1#3)}
+\crefformat{appendix}{#2appendix~#1#3}
+\Crefformat{appendix}{#2Appendix~#1#3}
+\crefformat{chapter}{#2chapter~#1#3}
+\Crefformat{chapter}{#2Chapter~#1#3}
+\crefformat{section}{#2section~#1#3}
+\Crefformat{section}{#2Section~#1#3}
+\crefformat{figure}{#2figure~#1#3}
+\Crefformat{figure}{#2Figure~#1#3}
+\crefformat{table}{#2table~#1#3}
+\Crefformat{table}{#2Table~#1#3}
+
+% controversial: cancel resetting page numbers at end of \frontmatter, for easier pdf navigation:
+\iflulu\else
+\makeatletter
+\def\pagenumbering#1{\gdef\thepage{\csname @#1\endcsname \c@page}}
+\makeatother
+\fi
+
+\input{macros.tex} % shared so that psfrag for figures can use it
+%\usepackage{levgrid}%GGG My grid package don't work; don't use it.
+%\dump

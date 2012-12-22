@@ -1,0 +1,19 @@
+\newcommand{\abc}{5}
+\newcommand{\xyz}[2][x]{%
+#1 + #2%
+}
+\renewcommand{%
+\phi%
+}{%
+\theta%
+}
+% comment
+\newcommand{\aaa}{\b{2}}
+\renewcommand{\phi}{\aaa}
+\newcommand{\b}[1]{#1}
+
+\phi
+\abc
+\xyz[y] {3}
+\xyz 3
+\xyz \alpha

@@ -1,0 +1,24 @@
+This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdftex 2012.5.21)  25 OCT 2012 22:08
+entering extended mode
+ %&-line parsing enabled.
+**ShowcaseCircular.tex
+(./ShowcaseCircular.tex [1{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}]
+Memory usage before: 3420&11159; after: 215&9125; still untouched: 2976815
+ ) 
+Here is how much of TeX's memory you used:
+ 7 strings out of 495585
+ 199 string characters out of 1169905
+ 23185 words of memory out of 3000000
+ 1461 multiletter control sequences out of 15000+50000
+ 14794 words of font info for 50 fonts, out of 3000000 for 9000
+ 849 hyphenation exceptions out of 8191
+ 6i,4n,0p,735b,26s stack positions out of 5000i,500n,10000p,200000b,50000s
+</usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmbx10.pfb></usr/sha
+re/texmf-texlive/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texmf-tex
+live/fonts/type1/public/amsfonts/cm/cmtt10.pfb>
+Output written on ShowcaseCircular.pdf (1 page, 50657 bytes).
+PDF statistics:
+ 18 PDF objects out of 1000 (max. 8388607)
+ 0 named destinations out of 1000 (max. 500000)
+ 1 words of extra memory for PDF output out of 10000 (max. 10000000)
+

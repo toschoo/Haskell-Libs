@@ -1,0 +1,1276 @@
+% ===============================================================
+% Frederic Lamy and Tobias Schoofs:
+% Industry Use Cases for the 
+% Java Environment for Parallel Realtime Development 
+% JTRES 2011
+% ===============================================================
+
+\documentclass{sig-alternate}
+
+\newcommand{\acronym}[1]{\textsc{#1}}
+\newcommand{\term}[1]{\textit{#1}}
+\newcommand{\eg}{\textit{e.g.}}
+\newcommand{\ie}{\textit{i.e.}}
+\newcommand{\etc}{\textit{etc.}}
+
+\usepackage[english, german, portuguese]{babel}
+\usepackage[utf8x]{inputenc} 
+\usepackage[T1]{fontenc} 
+\usepackage{amsfonts}
+\usepackage{graphicx}
+%\usepackage{caption}
+
+\begin{document}
+%
+% --- Author Metadata here ---
+\conferenceinfo{JTRES 2011}{September 26-28, 2011, York, UK}
+\CopyrightYear{2011} % Allows default copyright year (20XX) to be over-ridden - IF NEED BE.
+\crdata{978-1-4503-0731-4I/11/09} % Allows default copyright data (0-89791-88-6/97/05) to be over-ridden - IF NEED BE.
+% --- End of Author Metadata ---
+
+\title{Industry Use Cases for the Java Environment for Parallel Realtime Development}
+
+\numberofauthors{2} %  in this sample file, there are a *total*
+% of EIGHT authors. SIX appear on the 'first-page' (for formatting
+% reasons) and the remaining two appear in the \additionalauthors section.
+%
+\author{
+% You can go ahead and credit any number of authors here,
+% e.g. one 'row of three' or two rows (consisting of one row of three
+% and a second row of one, two or three).
+%
+% The command \alignauthor (no curly braces needed) should
+% precede each author name, affiliation/snail-mail address and
+% e-mail address. Additionally, tag each line of
+% affiliation/address with \affaddr, and tag the
+% e-mail address with \email.
+%
+% 1st. author
+\alignauthor
+Frederic Lamy\\
+       \affaddr{Cassidian Electronics, an EADS Company}\\
+       \affaddr{Woerthstrasse 85}\\
+       \affaddr{89077 Ulm, Germany}\\
+       \email{frederic.lamy@cassidian.com}
+% 2nd. author
+\alignauthor
+Tobias Schoofs\\
+       \affaddr{GMV, Portugal}\\
+       \affaddr{Av. D. João II, Lote 1.17.02}\\
+       \affaddr{Torre Fernão Magalhães - 7º}\\
+       \affaddr{1998-025 Lisboa, Portugal}\\
+       \email{tobias.schoofs@gmv.com}
+}
+\date{25 June 2011}
+
+\maketitle
+\begin{abstract}
+Multicore systems have become standard on desktop computers today
+and current operating systems and software development tools
+provide means to actually use 
+the additional computational power efficiently.
+A more fundamental change, however, is required
+to fully exploit the power of multicore systems.
+Furthermore, the fast growing market of embedded systems,
+up to now, is much less affected 
+by the introduction of parallel technologies.
+This is already changing quickly today. 
+Tools for efficient development 
+of reliable embedded software are demanded. 
+This is in particular true for tools
+that are able to guarantee hard real-time requirements.
+
+The \acronym{jeopard} project has addressed these demands 
+by developing software tools to exploit multicore power
+while ensuring correctness and predictable timing.
+
+In this paper, we will present the industrial use cases
+that have been developed in the scope of \acronym{jeopard}
+to validate the tools against requirements
+from real-world industry examples.
+The first use case is a radar application 
+developed at Cassidian in Ulm, Germany,
+where hard real-time requirements and 
+demanding performance requirements
+had to be met;
+the second is an avionics application 
+developed at \acronym{gmv} in Lisbon, Portugal,
+where hard real-time requirements and
+strict safety constraints had to be addressed.
+\end{abstract}
+
+% A category with the (minimum) three required fields
+% \category{Industrial experience}{High-integrity and safety-critical system support}{Java-based real-time operating systems and processors}
+%A category including the fourth, optional field follows...
+\terms{Software Engineering, Design, Reliability, Experimentation, Standardization, Verification, Performance}
+
+\keywords{Java, RTSJ, safety-critical real-time systems, radar processing, avionics}
+
+\section{Introduction}
+%Multicore Symmetric Multiprocessor Systems (\acronym{smp}) have
+%become standard for desktop computers today and current
+%operating systems and software development tools provide
+%means to actually use this additional computing power. Increasingly,
+%embedded systems are being proposed and built using multicore
+%systems, \eg\ mobile phones. Future embedded systems
+%may well exploit more complex multicore architectures such
+%as \acronym{numa} (Non-Uniform Memory Architecture) and NoC
+%(Network-on-Chip).
+
+Increasing demands are made on 
+embedded systems and greater reliance will be placed on the
+delivery of their services. More and more of these systems
+will become high-integrity systems whose failure can cause
+loss of life, environmental harm, or significant financial loss.
+The increasing demand on the processing power for the
+ever growing complexity of services delivered by embedded systems
+can only be met by the use of multicore systems. In addition to
+desktop systems, embedded systems have requirements
+on predictable timing behaviour and safety-criticality.
+
+The \acronym{jeopard} project has addressed these challenges
+by implementing tools for development and execution 
+of Real-Time Java applications running on multicore hardware.
+The project integrated an execution environment 
+(a real-time operating system (\acronym{rtos}) and
+a real-time Java \acronym{vm})
+as well as analysis, verification and debugging tools.
+
+The \acronym{jeopard} project has been conducted by a consortium
+of research institutes 
+(Forschungszentrum Informatik (\acronym{fzi}), 
+ Karlsruhe, Germany, 
+ the Technical University at Cluj-Napoca, Romenia 
+ the University of York, UK,
+ the Technical University of Vienna, Austria and
+ the Technical University of Denmark, Copenhagen),
+tool vendors 
+(aicas, Karlsruhe, Germany and
+ \acronym{sysgo}, Mainz, Germany)
+ and embedded system developers 
+(RadioLabs, Rome, Italy, 
+ Cassidian, Ulm, Germany and
+ \acronym{gmv}, Lisbon, Portugal)
+and was led by The Open Group.
+The project was funded by the European Commission
+through the $7^{th}$ Framework Programme.
+ 
+The main strategic objective of the \acronym{jeopard} project was
+to provide the tools for platform-independent development
+of predictable systems that make use 
+of \acronym{smp} multicore platforms \cite{WhitePaper,sie:09}.
+These tools will enhance the software productivity
+and   by extending technology that is established
+on desktop system by the specific needs of multicore embedded
+systems. 
+
+An important part of the project was dedicated to the evaluation
+of the proposed tools by means of real-world industrial applications
+from different domains.
+From these experience, lessons learnt were drawn 
+to better understand the needs of the embedded systems industry.
+
+\enlargethispage*{100cm}
+The rest of the paper is organised as follows.
+In section \ref{sec:over}, we will provide 
+a short overview of the \acronym{jeopard} platform.
+In section \ref{sec:obj}, we will define
+the use case objectives. 
+In sections \ref{sec:radar} and \ref{sec:aoc},
+we will discuss the use cases in more detail.
+Both sections will present the lessons learnt during the experiments.
+We will focus on those findings that are related
+to the challenges addressed by the \acronym{jeopard} project,
+\ie\ use of multicore for embedded systems.
+Finally, in section \ref{sec:conc}, we draw some conclusions.
+\clearpage
+
+\section{Overview of the JEOPARD Platform}\label{sec:over}
+%For embedded real-time systems to profit from the additional
+%computation power means a change in the way software
+%is created \cite{sie:09}. Traditionally, there is one control task on
+%a processing node; with such a design, performance cannot be improved
+%by simply distributing tasks among the cores. But
+%rather the task itself must be parallelised. This requires a
+%fundamental change in how the programmers create real-time
+%control software. Time-critical tasks need to be restructured
+%to enable parallel execution, and the resulting
+%parallel actions have to be mapped to the set processors.
+
+%In real-time software development on single core systems,
+%it is always clear that the highest priority thread runs and
+%has full and immediate access to all resources in the system.
+%On a multicore system, however, a second lower priority
+%thread may run and compete for other resources in the
+%system; in consequence, actual throughput might go down due to
+%lock contention. New classes of failures appear and some
+%of these, like data race-conditions, move from a mere
+%theoretical possibility to actual faults that crash systems at
+%runtime.
+
+%An opportunity provided by multicore systems is to
+%distribute functionalities 
+%over the available cores
+%that used to run on a single processor.
+%Previously having one node
+%exclusively execute one functionality, guaranteed quality of
+%service at a fundamental level. The integration of several
+%functional task on one multicore system must ensure at least
+%the same quality of service. The user must be able to model
+%the requirements for functionalities and enforce these under
+%all circumstances. Multicore systems may relax the situation
+%by adding new processing resources and means 
+%that allow distributing services over sets of processor cores.
+
+The \acronym{jeopard} platform addresses the challenges 
+raised by multicore platforms on different layers:
+
+\begin{itemize}
+\item The \acronym{cpu} Architecture Layer
+
+The basis of a multicore architecture is a Chip Multiprocessor
+(\acronym{cmp}). The \acronym{jeopard} project considered three
+basic variants of a \acronym{cmp} to support Java programs targeted
+at multicore platforms:
+\begin{enumerate}
+\item \acronym{smp} a symmetric arrangement of conventional processors,
+as typified by Pentium class multicore \acronym{cpu}s.
+
+\item Multi-\acronym{jop} -- a number of hardware Java processors
+with some shared memory (based upon the Java processor
+\acronym{jop} \cite{pit, jop}).
+
+\item \acronym{numa} -- to incorporate future architectures, including
+those with substantial field-programmable elements.
+\end{enumerate}
+
+For all architectures, the project developed efficient support
+for higher level \acronym{os} and Java based services. In particular,
+specific services for synchronisation, sche\-du\-ling support
+and deterministic automatic memory management. 
+
+Whereas the \acronym{smp} architecture is addressed by 
+all layers, including \acronym{os} and the \acronym{vm} layer, 
+the multi-\acronym{jop} architecture does not need 
+these layers. Java programs are executed 
+directly on the \acronym{jop} hardware
+without the need for an \acronym{os} or \acronym{vm}.
+
+\item The \acronym{os} Layer
+
+The \acronym{os} layer implements resource allocation mechanisms
+used by applications either at run time or at design time.
+In the \acronym{jeopard} platform, the \acronym{os} 
+hosts higher level run-time environments, such as Java \acronym{vm}s. 
+It, thus, strengthens the idea of virtualisation
+and the independence between hardware and software 
+as one of the key ideas in modern software development.
+
+One of the consequences is that the \acronym{os} shall 
+provide mechanisms that enable the higher level environments 
+to implement resource usage policies.
+A good example for this distinction is memory management.
+The \acronym{os} provides memory protection mechanisms
+that are based on resource containers assigned to applications,
+such that an application cannot access memory 
+that is not part of its resource container.
+How memory is used and maintained inside an application, however,
+is not part of the mechanism implemented by the \acronym{os}.
+This is implemented by the \acronym{vm}, 
+following, for instance, the Java Memory Model.
+
+In the \acronym{jeopard} platform,
+resource containers are protection domains
+which will be called \term{partitions} throughout this paper.
+Robust Partitioning is a well known concept 
+for safety and security-critical systems.
+In avionics, for example, partitioning is used
+to safely execute a set of real-time applications 
+on the same processing hardware.
+This is part of an architectural paradigm known as 
+Integrated Modular Avionics (\acronym{ima}) \cite{A651, Rushby}.
+In the defense domain, the concept is used to ensure security
+and known as Multiple Independent Levels of Security (\acronym{mils}) \cite{afoss}.
+In \acronym{jeopard}, a partitioning \acronym{os} is used mainly
+to address needs of safety-critical applications.
+
+On the \acronym{os}-level, 
+processor cores can be assigned to applications in two ways,
+either on partition level or on task (thread) level.
+The assignment is expressed in terms of \term{affinity} 
+either during run-time (for threads only) or during design-time. 
+Affinity is derived from the de-facto standard usage 
+in the \acronym{gnu}/Linux \acronym{os}.
+Currently however, affinity is not part of relevant standards,
+such as \acronym{posix} or, for \acronym{ima},
+\acronym{arinc 653} \cite{posix, A653P1}.
+Even worse, for \acronym{arinc 653}, multicore systems
+appear not to exist. 
+Nothing is specified describing how to configure or program
+the distribution of applications on processors.
+Moreover, it is explicitly forbidden to distribute one application
+over a set of processor cores. 
+This will be discussed in more detail in section \ref{sec:aoc}.
+
+\item The \acronym{vm} Layer
+
+For real-time Java applications to run on multicore embedded
+systems, a multicore real-time Java \acronym{vm} implementation
+is required. The runtime services of the \acronym{vm} such as
+the interpreter, thread synchronisation, memory management,
+\etc\ must be implemented to exploit the available
+processors while executing predictably \emph{and} efficiently.
+
+The biggest challenge for such a Java \acronym{vm} is to provide
+real-time garbage collection that can execute in parallel and
+without preemption of the Java application. A non-parallel
+blocking \acronym{gc} cannot be used in a real-time system. 
+What is needed is at least a parallel concurrent \acronym{gc} that
+uses a set of \acronym{cpu}s reserved for garbage collection work. But
+the highest flexibility can be reached only with an incremental
+parallel \acronym{gc}.
+
+Such a real-time garbage collector must ensure that 
+sufficient free memory is available even though many processors
+may be performing memory allocations and garbage collection
+in parallel. Fine-grained synchronisation techniques need
+to be developed to ensure that this parallel execution does
+not suffer from contention. In addition to the implementation
+of a parallel real-time garbage collector, a theoretical
+analysis of the level of parallelism that can be achieved is
+needed \cite{sie:08}.
+
+The parallel execution of thread synchronisation via Java
+monitors requires a careful implementation of the primitive
+monitor operations such as entering, exiting and notifying.
+Also, the Java thread scheduler must know about multiple
+processors, parallel Java interpretation and Just-in-Time compilation.
+%The result is the first deterministic Java implementation
+%for parallel systems. The users will be able to develop
+%deterministic parallel applications while profiting from the
+%safety, flexibility and productivity of a Java environment.
+
+\item The \acronym{api} Layer
+
+For a standard desktop computing environment, the application
+programmer is content to allow the \acronym{os} to manage
+the access to the computing resources. In an embedded environment
+this is generally not the case. Better real-time
+performance can often be obtained by partitioning the applications
+threads between the core processors. Currently,
+there is no easy way to do this 
+using Java or the \acronym{rtsj} \acronym{api}.
+This is an accepted limitation of the current real-time Java
+technology. Although some consideration has been given to
+an \acronym{api} to do this within the context 
+of \acronym{jsr} 282, the proposal
+is not based on practical experience \cite{wel:08,wel:09}.
+
+The work on the \acronym{api} layer was concerned with extending
+the Java programming model to allow access to the resources
+in a machine-independent way. The focus is on providing
+support for static partitioning but dynamic aspects were 
+also considered.
+In addition, the \acronym{api}s to allow 
+hardware-implemented \acronym{fpga} components
+to be integrated within the overall Java
+framework was addressed.
+
+\item The Tools Layer
+
+Independent of the implementation and run-time aspects,
+reliable applications running on parallel systems require in-depth
+analysis of the correctness of the implementation and
+of time-related aspects such as schedulability, lack of deadlocks,
+race conditions, \etc\ With the use of multicore systems,
+parallel execution becomes the norm such that errors
+that do not manifest as faults on single \acronym{cpu} systems are
+much more likely to cause system failure.
+For the correctness analysis of parallel applications, existing
+analysis tools need to be enhanced to find errors related
+to parallel execution through static analysis or concurrent
+unit tests. \acronym{jeopard} addressed this challenge
+by providing tools such as 
+a scheduling analyser based on contracts,
+a static analyser of Java bytecode 
+to detect deadlocks and race conditions,
+a concurrent unit testing tool \cite{szed:09}
+that reduces false positives
+in deadlock and race condition detection and
+a thread monitor that helps 
+to understand the actual parallel execution of the code.
+\end{itemize}
+
+\section{Use Case Objectives}\label{sec:obj}
+The objectives of the use case are threefold:
+\begin{itemize}
+\item Evaluation of the tools developed in the scope of the project
+      in terms of correctness, timeliness and performance;
+\item Contrasting the concepts developed in the scope of the project
+      with real-world requirements and a real-world development process.
+      Are the concepts sufficient in terms of 
+      design, integration, optimisation and verification?
+\item Demonstrate the feasibility of the new concepts,
+      in particular the use of Java and the use of multicore architectures,
+      in the context of the industry domains,
+      including safety-critical applications
+      and applications with high performance requirements. 
+\end{itemize}
+
+To address these objectives, requirements 
+for the \acronym{jeopard} platform 
+driven by the industrial use cases
+have been defined at the beginning of the project.
+These requirements included technical means, 
+\eg\ networking, inter-process communication 
+and real-time constraints the platform shall be able to guarantee.
+The requirements were derived by real application requirements,
+such that the evaluation of the applications
+according to already existing requirements and validation test-beds
+could eventually be used to evaluate the platform hosting the applications.
+
+A lot of effort has been spent on the first objective, 
+the evaluation of the tools; both demonstration activities
+eventually resulted in prototypes that, in principle, could be
+used as applications in their respective domains.
+The avionics use case, of course, would have to undergo 
+an expensive certification process according to air-safety regulations.
+The radar use case, on the other hand, would have 
+to undergo further testing to prove its reliability
+in a demanding application environment.
+
+The most important objective was, of course, the second one,
+aiming at the evaluation of the concepts proposed and developed
+in the scope of the project. 
+The results related to this objective lead not only
+to an enhancement of implementations, 
+such as performance optimisation
+or bug-fixes, but is fed back into research 
+to review former results and introduce new topics. 
+The discussion of the results of this objective 
+is the main part of the \textit{lessons learnt} 
+at the end of the following demonstrator sections
+and as such the main result of the \acronym{jeopard} industry experiments.
+
+Finally, the third objective is more related to the specific industry domains.
+The idea is that a successful demonstration of technologies
+like Java and multicore,
+may provide evidence to the industries
+that these new concepts 
+-- new in the domain of embedded systems development  --
+are sufficiently mature and reliable to be used
+in the the respective domains.
+For the radar use case, 
+Cassidian actually opts for building a new product
+on top of the \acronym{jeopard} prototype;
+for the avionics use case,
+\acronym{gmv} extends research already performed
+in the aviation industry concerning Java and multicore \cite{DIANA}.
+
+\section{The Radar Application}\label{sec:radar}
+
+Figure \ref{figRap} depicts the main Radar processor components 
+of a typical Air Traffic Control radar. 
+The Signal Processor digitises the received radar echoes,
+eliminates unwanted detections (ground reflections, weather fronts...) and
+provides range, azimuth and amplitude of flying objects bundled in detection
+reports to the clustering process (Parameter Extractor). 
+The Parameter Extractor merges the detections 
+belonging to one target together into a plot to be sent 
+to the tracking process (Tracker). 
+The tracker analyses the incoming plots 
+and uses them to update the tracks sent to the radar display. 
+The Radar Controller dispatches parameters 
+and control information to these three segments and monitors their status.
+
+%\begin{figure}[h]
+%\begin{center}
+%\includegraphics[width=0.4\textwidth]{images/radar/rap.PNG}
+%\caption{Radar Processor for Air Traffic Control}
+%\label{figRap}
+%\end{center}
+%\end{figure}
+
+Cassidian produced two demonstrators running on top of \acronym{jeopard} tools.
+\begin{itemize}
+\item Java Tracker (jTracker)
+\item Java Radar Signal Processor (j\acronym{rsp})
+\end{itemize}
+Although these demonstrators are only prototypes for the sake of evaluation of the \acronym{jeopard} tools, they are very similar to the original Radar Signal Processor and the Tracker applications running in several Cassidian products. The main difference between the Avionics and Radar Use Case is the raw computing power requested by the radar demonstrators j\acronym{rsp} and jTracker. On one hand, j\acronym{rsp} processes input datastreams with rates of about 10MBytes/s; these data rates are rising up to 40MBytes/s within the j\acronym{rsp} application. On the other hand, jTracker is confronted only with low data rate inputs, but must keep track of many small objects, each object requesting a considerable amount of computations.  
+
+The increasing availability of multicore microprocessors in the embedded field, allows radar processor designers to build more compact systems: one single board computer (\acronym{sbc}) fitted with a quad-core \acronym{cpu} replaces four to five \acronym{sbc}s fitted with one single core \acronym{cpu}. The \acronym{jeopard} tool chain brings to radar applications the ease of using Java and the guarantees for execution predictability in a parallel execution environment. Moreover, \acronym{jeopard} provides a practical answer for the need in radar systems to interface microprocessors to non \acronym{cpu} systems via \acronym{fpga}s thanks to the \acronym{jeopard} Tools Hardware Methods and \acronym{jop}. \acronym{jeopard} is therefore a key tool chain fostering the integration of heterogeneous components.
+
+One key achievement of \acronym{jeopard} is a working build 
+and execution tool chain 
+with which Cassidian was able to de\-mon\-stra\-te a stable j\acronym{rsp} at the 
+European Commission's \acronym{ict} event, September 2010 in Brussels. 
+Moreover, the \acronym{jeopard} debugging and analysis tools ThreadMonitor, 
+Concurrent Unit Testing (\emph{cJunit}) and \emph{Veriflux} provided 
+decisive support for the debugging of the parallel applications. 
+
+The \acronym{jeopard} evaluation benchmarked the \acronym{jeopard} real-time execution environment against the non real-time Java Virtual Machine (\ie{} Open\acronym{jdk}) and Operating System (\ie\ Linux). The main goal was to measure the gain brought by the \acronym{jeopard} tools in terms of reproducibility and evaluate the expected loss of average execution speed against the non real-time mainstream tool chain. The main evaluation criteria are:
+\begin{itemize}
+\item best, average and worst execution time
+\item scalability (parallelisation gain)
+\item Interface communication overhead
+\end{itemize}
+
+Using Java enabled us to use the same code with only minimal or no changes and run it on different platforms:
+\begin{itemize}
+\item Open\acronym{jdk} on Linux 
+\item Aicas Jamaica Java Virtual Machine on Linux with real-time scheduler
+\item Aicas Jamaica Java Virtual Machine on PikeOS 
+\end{itemize}
+
+\subsection{Java Tracker}
+In an Air Traffic Control radar, 
+the tracker maintains already confirmed tracks 
+and initiates new tracks using the target information updates 
+provided by the clustering application. The tracker:
+\begin{itemize}
+\item processes incoming plots from the clustering application and incoming  messages from the radar controller
+\item associates plots with existing tracks
+\item updates, initiates or deletes tracks 
+\item outputs track updates to the radar display
+\end{itemize}
+
+The jTracker test scenario is produced off-line 
+and produces plot data describing 600 synthetic targets. 
+This scenario is putting a relatively high load 
+on the tracker and generates higher traffic 
+than standard \acronym{atc} radars are used to cope with. 
+This scenario provides a realistic load for the \acronym{jeopard} evaluation.
+
+%\begin{figure}[h]
+%\begin{center}
+%\includegraphics[width=0.4\textwidth]{images/radar/jTrackerTestSetup.PNG}
+%\caption{jTracker Test Setup}
+%\label{figjTrackerTestSetup}
+%\end{center}
+%\end{figure}
+
+%Figure \ref{figjTrackerTestSetup} shows the test setup made up of three \acronym{pc}s, all connected via Ethernet:
+%\begin{itemize}
+%\item a plot data generator
+%\item the jTracker prototype (Intel (R) Core(TM) 2 Quad \acronym{cpu}s Q9500 2.83 Ghz, 4 G Byte \acronym{ram})
+%\item a track data display and recorder
+%\end{itemize}
+
+\subsubsection{jTracker results}
+For the average case, execution times of jTracker were disappointing.
+The average execution times were 2 to 5 times slower 
+when using the \acronym{jeopard} tools than running on the combination Open\acronym{jdk}/Linux. 
+The much more important worst case execution time, however, 
+was very good. The \acronym{jeopard} tools 
+cut the maximum latency to the halve of that of the Open\acronym{jdk}/Linux platform.
+
+The layered software architecture of the Java execution environment 
+enabled us to evaluate with minimal changes 
+the behaviour of jTracker running on the Jamaica Parallel Java \acronym{vm} 
+and standard Open\acronym{jdk} \acronym{vm} either on  Linux or on PikeOS. 
+This will enable us to adapt our products 
+to different customer requirements much faster than today: 
+use of Linux and standard Java \acronym{vm} 
+if criticality is low and price is an issue, on one hand, 
+use of Jamaica Parallel \acronym{vm} and PikeOS 
+for safety-critical applications on the other hand. 
+At the time of writing, 
+Cassidian is planning the adoption of the Jamaica Parallel \acronym{vm} 
+in future tracking products.
+
+\subsection{jRSP}
+\subsubsection{Application Overview Corrected}
+%\begin{figure}[h]
+%\begin{center}
+%\includegraphics[width=0.4\textwidth]{images/radar/jRSPOverview.png}
+%\caption{jRSP Overview}
+%\label{figJRspOverview}
+%\end{center}
+%\end{figure}
+j\acronym{rsp} processes real-time simulated data provided by the radar scenario generator and
+outputs detection reports to a radar display (\acronym{ppi}) 
+as depicted in figure \ref{figJRspOverview}. 
+The radar scenario generator is \acronym{fpga} based 
+and provides the same data (same format and timing) 
+as the front end (analogue to digital converter) in the real radar system.
+
+\subsubsection{jRSP Architecture}
+
+%\begin{figure}[h]
+%\begin{center}
+%\includegraphics[width=0.4\textwidth]{images/radar/UseCasesEvaluationjRSP.png}
+%\caption{jRSP Use Cases}
+%\label{figJRspUseCases}
+%\end{center}
+%\end{figure}
+
+%Figure \ref{figJRspUseCases} shows how the different actors interact with j\acronym{rsp}, in particular
+\begin{itemize}
+\item how the user
+is involved by this demonstrator: the user can actually see the results of radar processing
+displayed on the \acronym{ppi} and task from the \acronym{ppi} the execution of the high resolution
+spectrum estimation algorithm \acronym{hrse} as well.
+\item the \acronym{lcd} display, showing the results of \acronym{hrse}
+\end{itemize}
+
+The use of an \acronym{lcd} display as featured by very simple devices 
+(handheld calculator for example), 
+requires j\acronym{rsp} to provide software and hardware interfacing for such a simple device. 
+
+%\begin{figure}[h]
+%\begin{center}
+%\includegraphics[width=0.4\textwidth]{images/radar/jRSPDetail.png}
+%\caption{jRSP Architecture}
+%\label{figJRspArchitecture}
+%\end{center}
+%\end{figure}
+The j\acronym{rsp} architecture (figure \ref{figJRspArchitecture}) 
+is based on standard high-end \acronym{pc} and \acronym{fpga} hardware comprising:
+\begin{itemize}
+\item one Intel 6 core \acronym{cpu} i7-980X
+\item multi \acronym{pci}e (\acronym{pci} Express) slot 
+      mainboard fitted with \acronym{3gb ddr3 ram}
+\item multiple Gigabit Ethernet interfaces
+\item two Xilinx ML505 \acronym{pci}e \acronym{fpga} cards
+\end{itemize}
+
+The software tools used to run j\acronym{rsp} are:
+\begin{itemize}
+\item a Java Virtual Machine (Jamaica Parallel \acronym{vm} or Open\acronym{jdk})
+\item a Java Virtual Machine for \acronym{fpga}: 
+      Java Optimized Processor (\acronym{jop})
+\item an operating system: PikeOS or Linux
+\item a software suite seamlessly 
+      interfacing Java applications to \acronym{fpga}s: 
+      Hardware Methods (HWMethods)
+\end{itemize}
+
+j\acronym{rsp} receives the data from the scenario generator over Ethernet (\acronym{udp}).  On the multicore \acronym{cpu}, The data is packaged first, then fed through the pulse compression, spectrum estimation and detection. The result of the detection is sent via Ethernet (\acronym{tcp}) to the \acronym{ppi} display. When the user tasks j\acronym{rsp} to perform fine spectrum estimation, the control thread on the multicore \acronym{cpu} receives position information from the \acronym{ppi} display and forwards the required data picked up at the output of the pulse compression to the \acronym{fpga} running the high resolution spectrum estimation \acronym{hrse}. Communication between the control thread and \acronym{hrse} is completely handled by Hardware Methods: \acronym{fpga} and \acronym{cpu} software developers only \glqq see\grqq\ a software interface. Hardware Methods creates code frames and handles the transfer of data via \acronym{pci} Express. The control thread then forwards the result computed by \acronym{hrse} to the second \acronym{fpga} in the system running \acronym{jop}. This last communication scheme is handled by a reduced feature Java \acronym{rmi} running over Hardware Methods \cite{jRmiBachelor}. 
+
+
+
+\subsubsection{jRSP implementation}
+ 
+One great advantage of the \acronym{jeopard} tool chain is that without changing the top level design, developers can actually leverage the processing capabilities for their application by parallelising the demanding computations. This is exactly how j\acronym{rsp} was developed: the processing chain was first implemented with a single core development flow and checked for computing correctness. At that stage, performance was nearly irrelevant. Then the application benchmarks showed where the parallelisation was most needed. These benchmarks were made by inserting time measurement points within the code and/or visualising the different threads durations and interactions using the Thread Monitor tool.
+%\begin{figure}[h]
+%\includegraphics[width=0.5\textwidth]{images/radar/jRSPparallelprocessing.png}
+%\caption{jRSP parallel processing}
+%\label{figJRspParallelProcessing}
+%\end{figure}
+
+Figure \ref{figJRspParallelProcessing} show that j\acronym{rsp} threads are linked together via \acronym{fifo}s and that the pulse compression is run on two parallel threads and the spectrum estimation is run on four parallel threads. Although the first benchmarks were performed without parallelisation, the software architecture of j\acronym{rsp} was from the start designed to run in parallel: simple parameters enable to run the pulse compression and the spectrum estimation either on one single or two, three or four parallel threads.
+
+\subsubsection{jRSP results}
+
+The \acronym{jeopard} evaluation with j\acronym{rsp} shows that the execution times achieved using non real-time tools are 2 to 7 times shorter (better) in average depending on the algorithm and the number of threads running in parallel. However, the Jamaica\acronym{vm} in combination with Linux with real-time scheduling or PikeOS show a smaller and more constant (better) execution time jitter even if the number of cores increases. 
+
+With the best parallelisation configuration (two threads for pulse compression and four threads for spectrum estimation), both j\acronym{rsp} realised  
+with \acronym{jeopard} tools and non realtime tools can process the input data received over \acronym{udp} with no loss. Although the \acronym{cpu}
+load with the \acronym{jeopard} tools is higher (60-70 percent) compared to the \acronym{cpu} usage of
+the non realtime tools (about 20 percent), the \acronym{jeopard} tools have the advantage to provide periodic 
+threads (non existent in standard Java) that guarantee that the processing deadline
+will always be met. j\acronym{rsp} complete application latency results show that the overall
+application latency requirement could be safely reduced to 14-15 ms if using Jamaica parallel \acronym{vm} instead of Open\acronym{jdk}. The latency of HWMethods under the three variants of j\acronym{rsp} is relatively small (less than 0.5ms, average 0.2ms) compared to the input burst (frame) rate of j\acronym{rsp} opening new \acronym{fpga} co-processing options for standard and real-time Java application running on \acronym{cpu}s. At the start of the \acronym{jeopard} 
+project, HWMethods was meant to provide \acronym{fpga} co-processing only for one card. 
+j\acronym{rsp} demonstrates the support of HWMethods for multiple \acronym{fpga}s which was swiftly 
+added towards the end of the project. \acronym{jop} was used to interface to the \acronym{lcd} display 
+and relay the results of the high resolution spectrum estimation over HWMethods 
+from the application running on Jamaica\acronym{vm}. A Java \acronym{rmi} functionality for simple 
+objects was implemented for communicating the \acronym{hrse} 
+results from Jamaica\acronym{vm} to \acronym {jop}\cite{jRmiBachelor}.
+   
+\subsection{Lessons Learnt}
+During the radar use case, the following lessons have been learnt:
+\begin{itemize}
+\item 
+There is little performance gain 
+when running an application on a multicore platform 
+if this application has not been designed to run in parallel from the start.
+
+\item 
+Modifying a single core application 
+to run on a multicore platform 
+can take as much or even more time 
+as redesigning the whole application from scratch.
+
+\item 
+The overall system performance (execution time) 
+depends highly on a tight integration of the Java \acronym{vm} 
+with the underlying \acronym{os}. 
+The best performance is achieved 
+by tuning specific parameters of the \acronym{vm} and/or the \acronym{os}. 
+
+\item 
+\acronym{jeopard} connects \acronym{cpu}s to \acronym{fpga} seamlessly.
+This makes the overall platform extremely hardware independent
+and easily portable.
+
+\item 
+For applications demanding all the processing power a multicore \acronym{cpu} can provide, we found useful to \glqq switch off\grqq\ the garbage collector by allocating memory at program start as object pools.
+\end{itemize}
+
+\section{The Avionics Application}\label{sec:aoc}
+
+\subsection{Java in Avionics}\label{sub:javonics}
+The interest of the avionics community in Java is not new.
+Java is used as a language for developing host-based tools
+that are not subject to the rigid certification requirements
+for on-board systems. Moreover, Java is used
+to prototype applications that are later completely redesigned
+and rewritten in a language that is considered more appropriate
+for the verification strategies applied to critical embedded 
+software, such as C or Ada.
+In such a prototype, aspects like timeliness
+and safe memory management are of minor importance. 
+The programmer does not need to cope with the subtleties
+of worst case execution time or worst case memory allocation.
+
+On the other hand, the process appears to be inefficient.
+The software is in fact built twice: 
+First as a host-based demonstrator,
+second as a critical target application.
+An alternative would use Java not only for prototyping,
+but would stepwise improve the first implementation
+to later meet non-functional requirements such as 
+timeliness and memory allocation.
+The idea is to set up a process where
+software development would start using full-fledged Java
+and would move progressively to a realtime
+version of Java. It is expected that such a process
+would enable the avionics software developer to 
+(i) benefit from the features of standard Java 
+to achieve high level of
+flexibility and responsiveness during the initial development
+phases, and (ii) benefit 
+from the determinism and safety of realtime
+versions of Java during the late development phases \cite{scho09}.
+
+In the scope of the \acronym{diana} project \cite{DIANA},
+Atego's Java real-time environment for safety-critical systems,
+\acronym{perc p}ico, was used to implement such a process.
+\acronym{perc p}ico differs from other Java platforms
+in that it does not comprise run-time garbage collection.
+Instead, the developer annotates the code 
+to describe the scope of the usage of memory objects.
+Memory objects are kept in a stack
+from where they are automatically removed 
+according to their scope \cite{scho09}.
+
+During the \acronym{diana} activities, it turned out
+that this approach is, on one hand,
+very interesting for safety-critical software development;
+the annotations describe the intended memory usage
+and are, hence, as good as explicit memory management
+in the code itself with a language such as C for example. 
+It is, on the other hand, often necessary
+to refactor application code 
+that was initially written 
+without taking memory management into account.
+It turns out that the literal understanding
+of the prototype approach sketched above
+is too naive for application to real world projects.
+Totally ignoring the memory profile of an application
+during its design leads to code that is later very difficult
+to describe in terms of static annotations.
+
+Garbage collection is therefore an interesting aspect
+of higher-level languages even in avionics.
+The question is if it is possible to guarantee
+the run-time behaviour of garbage collection \cite{sie:02, ritz:03}.
+One of our interests in \acronym{jeopard}, 
+was to experiment with a garbage-collecting Java \acronym{vm}
+and its applicability to critical software development.
+
+\clearpage
+\subsection{Multicore in Avionics}\label{sub:multi}
+Multicore hardware will be reality in avionics very soon.
+The challenges raised with parallel applications
+are therefore studied by all major software and system developers
+in the avionics industry.
+
+It seems to be consensus among researchers and practitioners
+that, in partitioned systems, parallelism must be implemented
+on the partition level only \cite{kin09}. 
+This means that entire applications, 
+together with their virtual execution environment 
+(partition operating system, 
+language support libraries, \acronym{i/o} access libraries, \etc) 
+are assigned to different cores. 
+While this helps to avoid a wide range of errors 
+typically found in parallel systems, 
+and also protects applications from each other, 
+it does not solve the problem of competition 
+for resources of applications executing in parallel. 
+Strategies have to be found 
+to arbiter the parallel access to resources 
+in a predictable and efficient manner. 
+The strategies have to be implemented in a way 
+that allows for defining safe partition scheduling 
+and efficient inter-partition communication.
+
+One of the approaches is to separate resources,
+usually shared among applications in \acronym{smp} systems.
+This leads to a non-uniform memory architecture
+that can be described as a hardware-based implementation 
+of robust partitioning \cite{kin09}.
+On one hand, \acronym{numa} 
+favours predictability and, thus, safety.
+On the other hand, it adds requirements 
+which make it even more difficult to benefit 
+form general purpose hardware, for which
+\acronym{smp} appears to be the standard architecture today.
+
+In the context of \acronym{jeopard},
+we studied software development for multicore systems
+from a different point of view.
+Even if partitioning is an important aspect
+of our use case application,
+we wanted to gather experience with parallelism 
+on task level, 
+\ie\ we ignored the major trend in avionics research today
+and redesigned our application to run on multiple \acronym{cpu}s.
+Our particular use case,
+the software part of 
+a communication management unit (\acronym{cmu}),
+benefits indeed from such a design.
+There are many tasks in the software
+that, potentially, can run in parallel 
+and can do so in very different ways.
+We were interested in the impact of parallelism
+ (i) on the run-time behaviour of our application and
+(ii) on the software development process.
+
+To address the latter,
+we used most of the tools that were
+developed in the scope of the \acronym{jeopard} project,
+such as contract-based scheduling analysers,
+a concurrent unit-testing tool,
+static analysers and thread monitors.
+It turned out that parallelism brings, indeed,
+new challenges that have to be tackled by tools.
+We were, in particular, confronted with run-time behaviour
+that differed from our expectations 
+(see section \ref{sub:redesign}).
+It would have been very difficult, if not impossible,
+to understand the issues behind such surprises 
+-- usually locking on shared resources --
+without the help of the \acronym{jeopard} tools.
+
+Additionally, the concurrent unit testing tool
+in combination with the static analyser
+appears to be essential for creating 
+the evidence of correctness of parallel software
+in the scope of a certification process.
+We implemented a \emph{mini-process} 
+to use these tools efficiently in combination:
+We used the static analyser to find suspicious code;
+we then analysed the results to identify false positives.
+Only those cases for which no good explanation could be found
+were further investigated using 
+the more labour-intense \emph{cJunit} tool.
+
+Concerning the run time behaviour,
+we were convinced from the beginning
+that the use of parallel processor cores
+would lead to significant speed-up in our application and, hence,
+to optimised resource usage.
+Our main objective, however,
+was not so much the speed-up itself,
+but to implement a fine-grained control over system resources.
+We will discuss this aspect in more detail 
+in subsections \ref{sub:aoc} and \ref{sub:llaoc}.
+
+\subsection{The AOC}\label{sub:aoc}
+Our use case was based on the 
+Airlines Operations Centre (\acronym{aoc}).
+The \acronym{aoc} is the on-board part
+of a Mission and Trajectory Management (\acronym{mtm}) system.
+It can be roughly described as a router
+that manages reports and report requests 
+that are sent between the aircraft and ground systems
+as well as between different on-board subsystems.
+It is controlled by the pilot through a 
+Multifunctional Control and Display Unit (\acronym{mcdu}),
+see figure \ref{fig:mcdu}.
+
+%\begin{figure}[h]
+%\begin{center}
+%\includegraphics[width=0.25\textwidth]{images/aoc/mcdu.jpg}
+%\caption{Display Unit}
+%\label{fig:mcdu}
+%\end{center}
+%\end{figure}
+
+The \acronym{aoc} is with 30 \acronym{kloc} 
+already a complex embedded application;
+it was originally written in the C language
+addressing the \acronym{arinc 653} \acronym{apex} \cite{A653P1}.
+It was developed according to the certification requirements
+of \acronym{do-178b} \acronym{dal c} \cite{do178} and is, as such, 
+a moderately critical application.
+The \acronym{aoc} runs with a frequency
+of 10Hz with deadlines down to 30ms. 
+
+For the purpose of our experiments,
+we ported the application to Java
+and redesigned it to take advantage of multicore architectures.
+The application was hosted 
+with the \acronym{jeopard} execution environment
+on a quadcore desktop \acronym{pc}.
+We used the real-time operating system PikeOS
+as well as the \acronym{ima} simulation environment
+\acronym{sima} \cite{sima09} 
+on top of a patched Linux kernel \cite{ros:07}.
+In both configurations, the underlying platform --
+composed of operating system and execution environment --
+guarantees hard real-time constraints and enabled us to
+measure worst case execution times.
+We used the Linux/\acronym{sima} configuration mainly
+for development purposes, \ie\ debugging and testing 
+whereas \acronym{jeopard} on PikeOS was our intended
+target platform.
+Note that this combination of a development and a target
+platform resembles the prototyping approach, described above
+in section \ref{sub:javonics}, with the important difference
+that both platforms were real-time systems and, this way,
+even the development platform 
+allowed for execution time analysis.
+The prototyping approach practiced in \acronym{jeopard}
+was, hence, not a one-way process as the one described above,
+but enabled us to go back and forth in  iteration cycles.
+
+As with the original application
+the \acronym{aoc} was hosted together 
+with three other applications on the same computer
+separated in time and space 
+by the underlying partitioning \acronym{os}, 
+\ie\ PikeOS and, respectively, Linux/\acronym{sima}.
+In contrast to the original target,
+the three other applications are related 
+with testing purposes: 
+Two applications are communication stubs,
+one connected to an \acronym{mcdu} simulator,
+the other to a ground system mock-up,
+both running on a different computer;
+the third application is a test driver
+producing data such as ground speed, flight level,
+cabin temperature, engine temperature, 
+expected time of arrival on a waypoint, \etc
+
+%The demonstrator architecture is shown 
+%in figure \ref{fig:aocdemo}:
+
+%\begin{figure}[h]
+%\begin{center}
+%\includegraphics[width=0.3\textwidth]{images/aoc/demo.jpg}
+%\caption{AOC Demonstrator}
+%\label{fig:aocdemo}
+%\end{center}
+%\end{figure}
+
+\subsection{Redesign of the AOC}\label{sub:redesign}
+In the original design, 
+the \acronym{aoc} has three threads,
+the Downlink which sends messages 
+to client applications and to ground,
+the Uplink which receives messages 
+from client applications and from ground and
+the MainLoop which implements the application logic. 
+Figure \ref{fig:aocProc1} shows the processing in detail
+(omitting the Downlink which is not relevant for our purpose).
+
+%\begin{figure}[ht]
+%\begin{center}
+%\includegraphics[width=0.4\textwidth]{images/aoc/OneThread.jpg}
+%\caption{AOC Processing Logic}
+%\label{fig:aocProc1}
+%\end{center}
+%\end{figure}
+
+When a message is received, 
+it is first stored in a temporary buffer.
+This buffer is read (at 10Hz) by the MainLoop
+and the messages are stored in a database.
+Messages entering the system in this way are reports,
+for example expected time of arrival on a waypoint
+(sent from the aircraft to ground), 
+weather reports (sent from ground to the aircraft)
+or free text messages (exchanged between pilot and ground control).
+The database is a repository of reports
+kept in main memory.
+
+When the pilot requests a report,
+a message is sent to the \acronym{aoc}.
+As can be seen in the figure, 
+requests are not processed by the Uplink thread
+but directly by the MainLoop.
+The MainLoop parses the request
+and searches the requested report in the database,
+\eg\ the latest weather report.
+When it is found, it is sent back to the pilot.
+
+We developed two parallel designs to optimise this process.
+The first approach aims at
+parallelising the heavy message decoding task.
+To achieve this, we isolated the activity 
+\emph{Process Request} (see figure \ref{fig:aocProc1})
+in a dedicated thread.
+
+This approach was successful only for best case execution time.
+The best case went down from 20ms to 5ms. 
+The worst case, however, was extremely bad,
+so bad that we were not able to meet our deadlines anymore.
+The worst case went up from 30ms to almost 60ms with two
+parallel message decoders and to more than 80ms with three
+parallel decoders.
+
+We identified the problem quickly, using the tools
+of the \acronym{jeopard} platform, in particular the 
+Jamaica Thread Monitor.
+The issue was that the Java library, we used for the message decoding,
+shares objects between threads.
+This, of course, causes the threads to synchronise
+on these objects and, hence, leads to locking and overall slow-down.
+To overcome this problem, 
+we rewrote the library to use only local variables.
+
+Still, the approach had a drawback.
+Since the new thread implements a part of the processing chain
+of the MainLoop, the two threads have to synchronise
+each time a message request arrives, again slowing down
+the overall process. 
+Therefore, we redesigned the application in a more radical fashion.
+The decoding of messages is part of the MainLoop thread
+in the original design, in other words
+messages are stored as text in the database
+and transformed into report objects only when requested.
+(Which, of course, has the additional drawback
+that messages are transformed each time they are requested.)
+We changed this logic by inserting a new thread 
+on the other side of the database. 
+The message buffer is, hence, not read by the MainLoop anymore,
+but by the new thread which then would decode the message
+and store the resulting object in the database.
+
+With this approach, that also led to a more balanced and,
+indeed, more aesthetic design of the MainLoop processing,
+we achieved a speed-up of almost 50\%. Even more important,
+we could demonstrate that the resulting \acronym{aoc}
+scales well to the number of processing cores.
+When each decoder thread is run on one processor,
+the number of reports sent in the same time interval
+can be duplicated by adding one processor core 
+and one decoder thread without the necessity to assign
+more time resources to the application. 
+This fine-grained control over 
+resource allocation was our main goal for this exercise. 
+
+\subsection{Porting AOC to Java}
+The task of porting the application from C to Java
+was, as expected, smooth and painless.
+Thanks to Java memory management and
+available Java libraries,
+we achieved significant simplifications of the code.
+
+As a general tendency in moving from C to Java,
+we can point out an abstraction away
+from low-level concerns to logic representations
+of architectural patterns, for example 
+representing memory as objects.
+Here, however, we also encountered a pitfall
+that manifested itself in the slow-down
+described in the previous section.
+The cause of the slow-down was indeed
+an issue in one of the libraries.
+It seems paradox that the details 
+of concrete resource usage on a very low level,
+\eg\ sharing objects in main memory, instead of
+using local objects which are free from lock contention,
+return, when one starts to analyse the time behaviour
+of code that was developed 
+ignoring those details in the first place.
+
+Under the perspective of the prototype process, 
+described in section \ref{sub:javonics} above, however,
+this does not appear so paradox anymore.
+Indeed, in critical software development,
+the pure development activities are not the main cost factor.
+What matters more are the activities 
+to provide certification evidence.
+Even if we start with a full-fledged Java environment
+drawing on the plentiful resources of available libraries,
+we are later obliged to either substitute third-party code
+by own developments with already available certification credits
+or we have to produce certification evidence for the foreign code.
+The application, using all the available libraries,
+is, thus, not the end product, but definitely a mere prototype.
+
+Since the \acronym{jeopard} \acronym{vm} 
+provides automatic garbage collection,
+we did not encounter the difficulties
+of refactoring the application for being annotated 
+as in the \acronym{diana} project.
+Instead, we hoped to be able to demonstrate formally
+ (i) that the \acronym{gc} would never cause another 
+     real-time thread to miss its deadline and
+(ii) that it would always be able to free
+     sufficient memory so that no thread would run out of memory.
+
+Although, some work in this direction had already been done \cite{sie:08},
+we were disappointed regarding the \acronym{aoc} application.
+We faced the issue that the application is, 
+due to its internal structure, too complex
+for a reliable formal analysis -- 
+at least in the scope of the \acronym{jeopard} project.
+The point is that time-critical tasks
+(\eg\ the decoder thread)
+allocate memory that is used also by other tasks
+(\eg\ the report database or the temporary message buffer).
+The interdependencies between the threads
+and the shared memory turned out to be very complex.
+Note that providing a correctness proof
+may exceed the effort of using annotations instead.
+Annotations can, in fact, be seen as a special way
+to provide the evidence that memory management
+for a given application is feasible.
+The difficulties we encountered with a formal demonstration
+are, hence, related to the same problem 
+that led to the need for refactoring 
+the application in the \acronym{diana} project.
+
+The alternative to such a formal proof is testing.
+It is, however, doubtful if testing alone will be accepted
+by certification authorities 
+as sufficient evidence for a \acronym{gc} based application.
+For the time being, \acronym{gc} seems to be limited
+to applications of lower criticality, like
+\acronym{dal d} (minor impact of failure).
+Our experiments showed on the other hand
+that critical embedded software
+reaches a level of complexity that makes 
+the use of higher-level languages
+with dynamic memory management advantageous.
+
+\subsection{Lessons Learnt}\label{sub:llaoc}
+During the avionics use case, the following lessons have been learnt:
+\begin{itemize}
+\item 
+Multicore is a good means to enhance control over resource usage.
+In particular, we can express clear usage domains in terms of
+processor cores and threads. This is a very satisfying result.
+
+\item
+The parallelisation strategy must be carefully planned. 
+It is, in particular, essential to design memory objects
+with regard to their usage in different threads that,
+potentially, execute in parallel.
+
+\item
+Tools and methods are needed to provide 
+certification evidence for parallel applications;
+the static analyser \emph{Veriflux} and the \emph{cJunit} tool
+in combination provide a very good starting point.
+More research is, however, needed to reduce the number
+of false positives and to support formal reasoning about the code.
+
+\item
+Tools are also needed for debugging parallel applications.
+The run-time behaviour is sometimes difficult to understand
+without information on the actual execution of threads.
+The Jamaica Thread Monitor turned out to be very helpful in this respect.
+
+\item
+Java, as we already knew, is an appropriate language 
+for applications found in the aviation domain.
+Care must be taken when using the strong abstraction means
+provided by the language, such as dynamic memory management
+and standard libraries.
+
+\item
+Our application turned out to be too complex
+for a formal analysis of correctness with regard to garbage collection.
+This may limit the use of \acronym{gc} based \acronym{vm}s 
+to applications of lower criticality. 
+More research is needed on this aspect 
+if extremely critical applications
+are to be addressed in the future.
+\end{itemize}
+
+\section{Conclusions}\label{sec:conc}
+In this paper, we discussed two of the industrial experiments
+performed in the scope of the \acronym{jeopard} project
+to evaluate the \acronym{jeopard} development and execution
+platform. The objective of these use cases was
+to evaluate the maturity of the tools developed during the project,
+to validate the driving concepts using real industrial requirements
+to gain evidence that the concepts are able to
+solve real world problems, on one hand, and 
+to demonstrate their feasibility and, this way,
+to support their adoption in the industry on the other hand.
+
+In both use cases, improvements of the original software 
+was achieved by using the \acronym{jeopard} tools. 
+For Cassidian, one of the main achievements
+is a platform that can be easily 
+adapted to customers' needs,
+shortening time-to-market and, hence,
+establishing a competitive advantage.
+The means to achieve this is the platform abstraction
+implemented by Java and the processor core allocation
+by means of affinity sets provided by the \acronym{vm} 
+and underlying \acronym{os}es.
+In particular interesting for Cassidian
+in this context is the smooth integration 
+of \acronym{fpga}s into the Java platform
+using hardware methods. 
+
+For the avionics use case, two important achievements
+can be reported: 
+A fine-grained control over resource usage
+by means of multicore technology and
+the establishment of a process based on prototyping
+functional requirements with Java and
+integrating non-functional requirements
+progressively without a tool gap from the host-based prototype
+to the final target as it is reality today
+when host prototypes must be re-implemented 
+in another language, such as Ada or \acronym{c}.
+The use of a \acronym{gc} on the target system
+appears to be a promising path for less critical systems.
+For systems with high criticality levels, however,
+it still appears to be difficult to produce the 
+necessary certification evidence. 
+
+The use cases also provided some insight into the challenges
+raised by multicore systems and the methods and technologies
+to face them. Both use cases revealed the necessity
+to carefully design parallel applications.
+Just adding more processor cores and hoping for
+positive performance impact is not the way to go.
+Instead, parallelism must be considered in all stages
+of the development process.
+In particular, it appears to be of major importance
+to reflect the use of memory objects in parallel tasks.
+In the radar use case, this led to issues during
+the migration of the application, such that the porting
+to a parallel version turned out to be more work
+than it would have been to design the application
+for multicore in the first place.
+
+Finally, both use cases made intense use
+of the \acronym{jeopard} analysis and debugging tools.
+Tools, such as the Jamaica Thread Monitor,
+proved to be helpful if not essential
+during design and development;
+tools like the static analyser \emph{Veriflux} and
+the concurrent unit testing tool \emph{cJunit} 
+are essential for further verification activities.
+ 
+
+%
+% The following two commands are all you need in the
+% initial runs of your .tex file to
+% produce the bibliography for the citations in your paper.
+\bibliographystyle{abbrv}
+\bibliography{jeopard}  
+\end{document}

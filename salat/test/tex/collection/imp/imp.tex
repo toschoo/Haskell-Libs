@@ -1,0 +1,157 @@
+%
+% Standard book document class, with all pages looking the same
+\documentclass[12pt,oneside,openany]{book}
+%
+% AMS math package for additional math type-setting commands
+\usepackage{amsmath}
+%
+% Long table package for tables that can break across pages
+\usepackage{longtable}
+%
+% Package fncychap for typesetting the Chapter titles
+\usepackage{fncychap}
+\ChNameUpperCase
+\ChTitleUpperCase
+\ChNameVar{\centering\large}
+\ChNumVar{\centering\large}
+\ChTitleVar{\centering\bfseries\Large}
+%
+% TOCloft package for customizing the table of contents; the titles
+% option makes it not override the fncychap style for the Contents title
+\usepackage[titles]{tocloft}
+%
+% The wrapfig package is used to wrap text around the figures in chap. 6
+\usepackage{wrapfig}
+%
+% The ulem package enables overlining as in chap. 14 and the strikeout used
+% in the Frege index fix
+\usepackage{ulem}
+%
+% The multicol package is used for the two-column layout in the index
+\usepackage{multicol}
+%
+% The marginnote package for the page numbers in the margins; I had better luck
+% with this than with LaTeX's \marginpar command, though neither is perfect.
+\usepackage{marginnote}
+%
+% For customizing the look and indentation of lists; used for hanging displays
+% in the text, as well as in the Appendix
+\usepackage{enumitem}
+%
+% Improves typesetting in cramped quarters; mainly useful for ebook version
+\usepackage{microtype}
+%
+% The KP fonts project sets the main font used throughout; the fulloldstylenums
+% option makes all numerals ``old style'' or ``lowercase''
+\usepackage[fulloldstylenums]{kpfonts}
+%
+% For hanging paragraphs, used in the index.
+\usepackage{hanging}
+%
+% A powerful diagram-drawing package used for the figures in chap. 6
+\usepackage{tikz}
+%
+% The ToCenter package is used to center the main text block on the page even
+% with the margin notes; otherwise the right side would have to be bigger
+\usepackage{tocenter}
+\ToCenter{30pc}{50.5pc}
+%
+% Hyperref package used to create links in the TOC, in the index, set the PDF
+% metadata, create the PDF bookmarks, etc. The second line adds some additional
+% set-up options.
+\usepackage[hyperref,hyperfootnotes=false]{hyperref}
+\hypersetup{colorlinks=true, linkcolor=blue, bookmarksnumbered=true, pdfauthor=Bertrand Russell, pdftitle=Introduction to Mathematical Philosophy, pdfcreator=Kevin C. Klement, pdfsubject=Philosophy}
+%
+% Typical LaTeX title and author, though these aren't actually used anywhere
+\title{Introduction to Mathematical Philosophy}
+\author{Bertrand Russell}
+\date{London: George Allen \& Unwin, Ltd. May 1919.\\ Second Edition April 1920.}
+%
+% Basic paragraph types
+% -- normal paragraph
+\newcommand{\kkparagraph}[1]{
+
+#1}
+% -- Hanging display
+\newcommand{\kkdisplay}[1]%
+{\begin{description}[noitemsep,labelindent=1em,leftmargin=4em,rightmargin=0em]
+  \item #1
+ \end{description}
+}
+% -- Index entry
+\newcommand{\kkie}[1]{
+
+\hangpara{1.6em}{1} #1}
+%
+% Page number markers; anchors for links
+\newcommand{\kkpageindicate}[2]{\hypertarget{#2}{\ensuremath{\textcolor{red}{\mathbf{\vert}}}} \marginnote{#1}}
+% Page indicators at start of chapter
+\newcommand{\kkpageindicatechapstart}[3]{\marginnote{#1}\hypertarget{#2}{#3}}
+% Page indicators at end of paragraph/beginning of next
+\newcommand{\kkpnoteonly}[2]{\marginnote{#1}{\hypertarget{#2}{\vphantom{x}}}}
+\newcommand{\kkpmarkonly}{\ensuremath{\textcolor{red}{\mathbf{\vert}}}}
+%
+% For use if the version has hyperlinks
+\newcommand{\kklinked}[1]{#1}
+%
+% Commands used only in certain versions
+\newcommand{\ltronly}[1]{#1}    % Letter version only; used
+\newcommand{\lxonly}[1]{}       % two sided letter version only; unused
+\newcommand{\afouronly}[1]{}    % One sided A4 version only; unused
+\newcommand{\aftonly}[1]{}      % Two sided A4 version only; unused
+\newcommand{\ebkonly}[1]{}      % Ebook size only; unused 
+\newcommand{\iphoneonly}[1]{}   % iPhone size only; unused
+%
+% Commands used in all but certain versions
+\newcommand{\allbutaf}[1]{(page \pageref{change:fnswapone} / original page 160)}   % Something done everywhere but certain version
+\newcommand{\allbutiphone}[1]{#1}
+%
+% Set up title page spacing
+\newlength{\titlepagetop}
+\setlength{\titlepagetop}{50pt}
+\newlength{\titlepageby}
+\setlength{\titlepageby}{50pt}
+\newlength{\titlepagemiddle}
+\setlength{\titlepagemiddle}{230pt}
+%
+%
+% figures one and two from chapter 6
+\newcommand{\figone}{\begin{wrapfigure}[11]{l}{2in}
+\begin{tikzpicture}
+\usetikzlibrary{calc}
+\pgfsetarrows{latex-latex};
+\pgfsetarrowsend{latex};
+\path node (z) at (0.5,-2.8) [shape=circle,inner sep=1pt,outer sep=4pt,fill,label=below:$z$] {}
+      node (w) at (4.5,-2.8) [shape=circle,inner sep=1pt,outer sep=4pt,fill,label=below:$w$] {}
+      node (x) at (0.5,-0.3) [shape=circle,inner sep=1pt,outer sep=4pt,fill,label={[label distance=-3pt]above:$x\vphantom{y}$}] {}
+      node (y) at (4.5,-0.3) [shape=circle,inner sep=1pt,outer sep=4pt,fill,label={[label distance=-3pt]above:$y$}] {};
+\draw [->,thick,>=stealth] (z) to (w);
+\draw [->,thick,>=stealth] (x) to (z);
+\draw [->,thick,>=stealth] (y) to (w);
+\draw [->,thick,>=stealth] (x) to (y);
+\node [label=below:Q] (q) at ($(z)!.5!(w)$) {};
+\node [outer sep=4pt,label={[label distance=-3pt]above:P}] (p) at ($(x)!.5!(y)$) {};
+\node [label=left:S] (p) at ($(x)!.5!(z)$) {};
+\node [label=right:S] (p) at ($(w)!.5!(y)$) {};
+\end{tikzpicture}
+\end{wrapfigure}}
+%
+\newcommand{\figtwo}{\begin{wrapfigure}[11]{l}{1.55in}
+\begin{tikzpicture}
+\path node (d) at (0.5,-2.3) [shape=circle,inner sep=1pt,outer sep=4pt,fill,label=below:$d$] {}
+      node (c) at (3.9,-2.3) [shape=circle,inner sep=1pt,outer sep=4pt,fill,label=below:$c$] {} 
+      node (a) at (0.5,-0.3) [shape=circle,inner sep=1pt,outer sep=4pt,fill,label=above:$a$] {}
+      node (b) at (3.9,-0.3) [shape=circle,inner sep=1pt,outer sep=4pt,fill,label=above:$b$] {}
+      node (e) at (2.2,-3.8) [shape=circle,inner sep=1pt,outer sep=4pt,fill,label=below:$e$] {};
+\draw [->,thick,>=stealth] (a) to (b);
+\draw [->,thick,>=stealth] (a) to (c);
+\draw [->,thick,>=stealth] (a) to (d);
+\draw [->,thick,>=stealth] (b) to (c);
+\draw [->,thick,>=stealth] (c) to (e);
+\draw [->,thick,>=stealth] (d) to (c);
+\draw [->,thick,>=stealth] (d) to (e);
+\end{tikzpicture}
+\end{wrapfigure}}
+%
+% Inserts core document
+\input{imp-core}

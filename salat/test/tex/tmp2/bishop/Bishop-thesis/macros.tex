@@ -1,0 +1,147 @@
+% This is in a separate file so that it can be included by the figures when psfragging etc, so that the notation in the figures matches the main text
+%\usepackage[l2tabu, orthodox, abort]{nag}               % check for common latex errors
+%\ChNameVar{\Large\sffamily}\ChTitleVar{\Large\sffamily} % to avoid nag warnings
+\usepackage[error, all]{onlyamsmath}                    % check for a different class of errors
+%\usepackage{braket}                                     % meh. I like my own version of Dirac notation
+%\usepackage[morose]{cmdtrack}                           % for checking which of these commands are actually used!
+
+\newcommand*{\figthanks}[1]{ {(Figure used with permission from~\cite{#1}.
+    See \nameref{ch:copyperm}.)}}
+
+\newcommand{\vx}{{\vphantom{y}x}}
+
+\newcommand*{\ie}{\textit{i.e.}}
+\newcommand*{\eg}{e.g.}
+\newcommand*{\dc}{d.c.}
+\newcommand*{\etal}{\textit{et al.}}
+\newcommand*{\hc}{\text{h.c.}}
+
+%\newcommand*{\SSS}{\textsw{S}}
+%\newcommand*{\RRR}{\textsw{R}}
+\newcommand*{\SSS}{\ensuremath{\mathcal{S}}} % or \CMcal{}
+\newcommand*{\RRR}{\ensuremath{\mathcal{R}}}
+
+\newcommand*{\abs}[1]{\left\lvert #1\right\rvert}
+\newcommand*{\bra}[1]{\left\langle #1 \right\rvert}
+\newcommand*{\ket}[1]{\left\lvert #1 \right\rangle}
+\newcommand*{\bket}[2]{\left\langle \, #1 \,|\, #2 \, \right\rangle}
+\newcommand*{\boket}[3]{\langle\, #1 \,|\, #2 \,|\, #3 \,\rangle}
+\newcommand*{\com}[2]{\left[#1,#2\right]}
+
+% hmm. should do this right but I can't be bothered. Pick the one that works with the style in use...
+\newcommand{\onlinecite}{\citenum}
+%\newcommand{\onlinecite}{\cite}
+%\newcommand{\onlinecite}{\citealp}
+
+% Easily-modified referencing style commands.
+% Now superceded by cleveref? (cleveref had bugs when I started, but now seems to be fully working)
+\newcommand*{\eref}[1]{(\ref{#1})} % NB Not APS style
+\newcommand*{\Eref}[1]{Equation~(\ref{#1})}
+\newcommand*{\aref}[1]{\hyperref[#1]{appendix~\ref*{#1}}}
+\newcommand*{\Aref}[1]{\hyperref[#1]{Appendix~\ref*{#1}}}
+\newcommand*{\chref}[1]{\hyperref[#1]{chapter~\ref*{#1}}}
+\newcommand*{\Chref}[1]{\hyperref[#1]{Chapter~\ref*{#1}}}
+\newcommand*{\sref}[1]{\hyperref[#1]{section~\ref*{#1}}}
+\newcommand*{\Sref}[1]{\hyperref[#1]{Section~\ref*{#1}}}
+\newcommand*{\fref}[1]{\hyperref[#1]{figure~\ref*{#1}}}
+\newcommand*{\Fref}[1]{\hyperref[#1]{Figure~\ref*{#1}}}
+\newcommand*{\tref}[1]{\hyperref[#1]{table~\ref*{#1}}}
+\newcommand*{\Tref}[1]{\hyperref[#1]{Table~\ref*{#1}}}
+%%%%%%
+
+\newcommand*{\software}[1]{\textsf{#1}}
+\newcommand*{\mma}{\software{Mathematica}}
+\newcommand*{\umfpack}{\software{UMFPACK}}% Damn, no latin modern sans small caps
+
+\newcommand{\stree}{\mathsf{T}}
+\newcommand{\tPhi}{\tilde{\Phi}}
+
+\DeclareMathOperator{\tr}{tr}
+\newcommand*{\DD}{\mathcal{D}}
+\newcommand*{\Tt}{T'}
+\newcommand*{\Dp}{\Delta}
+\newcommand*{\sigt}{\tilde{\sigma}}
+\newcommand*{\dat}{\downarrow}
+\newcommand*{\uat}{\uparrow}
+%\newcommand*{\be}{\begin{equation}} % but this doesnt work if equation is actually gather....
+%\newcommand*{\ee}{\end{equation}}
+\def\be#1\ee{%
+%\begin{gridenv}%GGG
+\begin{gather}#1\end{gather}%
+%\end{gridenv}%GGG
+} % ...ouch
+
+\newcommand*{\amp}{V_0} %% XXX FIXME pdfx
+
+\newcommand*{\EC}{E_{\text{C}}}
+\newcommand*{\EJ}{E_{\text{J}}}
+\newcommand*{\ngate}{n_{\text{g}}}
+\newcommand*{\op}[1]{{#1}} % maybe \hat{} maybe not??
+\newcommand*{\ph}{\op{\phi}}
+\newcommand*{\vph}{\op{\varphi}}
+\newcommand*{\nh}{\op{n}}
+\newcommand*{\omr}{\omega_{\text{r}}}
+\newcommand*{\omd}{\omega_{\text{d}}}
+\newcommand*{\Hd}{\op{H}_{\text{d}}}
+\newcommand*{\aop}{\op{a}}
+
+\newcommand*{\Cc}[1]{\ensuremath{C_{#1}}} % Was \C
+\newcommand*{\Ct}{\ensuremath{C_\text{t}}}
+\newcommand*{\ec}[1]{\ensuremath{E_{\text{C}#1}}}
+\newcommand*{\ect}{\ensuremath{E_\text{Ct}}}
+\newcommand*{\ej}[1]{\ensuremath{E_{\text{J}#1}}}
+\newcommand*{\nng}[1]{\ensuremath{n_{\text{g}#1}}}
+\newcommand*{\eC}[1]{\ensuremath{\xi_{#1}}}
+\newcommand*{\eCt}{\ensuremath{\xi_\text{t}}}
+\newcommand*{\nn}[1]{\ensuremath{n_{#1}}}
+\newcommand*{\pho}[1]{\ensuremath{\varphi_{#1}}}
+\newcommand*{\vg}[1]{\ensuremath{V'_{#1}}}
+
+\newcommand*{\dg}{^{\dag}}
+\newcommand*{\pdg}{^{\vphantom{\dag}}}
+
+\newcounter{fig}
+\newenvironment{romenu}{\begin{list}{(\roman{fig})}{\usecounter{fig} \setlength{\labelwidth}{1.5cm}}}{\end{list}}
+
+\newcommand{\MM}{\ensuremath{\langle M\rangle}}
+
+\newcommand*{\pp}{\partial}
+\newcommand*{\vc}[1]{\mathbf{#1}}
+\DeclareMathOperator{\sgn}{sgn}
+
+\newcommand*{\rmi}{\mathrm{i}}
+\newcommand*{\rme}{\mathrm{e}}
+\newcommand*{\rmd}{\mathrm{d}}
+
+\newcommand*{\pd}{\partial}
+
+% Define a semibold maths version, for use in the captions
+% No semibold MnSymbol, so use bold or normal?
+\makeatletter
+\DeclareMathVersion{semiboldproportional}
+\SetSymbolFont{operators}{semiboldproportional}{T1} {\Mn@Math@Family} {sb}{n}
+\SetSymbolFont{letters}  {semiboldproportional}{OML}{MinionPro-TOsF}  {sb}{\Mn@Math@LetterShape}
+\SetMathAlphabet\mathit  {semiboldproportional}{T1} {\Mn@Math@Family} {sb}{it}
+
+\DeclareMathVersion{semiboldtabular}
+\SetSymbolFont{operators}{semiboldtabular}     {T1} {\Mn@Math@TFamily}{sb}{n}
+\SetSymbolFont{letters}  {semiboldtabular}     {OML}{MinionPro-TOsF}  {sb}{\Mn@Math@LetterShape}
+\SetMathAlphabet\mathit  {semiboldtabular}     {T1} {\Mn@Math@TFamily}{sb}{it}
+\def\semiboldmath{\@nomath\semiboldmath
+    \mathweight{semibold}}
+\makeatother
+
+\newcommand{\captitle}[1]{\textbf{\semiboldmath #1}}
+% Use extra bold for caption letters, for easier spotting...
+\newcommand{\capl}[1]{{\fontseries{eb}\selectfont{#1}}}
+
+\newenvironment{subal}[1]{%
+      \subequations #1%
+%      \gridenv%GGG
+      \align
+    }{%
+      \endalign
+%      \endgridenv%GGG
+      \endsubequations
+      \ignorespacesafterend
+    }

@@ -1,0 +1,330 @@
+\svnid{$Id: ghz.tex 461 2010-04-10 00:33:13Z lsb $}%
+\chapter[%Generating and detecting Greenberger--Horne--Zeilinger states]
+    \texorpdfstring{
+        Generating and detecting Greenberger--Horne--Zeilinger states}%
+    {Generating and detecting GHZ states}]
+    {\fontseries{mc}\selectfont
+        Generating and detecting Greenberger--Horne--Zeilinger states}\label{ch:ghz}%
+    \chaptermark{GHZ states}%
+    \lofchap{Generating and detecting Greenberger--Horne--Zeilinger states}%
+\thumb{Generating and detecting Greenberger--Horne--Zeilinger states}%
+\lettrine{P}{revious} chapters have discussed the quantum optics of superconducting circuits, but much of the interest in these systems relates to their potential for quantum information processing tasks. In this chapter, we move in such a direction and consider a circuit containing several artificial atoms, focussing on their potential to behave as qubits. We discuss a proposal for generating and detecting a particular class of maximally entangled states, first pioneered by Greenberger, Horne, and Zeilinger~(GHZ)\@. Instead of creating the GHZ state by multi-qubit gates, we employ the idea of entanglement generation by measurement---an elegant way to create entangled states of two or more qubits without the need for high-fidelity two-qubit gates \cite{duan_long-distance_2001, ruskov_entanglement_2003, sarovar_high-fidelity_2005, maunz_quantum_2007, blais_quantum-information_2007}. The basic idea is: first prepare an initial state, then perform a measurement. Repeat the protocol many times, keeping only the subensemble of states which produced a particular measurement outcome. In order to produce entangled states in this way, either the preparation step has to involve two-qubit interactions or the measurement needs to be a \emph{joint readout} of several qubits. In cQED, high-fidelity single-qubit rotations are available for the preparation step~\cite{chow_2009}, and the dispersive readout constitutes a very natural joint multi-qubit measurement~\cite{blais_cavity_2004, wallra_strong_2004}.  It is a joint readout because the qubits are coherently coupled to the voltage inside the resonator, giving rise to a state-dependent shift of the resonator frequency.  Heterodyne or homodyne detection of the phase of microwave radiation transmitted through the resonator can thus be used to gain information about the state of the qubits. If the linewidth $\kappa$ of the cavity is much larger than the dispersive shift due to the qubits, $\kappa\gg\chi$, (and if we ignore relaxation processes), then the corresponding measurement operator can be arranged to be a weighted sum of the qubit Pauli operators $\sigma^z$, where the weights are conveniently adjusted by the detunings of the respective qubits from the resonator frequency.
+\begin{figure}
+   \centering
+   \levincludegraphics{ghz0-conv}
+   \caption[Sketch of the circuit QED architecture]
+   {\captitle{Sketch of the circuit QED architecture.} \capl{a}, The system consists of a superconducting coplanar waveguide resonator, with charge qubits, shown magnified in \capl{b}, placed within the resonator at positions corresponding to antinodes of the microwave electric field $\vc{E}(x)$. Each qubit can be addressed by an individual flux bias line, which is used to tune the local magnetic field $\vc{B}$. The coplanar waveguide is coupled capacitively to an input and output port, such that microwave signals can be coupled into the resonator, and microwave photons leaking out of the resonator can be detected. The input and output capacitors, \capl{c}, are chosen asymmetric so that photon leakage occurs preferentially through the output side.\label{fig:figure0}}
+\end{figure}
+
+This idea of \emph{probabilistic state-preparation by measurement} has recently been applied to a 2-qubit cQED system by Hutchison \etal\ \cite{hutchison_quantum_2008}. Their theoretical study included the adverse effects of qubit relaxation and dephasing, and showed the practical applicability of the method, even for realistic decay and decoherence rates as currently realized in cQED experiments. Here, we extend this method to the generation of multi-qubit GHZ states \cite{greenberger_going_1989} (a similar extension has now been performed by Helmer and Marquardt \cite{Helmer2009}). For superconducting qubit systems there have been successful demonstrations of Bell-state preparation \cite{steffen_measurement_2006, plantenberg_demonstration_2007, filipp_two-qubit_2008, dicarlo_demonstration_2009}, and various proposals for creating GHZ states, mainly focusing on the generation via two-qubit gates and qubit-qubit interactions, see \eg\ \cite{galiautdinov_maximally_2008, wei_generation_2006, kim:100508}. Instead of employing such entangling gates for generating a GHZ state, we propose a scheme tailored to cQED, consisting of one-qubit rotations and a dispersive measurement only. Based on quantum trajectory simulations, we show that currently attainable values for qubit decoherence and decay allow for the creation of three-qubit GHZ states in cQED with high fidelity and high degree of entanglement. The degree of entanglement can be increased at the cost of lowered production rate.
+
+In order to verify the production of the desired GHZ state, we propose to use a second dispersive readout. Because the GHZ state is maximally entangled, this verification is related to proving the violation of a Bell-type inequality \cite{bell_problem_1966, aspect_experimental_1981}. However, proving such a violation in a \textit{loophole-free} fashion turns out to be a much more challenging task in cQED\@. Given the required measurement time of hundreds of nanoseconds, space-like distances (in the sense of special relativity) are of the order of tens of meters and thus difficult to achieve in a cQED setup, and the dispersive readout is  in fact inherently nonlocal. Accepting that the communication loophole therefore cannot strictly be closed, we discuss the potential of the dispersive readout for observing quantum correlations in a 3-qubit GHZ state, as well as the potential for devising a factorizing measurement that is local in the no-signalling sense \cite{dieks_inequalities_2002}. Using quantum trajectory simulations including the measurement imperfections caused by qubit decay, we show that a convincing violation of the Bell inequality would require a signal-to-noise ratio which is currently out of experimental reach, but may be approached once efficient methods for protecting qubits from decay have been devised, or with improvements in the noise performance of microwave amplifiers \cite{bergeal_analog_2008}.
+
+This chapter is organized as follows: The following section discusses what is meant by a Bell test in general and in the context of cQED\@. \Sref{sec:idealized} presents the central idea of generating and detecting multi-qubit GHZ states by dispersive measurements, starting with the idealized situation of no qubit decoherence and decay. The remainder of the chapter is devoted to the consequences of imperfections introduced by decay during the measurement process. In \sref{sec:model}, we specify the treatment of qubit decay and continuous homodyne detection using an effective stochastic master equation previously introduced in~\cite{hutchison_quantum_2008}. Quantitative results from solving this master equation for the situation of GHZ-state generation are presented in \sref{sec:generation}. We describe different protocols for accepting or rejecting a generated state as a GHZ state, and show in particular that nonlinear filtering offers a significant advantage over simple boxcar filters. \Sref{sec:detection} discusses the detection of GHZ states within the dispersive measurement scheme and comments on the potential to violate a Bell-type inequality. Finally, conclusions are presented in \sref{sec:conclusions}.
+
+\section{Bell tests}\label{sec:bell}
+A Bell test is an experiment that attempts to prove Bell's theorem: \emph{quantum mechanics is incompatible with local realism}. Generally these tests take the form of attempting to violate a \emph{Bell inequality}, which is an upper bound on the correlations of results of distant measurements. These inequalities are obeyed by any Local Hidden Variable~(LHV) theory, namely a theory that uses local variables with objective values. There are many such inequalities, including those of Bell~\cite{bell_epr_1964}; Clauser, Horne, Shimony and Holt (CHSH) \cite{clauser_proposed_1969}; Greenberger, Horne and Zeilinger (GHZ) \cite{greenberger_going_1989}\@. At the present time there are rather few physicists who seriously doubt the validity of quantum mechanics. However, proving non-classicality of a given experimental platform, via a Bell inequality violation, is widely viewed as excellent benchmark for such a platform for quantum information processing. Despite rapid progress in the field of cQED, a clear-cut demonstration that the system violates classicality was outstanding until the very recent work described in Refs.~\cite{ansmann_thesis,ansmann_violation_2009}.
+
+\subsection{Idealized Bell test}\label{sec:bellideal}
+An idealized Bell test is conceptually simple, if rather abstract, involving a number of participants, measuring devices, settings and outcomes. We have at least two participants. If there are exactly two then it is traditional to name them Alice and Bob. For generality however there may be any number $\ell\ge2$ of participants. Each participant is in possession of a device with at least two settings. To remain general we define the device belonging to the $i$th participant as having $m_i\ge2$ settings. Each device in each setting can produce at least two outcomes. Again, for generality let us say that the $i$th device in its $j$th setting can produce one out of a set of $n_{ij}$ outcomes. There is no requirement that each participant's device have the same number of settings and outcomes, nor that the number of outcomes be fixed independent of the setting, but in the special case that all the participants have identical devices, for which the number of allowed results is setting-independent, we can describe the experiment in shorthand by the triple $\ell\times m\times n$. The simplest and most-studied situation is the $2\times2\times2$ case, with two participants (`bipartite'), two possible settings (`binary settings'), two outcomes (`binary outcomes'). The simplest version of the Mermin inequality, described in \sref{sec:perfdetect}, corresponds to the multipartite, binary-setting, binary outcome situation,  $\ell\times2\times2$ for $\ell\ge3$.
+
+This framework is very abstract. A concrete example of the type that typically people have in mind is an optical experiment where the participants are each measuring the polarizations of photons belonging to entangled pairs, where the device might consist of a polarizing filter in front of a photomultiplier tube and where the $m_i$ settings are a set of rotation angles for the filter, and binary outcomes are that a photon is or is not detected. However, nothing in the test protocol requires that the devices actually \emph{measure} anything. It would not be cheating if, for example, for one setting of one of the machines it always gave a particular result with unit probability. Similarly, one of the settings of the machine might cause it to roll a dice or toss a coin in order to produce the measurement outcome. These devices are all legal, although they are rather crippled from the point of view of violating a Bell inequality. As far as the Bell test protocol is concerned, the physical implementation of the devices, settings and outcomes are irrelevant and only the correlations between the outcomes are important.
+
+\begin{table}
+    \centering
+    \footnotesize
+    \begin{threeparttable}
+    \caption{\captitle{A demonstration $2\times2\times2$ Bell test correlation table.} The numbers in the \emph{occurrences} column are random, for illustrative purposes.\label{tab:compiled}}
+    \begin{singlespace}
+        \figureversion{tab,lf}
+        \begin{tabular}{@{}ccccr@{}}
+            \toprule
+            \multicolumn{2}{c}{Alice} & \multicolumn{2}{c}{Bob}&\\
+            \cmidrule(r){1-2}\cmidrule(lr){3-4}
+            setting & outcome   & setting & outcome & occurrences\\
+            \midrule
+            0&0&0&0&123\\
+            0&0&0&1&90\\
+            0&0&1&0&21\\
+            0&0&1&1&34\\
+            0&1&0&0&232\\
+            0&1&0&1&3\\
+            0&1&1&0&77\\
+            0&1&1&1&99\\
+            1&0&0&0&42\\
+            1&0&0&1&42\\
+            1&0&1&0&523\\
+            1&0&1&1&121\\
+            1&1&0&0&0\\
+            1&1&0&1&17\\
+            1&1&1&0&45\\
+            1&1&1&1&11\\
+            \bottomrule
+        \end{tabular}
+    \end{singlespace}
+    \end{threeparttable}
+\end{table}
+
+Given our set of participants and their devices, the protocol is that the participants spread themselves far enough apart from each other that they cannot communicate. To make sure that they cannot communicate even in principle, they must have a space-like separation in the sense of special relativity. Now, each participant chooses one of the $m_i$ settings for their device, and records the setting and the associated outcome in some immutable form. This must be done \emph{simultaneously} in the sense that all of the participants must have finished recording their outcomes before they come into causal contact with each other. The protocol is repeated many times, after which the participants bring their lists of recorded settings and outcomes to a convenient location and compile a summary, of the form of \tref{tab:compiled}, showing all the possible correlations. For an $\ell\times m\times n$ experiment, this table has $m^\ell n^\ell$ rows.
+
+The final step in the Bell test protocol is to examine the table and decide if there exists \emph{any} conceivable LHV theory that is able to explain the results. If not, then the test has successfully disproved the ability of LHV theories to explain the universe.
+
+\subsection{How many repetitions of the protocol are needed?}\label{sec:reps}
+The proof of a Bell inequality violation will necessarily be statistical in nature. Even a very highly correlated set of results could in principle result by lucky chance from an entirely random classical process. However, if the protocol is repeated sufficiently many times it can convince even skeptics. A fair coin might by fluke turn up heads 10 times in a row, but who is willing to believe that it would do so 1000 times?
+
+The statistical nature of Bell tests notwithstanding, a certain mystique has arisen surrounding a particular class of tests, of which the GHZ was the first, that have been termed Bell tests \emph{without inequalities}. This consists of a set of settings and outcomes for which the quantum probabilities are all either $0$ or $1$, while for LHV this is impossible. This should be contrasted with,  for example, the CHSH~\cite{clauser_proposed_1969} and CH~\cite{clauser_experimental_1974} schemes, where the quantum probabilities exceed the classical ones but do not reach the extremal $0$ and $1$. The fact that all the quantum probabilities are $0$ or $1$ has led some people to claim that the experiment need only be repeated one time in order to rule out local realism. This is clearly untrue, as was stated quite strongly by Peres~\cite{peres_bayesian_2000}:
+\begin{quote}
+    This is sheer nonsense: a single experiment can only verify one occurrence of one of the terms\textellipsis.
+\end{quote}
+Nevertheless, this is a popular misconception, again quoting Peres~\cite{peres_bayesian_2000}:
+\begin{quote}
+    The list of authors is too long to be given explicitly and it would be unfair to give only a partial list.
+\end{quote}
+To be explicit: the reason why a single experiment is insufficient is that we can imagine a LHV theory that simply adopts the uniform random distribution over all outcomes. Although quantum mechanics is correct, the resulting sequence of observations does not have zero probability under the classical theory, simply because \emph{no} sequence of results has zero probability under the classical theory. It is only by repeating the experiment many times that we can show that the results are vastly \emph{more likely} under quantum mechanics than LHV\@.
+
+Still, there is a gut feeling that the `without inequality' class of Bell tests should be somehow \emph{stronger} than the ordinary kind. In fact van Dam \etal~\cite{van_dam_statistical_2005} were able to prove exactly this, using a game-theoretical analysis and an argument based on the Kullback--Leibler divergence (also known as the \emph{relative entropy}). They showed that the 3-qubit GHZ test is around $4.5$ times stronger than the CHSH test, which in turn is the strongest of the 2-qubit tests they examined. The sense of this statement is that if, say, $200$ repetitions of the GHZ test would be sufficient to persuade someone to discard a classical viewpoint, then $4.5\times200=900$ repetitions of the CHSH test would be needed in order to have an equivalently persuasive effect. The outline of their argument is that they imagine a game played between two players: an experimentalist who believes in quantum mechanics and a theorist who believes in local realism. In order to convince the local realist to change his mind, the experimentalist should choose to perform the set of experiments such that the \emph{best} local realistic model explains the data \emph{worst}, when compared to the quantum mechanical description. The relative entropy quantifies the divergence between the probability distributions that the two models predict.
+
+\subsection{Loopholes}\label{sec:loopholes}
+As should be clear from the idealized description in \sref{sec:bellideal}, a Bell test is a remarkably difficult experiment to perform. There are some obvious tricky questions such as `at what stage can we consider the result to be recorded immutably?' There are also some more prosaic problems such as finite detector efficiencies. Because of these problems, real implementations invariably have \emph{loopholes}. This section examines the effect of the three main loopholes: \emph{superdeterminism, detection} and \emph{communication.} Generally only detection and communication are given serious consideration, and proposals for so-called \emph{loophole-free} experiments really mean that they simultaneously avoid both the detection and communication loopholes. So far such a loophole-free experiment does not yet exist, although both loopholes have been closed in independent experiments~\cite{rowe_experimental_2001, weihs_violation_1998}.
+
+\paragraph{Superdeterminism.} One fundamental problem with performing a Bell test is that the participants and their devices will never truly be causally disconnected (for the reason that the entire visible universe is causally connected). This has been termed the `superdeterminism' loophole by Bell and, although it is recognized as a conceptual problem, it is usually not considered to be a problem in practice, on the basis that any theory that would be able to take advantage of superdeterminism would likely be much less plausible than quantum mechanics.\footnote{LHV theories that take advantage of the superdeterminism loophole have sometimes been presented as having mysterious philosophical consequences, implying the non-existence of free will~\cite{bell_cuisine}. I feel compelled to point out, however, that allowing for the much more mundane possibility of malicious tampering with the experiment, the superdeterminism loophole is quite easily exploited: for example two devices fitted with `cryptographic' pseudorandom number generators can produce results which appear to be entirely random, to someone not in possession of the key, but there can be arbitrarily strong correlations between the devices. This requires zero communication between the devices beyond initializing them with the same cryptographic keys.}
+
+\paragraph{Detection.} The detection loophole is caused by the problem of finite detector efficiency. For most Bell tests, the detectors need to be very efficient in order to have a chance to violate the inequality, for example for the CHSH test the threshold is $2(\sqrt{2}-1)\simeq82\%$. For less efficient detectors, one obtains results which are consistent with quantum mechanics, but unfortunately are also consistent with certain classical theories. These classical theories are somewhat strange, however, because in order to reproduce the quantum mechanical result, the probability of the detector to fail to detect a given event has to be correlated with what the result would have been if it were detected. If we make an additional \emph{fair sampling assumption}, namely that the detector efficiency is independent of what the result would have been, then we can calibrate away the detector efficiency.
+
+\paragraph{Communication.} The communication loophole is caused by the fact that maintaining delicate quantum correlations across large distances is quite difficult, especially for experiments that do not use photons. Generally it is necessary to \emph{assume} that even though the parts of the experiment are close enough that they could in principle interact, that they are still sufficiently separated to make such an interaction quite unlikely.
+
+\subsection{So what are we trying to do?}\label{sec:sowhat}
+In cQED we have no chance of avoiding the communication loophole, given the space constraints of a dilution refrigerator and that the dispersive readout is \emph{inherently} nonlocal, since a photon must `bounce around a few times in the cavity' in order for us to talk about the cavity even having a resonance frequency. Since the loophole is unavoidable, our purpose cannot be to convince skeptics of the superiority of quantum mechanics over LHV, nor to perform the long-sought loophole-free Bell test. Rather, as stated in the introduction, our purpose is to perform the Bell test as a benchmark---to be blunt we wish to demonstrate a Bell test merely \emph{because this is known to be difficult}. In order to make the achievement as impressive as possible, then, we should avoid using the fair sampling assumption. We should also ensure that the communication loophole is only opened \emph{in principle}, due to the non-space-like separations. In other words we should avoid using a measurement scheme that behaves in an explicitly non-local fashion. A necessary condition~\cite{popescu_1994} for this is that the measurement scheme should be \emph{non-signalling} which simply means the  measurement scheme should forbid the participants to send each other messages purely by choosing a particular sequence of measurement settings.\footnote{The non-signalling requirement is also a \emph{sufficient} condition for the measurement scheme to be local if we additionally assume the validity of quantum mechanics~\cite{dieks_inequalities_2002}. A recent candidate for a necessary \emph{and} sufficient criterion for separating quantum mechanics from \emph{post-quantum} theories is the criterion of \emph{information causality}, namely the requirement that communication of $m$ classical bits should result in an information gain of at most $m$ bits~\cite{pawlowski_new_2009}.} Therefore, we adopt as our goal the rather ambitious task of performing a Bell test in cQED, without making the fair-sampling assumption, and using a measurement that explicitly obeys a non-signalling property.
+
+\section{Quantum trajectories}\label{sec:trajectories}
+Stochastic wavefunctions \cite{dum_monte_1992, dalibard_wave-function_1992, barchielli_measurements_1991} and quantum trajectories \cite{carmichael_open_1993}, are \emph{stochastic unravelings} of the master equation. This means that they provide a stochastic description of the system dynamics, which reduces to the master equation description once an averaging is performed over the ensemble of stochastic realizations. One reason to prefer such a description is for numerical efficiency---for a $d$-dimensional Hilbert space, storing a wavefunction requires $\mathcal{O}(d)$ space, compared to $\mathcal{O}(d^2)$ for the full density matrix. It might seem  that this is a time-for-space tradeoff, given the need to ensemble average over stochastic realizations, but it can be shown \cite{breuer_stochastic_1997} that for large $d$, the time requirements of the stochastic solution scale no worse than the master equation solution. Depending on the precise nature of the problem, the stochastic solution can be vastly faster, for example when there is a majority of the state space where large time-steps can safely be taken and a small part of the space where very small time-steps are required. In such a case, the integrator of the stochastic wavefunction can generally take large timesteps, only adaptively shrinking them when encountering the region of rapid dynamics, whereas the integrator of the master equation describes the dynamics of the whole ensemble and must therefore always adapt to the \emph{smallest} timescale of the problem.
+
+Even in the absence of numerical efficiency considerations, quantum trajectories are useful for describing the dissipative dynamics of the master equation as being due a continuous measurement of the system. This can be related to the input-output theory of \sref{sec:inout}, being more specific about the exact nature of the measurement of $b_\text{out}$. For example, if there is a term $\kappa \DD[a]\rho$ in the master equation, leading to an outgoing field $b_\text{out}(t)=\sqrt{\kappa}a(t)$, then if we monitor the $b_\text{out}$ channel with a photomultiplier, each time the photomultiplier registers a `click', the state of the system \emph{conditioned on our observing the click} updates as
+\be\label{eq:jump}
+    \rho\mapsto \frac{a\rho a\dg}{\tr\left[a\dg a\rho\right]} ,
+\ee
+which is called a \emph{jump unraveling}. Similarly there is a \emph{quantum state diffusion} unraveling, corresponding to a homodyne or heterodyne monitoring of the output channel. The technical details of the quantum trajectories approach are covered very nicely in standard texts~\cite{hornberger_decoherence_2009, breuer_petruccione} so we refrain from further discussion here.
+
+In the calculations of this chapter, we use a somewhat unusual \emph{stochastic master equation} approach. This corresponds to monitoring only one of the relaxation channels of the system, namely the photon leakage through the output port of the cavity. This does not provide the numerical speed-up compared to simply integrating the master equation. However it provides a much more convenient way to describe time-domain processing of the output signal, compared to the alternative of using the ordinary master equation and calculating high-order multi-time correlation functions via the quantum regression theorem.
+
+\section{Idealized preparation and detection of GHZ states}\label{sec:idealized}
+The $N$-qubit GHZ state \cite{greenberger_going_1989} is the maximally entangled multi-qubit state of the form
+\begin{subal}{\label{ghz}}
+    \ket{\text{GHZ}}&=\biggl( \bigotimes_{j=1}^N \ket{\uparrow}_j+\bigotimes_{j=1}^N \ket{\downarrow}_j\biggr)\Big/\sqrt{2} \\
+    &=\bigl(\ket{\uparrow\uparrow\cdots\uparrow}+\ket{\downarrow\downarrow\cdots\downarrow}\bigr)\big/\sqrt{2},
+\end{subal}%
+    \nomdref{CN}{$N$}{Total number of qubits}{ch:ghz}%
+    \nomdref{Bketj}{$\ket{\cdot}_j$}{Denotes the state of the $j$th qubit}{ch:ghz}%
+    \nomdref{Zj}{$j$}{Denotes quantities relating to the $j$th qubit}{ch:ghz}%
+    \nomdref{CGHZket}{$\ket{\text{GHZ}}$}{The GHZ state $\ket{\text{GHZ}}= \big(\ket{\uparrow\uparrow\cdots\uparrow} +\ket{\downarrow\downarrow\cdots\downarrow}\big)/\sqrt{2}$}{ghz}%
+where $\ket{\cdot}_j$ denotes the state of the $j$th qubit.
+GHZ states have received much attention in the context of violation of Bell-type inequalities, see \eg\ \cite{mermin_extreme_1990, mermin_quantum_1990, pan_experimental_2000, cabello_bells_2002, zhao_experimental_2003}, ruling out classical local hidden variable (LHV) theories as a valid description of nature. They are also of interest as optimal resource states for measurement-based computation \cite{anders:050502}.
+
+In this section, we lay out the essential ideas behind the preparation and detection of GHZ states using the joint dispersive readout typical for cQED\@. To keep the discussion as clear as possible, the exposition in this section ignores the adverse effect of qubit decay and decoherence, and other possible sources of measurement imperfections. We shall return to the full discussion of the realistic situation including these effects in the following sections.
+
+\subsection{Preparation scheme}\label{sec:prep}
+With the dispersive readout of cQED, the measurement outcomes are inferred from the detection of the homodyne signal for the microwaves transmitted through the resonator. Recall from \eref{eq:binbout} that $b_\text{out}^\dag$ and $b_\text{out}$ denote the creation and annihilation operator for a photon in the output line. Homodyne measurement is much like the heterodyne measurement described in \sref{sec:heterodyne}, except that $\omega_\text{IF}=0$. Thus, for a particular setting of the phase between the RF drive and the LO, the homodyne signal is proportional to $\langle b_\text{out}(t) + b_\text{out}^\dag(t)\rangle$.
+
+For each measurement, this time-dependent signal can then be reduced to a single number, the time-integrated signal $s\propto\int_0^t \rmd t'\,\langle b + b^\dag\rangle$.%
+    \nomdref{Cs}{$s$}{The time-integrated signal $s\propto\int_0^t \rmd t'\,\langle b + b^\dag\rangle$}{sec:prep}
+In the absence of qubit decay and decoherence, the probability distribution $p(s)$ for this integrated signal $s$ takes the form of Gaussian peaks, which initially overlap strongly, indicating that we begin with little information about the state of the system, and subsequently separate with increasing measurement time $t$ \cite{blais_cavity_2004, gambetta_protocols_2007, majer_coupling_2007, filipp_two-qubit_2008, gambetta_quantum_2008}, as the signal-to-noise ratio gradually increases with longer time-averaging. In the limit of negligible overlap between peaks, the dispersive readout corresponds to a projective measurement of the operator
+\be\label{eq:Xdef}
+    X=\sum_j\delta_j\sigma^z_j,
+\ee%
+     \nomdref{CX}{$X$}{The operator that is implemented by the dispersive readout $X=\sum_j\delta_j\sigma^z_j$}{eq:Xdef}%
+where the weights $\delta_j=\chi_j/\bar\chi$ are the fractional contributions to the mean dispersive shift, $\bar\chi=\sum_j\chi_j/N$.%
+    \nomdref{Gxchibar}{$\bar{\chi}$}{The mean dispersive shift, $\bar\chi=\sum_j^N\chi_j/N$}{sec:prep}%
+    \nomdref{Gddeltazj}{$\delta_j$}{Fractional contribution for the $j$th qubit to the mean dispersive shift $\delta_j=\chi_j/\bar\chi$}{sec:prep}
+In detail, the preparation scheme can be described as follows:
+\begin{romenu}
+ \item Arrange all qubit detunings such that the system is dispersive, and mutual qubit detunings are large compared to the qubit-qubit interaction strengths. The initial state is the state with each qubit in its ground state, $\bigotimes_{j=1}^N\ket{\downarrow}_j$, which is easy to reach because, as we showed in the \sref{sec:nodissip}, the effective temperature of cQED circuits can be arranged to correspond to \emph{at most} $0.003$ thermal photons on average;
+ \item Perform $\pi/2$ rotations (see \sref{sec:oneqgates}) on each of the $N$ qubits, preparing the state $2^{-N/2}\bigotimes_{j=1}^N(\ket{\downarrow}_j+\ket{\uparrow}_j)$;
+ \item While keeping the system dispersive and the mutual qubit detunings sufficiently large, adjust the qubit detunings such that their dispersive shifts assume the ratio, \be \chi_1:\chi_2:\ldots:\chi_{N-1}:\chi_N=1:1:\ldots:1:N-1, \ee and perform a dispersive measurement. Ideally, this corresponds to a projective measurement of the observable $X=\sum_j\delta_j\sigma^z_j$. Conditioned on the measurement result being `$0$', see \fref{fig:figure1}a, we thus obtain the pre-GHZ state
+     \be
+        \ket{\text{pGHZ}} =\left(\ket{\downarrow\downarrow\cdots\downarrow\uparrow}+ \ket{\uparrow\uparrow\cdots\uparrow\downarrow}\right)/\sqrt{2} ;
+     \ee
+ \item In the final step, a $\pi$ rotation is applied to qubit $N$, yielding the GHZ state, \eref{ghz}. Alternatively, one may choose a different computational basis by interchanging the `$\uparrow$' and `$\downarrow$' labels for qubit $N$.
+\end{romenu}%
+\begin{figure}
+\centering
+\levincludegraphics{ghz1-conv}
+\caption[Dispersive measurements for generating and detecting GHZ state]
+{\captitle{Dispersive measurements for generating and detecting GHZ states.}
+     Dispersive measurements employed for \capl{a} generating a GHZ state, and \capl{b} detecting the parity $\Pi=\prod_j\sigma^z_j$. Both panels show the probability density $p(s)$ for the integrated homodyne signal $s$ for the concrete example of a 3-qubit system. \capl{a}, For the generation of a 3-qubit pre-GHZ state, the dispersive shifts are fixed at ratios $\chi_1:\chi_2:\chi_3=1:1:2$. Ideally, the Gaussian peaks belonging to the 5 measurement results $\{\pm4,\pm2,0\}$ separate with increasing measurement time $t$ (here: $t=5/\Gamma_\text{ci}$), allowing for a reliable projective measurement when using appropriate thresholds, \eg\ $\nu_1$, $\nu_2$ for the selection of the measurement outcome `$0$'. \capl{b}, The dispersive parity measurement requires identical dispersive shifts, $\chi_1:\chi_2:\chi_3=1:1:1$. The four measurement  outcomes $x_i\in\{\pm3,\pm1\}$ then allow the inference of the parity value by $\Pi_i=-\sin(x_i\pi/2)$.\label{fig:figure1}}
+\end{figure}%
+The necessary adjustment of the $\chi_j$ ratios is possible in cQED samples employing local flux-bias lines \cite{dicarlo_demonstration_2009}, which allow for the fine tuning of individual qubit frequencies. We note that even though there are $2^N$ different states, the scheme requires the resolution of only $\sim2N$ different peaks, which should be compared to the need for application of $(N - 1)$ two-qubit gates for the preparation of the same GHZ state via gates, see \eg\ \cite{bodoky_production_2007}. The \emph{probability of success} of the above idealized procedure is $2^{-N+1}$.
+
+
+\subsection{Detection scheme\label{sec:perfdetect}}
+Ideally, the confirmation of the GHZ state production and the verification of its quantum correlations proceed by a measurement of the Bell--Mermin operator~\cite{mermin_extreme_1990},
+\be\label{merminop}
+M=2^{N-1}\,\rmi\bigg( \prod_{j=1}^N \sigma^-_j- \prod_{j=1}^N \sigma^+_j \bigg).
+\ee
+For the $N$-qubit GHZ state, this operator takes on the value $M=2^{N-1}$, while the corresponding combination of correlations for LHV theories predicts an outcome $M\le 2^{N/2}$ if $N$ is even, and $M\le 2^{(N-1)/2}$ if $N$ is odd \cite{mermin_extreme_1990}---thus leading to a violation that grows exponentially in the qubit number.
+
+In the general case, the Bell--Mermin operator is not amenable to a direct measurement. However, for $N$ qubits, it can be decomposed into $2^{N-1}$  $N$-qubit parity operators, which are more easily accessible by experiment, and the GHZ state is a simultaneous eigenstate of all the relevant parity operators. The specific form of the Bell--Mermin operator in the three-qubit case is given by
+\be\label{eq:merminop3}
+M = \sigma^\vx_{1}\sigma^\vx_{2}\sigma^\vx_{3}-\sigma^\vx_{1}\sigma^y_{2}\sigma^y_{3}-\sigma^y_{1}\sigma^\vx_{2}\sigma^y_{3}-\sigma^y_{1}\sigma^y_{2}\sigma^\vx_{3},
+\ee%
+    \nomdref{CM}{$M$}{The Bell--Mermin operator. For the case of 3 qubits, $M=\sigma^\vx_{1}\sigma^\vx_{2}\sigma^\vx_{3} - \sigma^\vx_{1}\sigma^y_{2}\sigma^y_{3} - \sigma^y_{1}\sigma^\vx_{2}\sigma^y_{3} - \sigma^y_{1}\sigma^y_{2}\sigma^\vx_{3}$.
+    LHV theories satisfy $-2\le M\le2$}{eq:merminop3,merminop}%
+obtained from \eref{merminop} by setting $N=3$ and using $\sigma^\pm_j=(\sigma^\vx_j\pm \rmi\sigma^y_j)/2$.
+In the ideal case, one would perform the $2^{N-1}$ parity measurements, using a quantum non-demolition method on one and the same state.
+
+Since the dispersive readout does not realize exact parity measurements, we accept the necessity to repeat measurements. Instead of the parity, the dispersive readout can easily access the operator $X=\sum_j\sigma^z_j$ (obtained from the general expression \eref{eq:Xdef} for $X$ by setting all the dispersive shifts equal, $\delta_j=1$). Once $X$ is known, the value of the parity $\prod_j\sigma^z_j$ can be uniquely inferred, see \fref{fig:figure1}b. Specifically, the measurement results of the operator $X$, given by $x_i\in\{\pm3,\pm1\}$ also reveal the parity $\prod_j\sigma^z_j$ of the states: for $x_i=-3,1$ there is an odd number of `spin-downs' ($\downarrow$) and the parity is negative, whereas for $x_i=-1,3$ the number of `spin-downs' is even and the parity is positive. Using single-qubit rotations mapping the appropriate $x$ and $y$ axes to $z$ \cite{kofman_analysis_2008}, all the required parities can be measured dispersively.
+
+The crucial step thus consists in tuning all dispersive shifts to be identical. As with the preparation step, this can be achieved by adjusting qubit detunings using local flux-bias lines. Compared to the setting employed for the GHZ state generation, it is in fact only the detuning of the $N$th qubit that needs to be changed. Ideally, the measurement of $X$ then leads to the measurement outcomes $x_i\in\{\pm N,\pm(N-2),\ldots,\pm \ell\}$, terminating with $\ell=1$  if $N$ is odd and with $\ell=0$ if $N$ is even. The inferred parity outcomes simply alternate in sign according to $\Pi_i=-\sin(x_i\pi/2)$ for odd $N$ and by $\Pi_i=\cos(x_i\pi/2)$ for even $N$\@. It is important to note that, while the number of required different measurements grows exponentially with $N$, the number of measurement outcomes that need to be resolved is given by $N+1$, only growing linearly with the qubit number. This should be compared to the situation of a full state readout, which would require resolution of $2^N$ different peaks and dispersive shifts to be spread over an exponentially large frequency range, $\chi_j=2^j\chi_0$.
+
+Both the generation and detection scheme will obviously suffer from qubit decoherence and decay. The subsequent sections take into account these effects and study quantitatively how the idealized proposal performs under more realistic conditions.
+
+\section{Model\label{sec:model}}
+For the generation and subsequent detection of a multi-qubit GHZ state we consider a cQED system comprising three superconducting charge qubits  coupled to the fundamental mode of a microwave resonator. The model of the system and notation follow those in reference~\cite{hutchison_quantum_2008}. Neglecting the possible influence of levels beyond the two-level approximation for the superconducting qubits, the system is described by a driven Tavis--Cummings Hamiltonian \cite{tavis_exact_1968}, which is simply the  Jaynes--Cummings Hamiltonian \eref{eq:JC}, extended to more than one qubit
+\be\label{eq:hamiltonian1}
+H =\omega_\text{r} a^\dagger a  + \sum_j \frac{\omega_{\text{q},j}}{2}\sigma^z_j + \sum_j g_j(a\sigma_j^+ + a^\dagger \sigma_j^- )
+    + (a\xi^* \rme^{\rmi\omega_\text{d} t} + a^\dagger \xi \rme^{-\rmi\omega_\text{d} t}),
+\ee
+where, as before, $\omega_\text{r}/2\pi$ denotes the resonator frequency and $\xi$ the strength of the measurement drive. The qubit frequencies $\omega_{\text{q},j}/2\pi$ are considered to be tunable individually, as realized by local flux-bias lines in recent cQED experiments \cite{dicarlo_demonstration_2009}. The qubit-resonator couplings are given by $g_j$, whose signs are determined by the location of the respective qubit  within the resonator. For concreteness, we will focus on the case of a half-wave coplanar waveguide resonator, with two qubits placed close to one end, and the third qubit on the opposite end, leading to relative signs $\sgn(g_1)=\sgn(g_2)=-\sgn(g_3).$
+
+The system is to be operated in the dispersive regime described in \sref{sec:dispersive}, where the detuning is large compared to the coupling, $|\lambda_j| = |g_j|/|\omega_{\text{q},j} - \omega_\text{r}|= |g_j/\Delta_{\text{q},j}| \ll1$, and the photon occupation remains small compared to the critical photon number~\cite{wallraff_unitvisibility}, $\langle a^\dag a\rangle\ll n_\text{crit}=\Delta^2/4g^2$. Under these conditions the interaction term in \eref{eq:hamiltonian1} can be adiabatically eliminated \cite{blais_cavity_2004}, such that the effective Hamiltonian that generalizes \eref{eq:dispqbit}, in the frame rotating with the measurement drive frequency $\omega_\text{d}/2\pi$ reads
+\be H_{\mathrm{eff}} = \Delta_\text{r} a^\dagger a +  \sum_j
+    \frac{\Delta_{\text{q},j} + \chi_j}{2} \sigma_j^z + \sum_j \chi_j a^\dagger a \sigma_j^z
+        + (a \xi^* + a^\dagger \xi ),
+\ee
+where, as before, $\Delta_\text{r} = \omega_\text{r} - \omega_\text{d}$ is the detuning between measurement drive and resonator, and as in \eref{eq:chicpb} $\chi_j = g_j^2/\Delta_{\text{q},j}$ gives the dispersive shift\footnote{A structurally identical Hamiltonian is also obtained in the case of transmons; merely the dispersive shifts $\chi_j$ are modified, as given in~\eref{eq:chi}.} due to qubit $j$. Here, the qubit-qubit coupling $\sim J$ via virtual photons has been neglected, as is appropriate for sufficient detuning between qubits, $J\ll\abs{\Delta_{\text{q},j}-\Delta_{\text{q},j'}}$. The effects of qubit decay and cavity photon leakage are taken into account within a master equation description. Specifically, we include intrinsic qubit relaxation with rates $\gamma_{j}$, (single-mode) Purcell-induced relaxation with rates $\gamma_{pj}$ \cite{purcell__1946, houck_controlling_2008}, and photon decay from the cavity with rate $\kappa$. As we saw in the last chapter, pure dephasing can be ignored for transmons \cite{schreier_suppressing_2008}, and will be neglected here. (We have checked that inclusion of pure dephasing at small rates, comparable to those achieved in \cite{schreier_suppressing_2008}, does not significantly alter the results.)
+
+As demonstrated in \cite{hutchison_quantum_2008}, one can dramatically simplify the resonator-qubit master equation and reach an effective master equation for the qubits only, given that photon decay is fast. Specifically, we assume that the drive is on resonance to the cavity, $\Delta_\text{r}=0$, and require
+\be
+ \textstyle\kappa\gg\max\big\{\xi,\sum_j\lvert\chi_j\rvert\big\}.
+\ee
+Under these conditions, an analogous separation of qubit and resonator degrees of freedom can also be reached on the level of the stochastic master equation (SME), appropriate for the situation of continuous homodyne detection of the emitted microwave radiation \cite{hutchison_quantum_2008}. The effective SME for the qubit density matrix $\rho_J$ conditioned on the measurement record
+\be\label{eq:Jtrace}
+    J(t) = \sqrt{\smash[b]{\Gamma_\text{ci}}}\sum_j\langle \delta_j\sigma^z_j\rangle + \zeta(t)
+\ee%
+    \nomdref{CJ}{$J(t)$}{The measurement trace $J(t) = \sqrt{\smash[b]{\Gamma_\text{ci}}}\sum_j\langle \delta_j\sigma^z_j\rangle + \zeta(t)$}{eq:Jtrace}
+is given by
+\be\label{theSME}
+    \dot\rho_J=L\rho_J + \sqrt{\smash[b]{\Gamma_\text{ci}}}\zeta(t)\:\mathcal{M}\big[\sum_j \delta_j \sigma_j^z\big] \rho_J,
+\ee
+where we are using similar notation to \cite{hutchison_quantum_2008}: $\mathcal{M}[c]$ is the measurement operator given by $\mathcal{M}[c]\rho_J = (c-\langle c\rangle )\rho_J/2 + \rho_J (c-\langle c\rangle )/2$,%
+    \nomdref{CMM}{$\mathcal{M}[\cdot]\cdot$}{The measurement superoperator $\mathcal{M}[c]\rho_J = (c-\langle c\rangle )\rho_J/2 + \rho_J (c-\langle c\rangle )/2 $}{theSME}%
+    \nomdef{ASME}{SME}{Stochastic master equation}
+$\zeta(t)$ represents Gaussian white noise with zero mean and $\langle \zeta(t)\zeta(t')\rangle = \delta (t-t')$, and $\Gamma_\text{ci}=\eta\Gamma_\text{m}$%
+    \nomdref{Gfzeta}{$\zeta(t)$}{Gaussian white noise with zero mean and $\langle \zeta(t)\zeta(t')\rangle = \delta (t-t')$}{eq:Jtrace}%
+    \nomdref{GcaGammaci}{$\Gamma_\text{ci}$}{The effective measurement rate, reduced by an efficiency factor from the maximum rate}{eq:Jtrace}
+denotes the effective measurement rate, reduced by an efficiency factor\footnote{As in \cite{hutchison_quantum_2008}, we have checked that additional measurement-induced dephasing does not alter our results, and that the relevant parameter is the ratio of coherent information rate $\Gamma_\text{ci}$ and decay rates. As a result, we may set $\Gamma_\text{d}=\Gamma_\text{ci}/2$.} with respect to the maximum rate $\Gamma_\text{m}=64\bar{\chi}^2|\xi|^2\kappa^{-3}$. The generator $L$ is defined as
+\be
+\begin{split}
+L\rho&=-\rmi\biggl[\sum_j\frac{\omega_{\text{q},j}+\chi_j}{2}\sigma^z_j + \frac{4\bar\chi\abs{\xi}^2}{\kappa^2}\sum_j\delta_j\sigma^z_j,\rho\biggr]\\
+ &\quad+\sum_j(\gamma_{j}+\gamma_{pj})\mathcal{D}[\sigma^-_j]\rho + \frac{\Gamma_\text{d}}{2}\mathcal{D}\Bigl[\sum_j\delta_j\sigma^z_j\Bigr]\rho
+\end{split}
+\ee
+with the measurement-induced dephasing rate $\Gamma_\text{d}=\Gamma_\text{m}/2$. Assuming mutually distinct qubit frequencies, we have treated the Purcell effect in the secular approximation. This distinguishes the current discussion from the work of Hutchison \etal---whereas they were able to make use of a \emph{dark state} that was protected from Purcell decay due to symmetry, we are not so fortunate. Specifically, we neglect the cross-terms in $\mathcal{D}[\sigma^-_1+\sigma^-_2-\sigma^-_3]$ which are interference effects for radiation from different qubits, and which only become important if the qubit frequencies are sufficiently close, \ie, $\abs{\Delta_{\text{q},i}-\Delta_{\text{q},j}}\ll\gamma_{pi}+\gamma_{pj}$ \cite{majer_coupling_2007, hutchison_quantum_2008}. With this approximation, Purcell-induced decay and intrinsic decay (which might itself be due to multimode Purcell effect) can be treated on the same footing, and in the following we will assume similar decay rates for all qubits and subsume them under the shorthand $\gamma=\gamma_{j}+\gamma_{pj}$. Finally, the integrated signal $s$ is simply given as the time integral of the measurement record for the full measurement time~$t$,%
+    \nomref{Cs}{eq:sfromJ}%
+\be\label{eq:sfromJ}
+    s=\int_0^t \rmd t'\,J(t').
+\ee
+
+\begin{figure}[t]% GGG
+\centering
+\levincludegraphics{ghz2-conv}
+    \caption[GHZ state preparation in presence of decay]
+    {\captitle{GHZ state preparation in presence of decay.}
+        \capl{a}, Histogram of the integrated signal after a measurement time $t = 5/\Gamma_\text{ci}$, and probability distribution $p(s)$ in the absence of any decay (red curve). \capl{b} Scatterplot (blue dots) showing the correlation between the expectation value of the Mermin operator $\langle M \rangle$ and the integrated signal $s$ for $t = 5/\Gamma_\text{ci}$. Each point corresponds to one of 10\,000 trajectories. For comparison, the correlation in the ideal case of no decay is shown as the dashed black curve. The boxes indicate the action of the boxcar and the nonlinear filtering scheme, where the nonlinear filter selects all points lying in the purple box and the boxcar filter the ones in the red box. The Mermin bound is $\langle M \rangle=2$, and local hidden variable (LHV) theories only permit values $\langle M \rangle\le2$. Parameters are chosen as $\Gamma_\text{d} = \Gamma_\text{ci}/2$, $\gamma/\Gamma_\text{ci}= 1/35$ and $\delta_1 = \delta_2 = 3/4$ and $\delta_3 = 3/2$.\label{fig:figure2}}
+\end{figure}
+\section{Preparation of the GHZ state under realistic conditions}\label{sec:generation}
+We now turn to the situation of GHZ state preparation in the presence of qubit decay, which we study using
+quantum trajectory simulations based on the stochastic master equation \eref{theSME}. Following the steps
+(i)--(iii) described in \sref{sec:idealized}, the system is initialized and dispersive shifts are adjusted for the measurement step. The interplay of measurement-induced dephasing, gradual state projection, and the simultaneous qubit decay are captured by the conditional density matrix $\rho_J$, where each simulation run generates a particular measurement record $J(t)$ up to a final measurement time $t$, corresponding to the
+experimentally accessible homodyne signal.
+
+Since preparation of the correct pre-GHZ state is probabilistic (ideally, state generation succeeds with probability $P=1/4$ in the present case), one has to define a criterion (`filter') for success of preparation, and postselect the corresponding subensemble \cite{gambetta_protocols_2007}. In principle, the information available to the filter is the full measurement record. In the following, we will discuss two different filters, the linear boxcar filter and the full nonlinear Bayesian filter and compare their performance in selecting high-fidelity GHZ states under realistic conditions.
+
+The simple filter already outlined in \sref{sec:idealized} is the linear boxcar filter. It compresses each measurement record into a single number, the integrated signal $s=\int_0^t \rmd t'\, J(t')$, and declares successful
+pre-GHZ state preparation whenever $s$ falls within the limits of appropriately chosen thresholds, $\nu_1\le
+s\le\nu_2$. Otherwise, the state is rejected.
+
+The results for the integrated signal of many such measurements are conveniently plotted in form of a histogram, see \fref{fig:figure2}a. When compared to the probability distribution expected in the ideal case of no decay, one observes that qubit decay leads to a distortion of the probability density with an overall shift of probability density towards the left-most peak, \ie, towards the signal associated with the ground state. The shift is thus easily understood as a consequence of decay processes acting during the finite measurement time.
+
+As a benchmark for the quality of the generated states and its correlation with the integrated signal, \fref{fig:figure2}b shows a scatterplot of the expectation value of the Bell--Mermin operator $\langle M \rangle$ versus the integrated signal for 10\,000 individual measurement trajectories. For comparison, the corresponding scatterplot in the ideal case of no decay is shown to collapse to a single curve. The scatter in the nonideal case results in trajectories of the same integrated signal, but very different values of $\langle M \rangle$, and thus in a significant number of falsely accepted states within the simple boxcar filtering.
+\begin{figure}
+\centering
+\levincludegraphics{ghz3-conv}
+\caption[Time traces of the signal $J(t)$ for individual quantum trajectories]
+{\captitle{Time traces of the signal $J(t)$ for individual quantum trajectories.}
+  The traces are smoothed over time $0.1 \Gamma_{\text{ci}}^{-1}$ (cyan) and $\Gamma_{\text{ci}}^{-1}$ (blue). For \capl{a} and \capl{b} the expectation of the Mermin operator is large, $\langle M \rangle>3.9$, whereas for \capl{c} and \capl{d} it is small, $\langle M \rangle <0.1$. The horizontal lines indicate the values $J(t)$ would take on average for the integrated signal $s$ to be at the peaks of \fref{fig:figure2}a. All 4 traces are selected by boxcar filter on the integrated signal, such that they all lie close to the middle of the center peak, $s\simeq0$. For \capl{b},~\capl{d} the relaxation is low, $\Gamma_{\text{ci}}/\gamma=142$, and trajectories with extremal values of $\langle M \rangle$ can be distinguished by eye. For \capl{a},~\capl{c} the measurement time is shorter and relaxation is faster $\Gamma_{\text{ci}}/\gamma=35$, nevertheless the nonlinear filter is still able to reliably estimate $\langle M \rangle$, as is demonstrated in \fref{fig:fig4}.\label{fig:fig3}}
+\end{figure}
+
+The essential mechanism for false acceptance of states is illustrated in \fref{fig:fig3}, showing the measurement record $J(t)$ as a function of time for four individual trajectories. Speaking loosely, the trajectories with integrated signal $s$ close to $0$ can be divided into two categories: trajectories with measurement records $J(t)$ fluctuating around $J(t)=0$, see \fref{fig:fig3}a,b and measurement records showing larger variations of $J(t)$ which accidentally average to $s=0$ upon integration. Trajectories of the first category correspond to the correct pre-GHZ state with high probability. On the other hand, an example from the second category consists of trajectories which, with high probability,  initially assume the state $\ket{\downarrow\uparrow\uparrow}$ with $\langle X \rangle =2$, and then suffer a decay process in qubit 3 at some intermediate time, thus transitioning to the state $\ket{\downarrow\uparrow\downarrow}$ with $\langle X \rangle =-2$, see \fref{fig:fig3}c,d.
+
+This insight also points to a remedy for the boxcar filter. The full measurement record can, when spaced densely enough, be used to reconstruct the actual underlying quantum trajectory $\rho_J(t)$ in the following way: Given that the state before the onset of the measurement [see step~(ii) in \sref{sec:idealized}] as well as the parameters entering the stochastic master equation are known with sufficient accuracy, one can successively determine the Wiener increments $\rmd W(t) = \zeta(t)\rmd t$ from the measurement record. These, in turn, can then be used to propagate $\rho_J$ from the initial time to the measurement time $t$, and the resulting $\rho_J(t)$ encodes the expected value of the Bell--Mermin operator via $\langle M \rangle =\tr [\rho_J(t)M]$. This procedure corresponds to a nonlinear filter \cite{gambetta_protocols_2007}, with an acceptance criterion based on the value of $\langle M \rangle$ itself, see \fref{fig:figure2}b.
+
+\begin{figure}
+\centering
+\levincludegraphics{ghz4-conv}
+\caption[Expectation value of the Mermin operator $ \langle M \rangle$ as a function of acceptance probability]
+{\captitle{Expectation value of the Mermin operator $ \langle M \rangle$ as a function of acceptance probability, for several ratios $\Gamma_\text{ci}/\gamma$.}
+  Parameters are chosen as in \fref{fig:figure2}. Solid (dashed) lines show the results using the nonlinear (boxcar) filter. (See text for details.) Using nonlinear filtering, the fraction of accepted trajectories with high $\langle M\rangle$-value can be substantially increased. For an acceptance probability $\lesssim 1/4$ the advantage of the nonlinear scheme becomes apparent. For each point, $\langle M \rangle$ is obtained by averaging over $20\,000$ trajectories and optimizing with respect to measurement time $t$ and boxcar thresholds. The inset shows the expectation value $\langle M \rangle$ as a function of the ratio $\Gamma_\text{ci}/\gamma$ for an acceptance probability of $1\%$.\label{fig:fig4}}
+\end{figure}
+The advantage of using the nonlinear filter is highlighted by \fref{fig:fig4}, which compares the performances of boxcar and nonlinear filter. For acceptance probabilities smaller than the ideally attainable $P=1/4$, we find that the nonlinear filter constitutes a significant improvement over the boxcar filter. Specifically, for ratios $\Gamma_\text{ci}/\gamma\lesssim4$ currently supported by experiments, the nonlinear filter will be crucial in order to reliably exceed the value $\langle M \rangle =2$, which is the relevant Mermin bound for violation of local-hidden variable theories in this case. \Fref{fig:fig4} demonstrates that, when exploiting the trade-off between large expectation values of $\langle M \rangle$ and high acceptance probabilities, high-fidelity GHZ states can be prepared under realistic conditions.
+
+\section{GHZ state detection under realistic conditions\label{sec:detection}}
+\newcommand{\UU}{\ket{\Uparrow}}
+\newcommand{\sg}[1]{\sigma^{x}_{#1}}
+The measurement of the Bell--Mermin operator via parity detection, presented in \sref{sec:idealized}, requires the resolution of $\sim N$ peaks in the probability density $p(s)$ of the integrated signal. While clearly advantageous relative to the resolution of $\sim 2^{N}$ peaks needed for a full readout, the parity detection remains difficult with current experimental parameters due to the qubit relaxation within the measurement time. In the following, we discuss a scheme that avoids this problem.
+
+The key of this scheme lies in the fact that at low temperatures, decay into the state $\UU=\ket{\uparrow\uparrow\cdots\uparrow}$%
+    \nomdref{BUU}{$\ket{\Uparrow}$}{The state with all qubits in their excited state: $\ket{\Uparrow}=\ket{\uparrow\uparrow\cdots\uparrow}$}{sec:detection}
+is negligible. This is similar to Kofman and Korotkov's use of the `negative result outcomes'  to avoid the effects of measurement crosstalk in Bell tests using superconducting phase qubits \cite{kofman_analysis_2008}. False positive events in the detection of  the state $\UU$ can thus be suppressed by setting the acceptance threshold $\nu$ for the integrated homodyne signal sufficiently high. Using this insight, we construct a measurement $B$ by assigning the measurement outcomes `$0$', `$1$' to the cases where the signal is respectively smaller or larger than a preset threshold. We can describe $B$ in the language of generalized observables as a positive operator valued mapping (POVM) \cite{davies_quantum_1976}, by specifying its effects
+\begin{subal}{\label{eq:e1}}
+    E_1 &= \alpha \ket{\Uparrow}\bra{\Uparrow}, \\
+    E_0 &= \openone - E_1 .
+\end{subal}
+Here, $\alpha=P_{\UU}(s>\nu)$  is the probability that the signal exceeds the threshold $\nu$ given the system was prepared in $\UU$. This probability is set by the decay of the $\UU$ state during the measurement time, and is analogous to the detector efficiency in quantum optics.  As a result, $1-\alpha$ can be described as a `false negative' probability that the measurement fails to detect a valid $\UU$ state. Experimentally, $\alpha$ can be determined by repeatedly preparing the system in $\UU$ (using single-qubit $\pi$ rotations), and subsequently performing the measurement. This procedure yields the expectation value
+$\langle \Uparrow\rvert B\lvert\Uparrow \rangle$, which is identical to the fraction of the cases where $s>\nu$, and hence to $\alpha$. In general, complete characterization of a POVM via detector tomography \cite{lundeen_tomography_2009,luis_complete_1999,fiurek_maximum-likelihood_2001,dariano_quantum_2004} requires many measurements and a numerical optimization procedure to ensure the resulting POVM remains physical. Due to the simple structure of the measurement $B$, it may be conveniently characterized by determining only a single parameter~$\alpha$.
+
+ The measurement $B$ can now be combined with single-qubit rotations to determine the parity. We perform all combinations of $n$-qubit bit flips, $0\le n\le N$, and sum the measured $\langle B\rangle$ with relative sign ${(-1)}^n$. For clarity we specialize to the 3-qubit case, and define
+ \be \label{eq:ff}
+ \begin{split}
+    f_{zzz}=&\langle B\rangle - \langle \sg1 B \sg1\rangle - \langle \sg2 B \sg2\rangle -\langle \sg3 B \sg3\rangle \\
+     & + \langle \sg2\sg3 B \sg2\sg3\rangle + \langle \sg1\sg3 B \sg1\sg3\rangle + \langle \sg1\sg2 B\sg1\sg2\rangle
+     - \langle \sg1\sg2\sg3 B \sg1\sg2\sg3\rangle .
+\end{split}
+\ee
+The value of $f_{zzz}$ is proportional to the parity measured in the $z$-basis, $f_{zzz}=\alpha \langle \sigma_1^z\sigma_2^z\sigma_3^z\rangle$, with the proportionality constant being $\alpha$ as defined above. It is straightforward to extend this scheme to the actual parities required for determining the value of the Bell--Mermin operator by prepending additional single-qubit rotations.
+
+The expectation of the Bell--Mermin operator can now be related to the actual measurements via $F=\alpha\MM$, where
+\be
+    \label{eq:FF}
+    F=f_{xxx}-f_{xyy}-f_{yxy}-f_{yyx} .
+\ee
+Thus, the measurement of the 32 expectation values entering into $F$ and determination of $\alpha$ allow for the extraction of $\MM=F/\alpha$, with no restrictions on the qubits' decay rates.\footnote{If decay is  fast, however, $\alpha$ may become so small that the time required for gathering sufficient statistics may become impractically long.}
+
+As explained in \sref{sec:sowhat} the nature of the dispersive measurement prevents us in principle from a strict violation of a Bell-type inequality. However, in the limit where the measurement effects factorize into tensor products over the single-qubit Hilbert spaces, \ie,
+\be
+    E_{ijk}=E_{i}^{(1)}\otimes E_{j}^{(2)}\otimes E_{k}^{(3)} ,
+\ee
+the measurement can be considered local in the sense of the no-signalling property
+\cite{busch_luders_1998,dieks_inequalities_2002}. The effect defined in \eref{eq:e1} obeys such a factorization
+\begin{equation}
+    E_1=\alpha \bigl(\ket{\uparrow}_1\bra{\uparrow}_1\bigr) \otimes
+        \bigl(\ket{\uparrow}_2\bra{\uparrow}_2\bigr) \otimes
+        \bigl(\ket{\uparrow}_3\bra{\uparrow}_3\bigr) .
+\end{equation}
+Similarly, the rotated measurements entering into $F$ factorize in this sense, provided the rotations themselves also factorize. This additional requirement holds not only for perfect single-qubit rotations~\cite{kofman_analysis_2008}, but also for imperfect rotations, as long as there is no coupling or crosstalk between qubits during the rotation pulse. For example, independent single-qubit relaxation processes during a finite-duration rotation pulse do not spoil the factorization property. By contrast, a rotation of qubit $b$ caused by a rotation pulse on qubit $a$ no longer factorizes. In the following, we will assume that such crosstalk is negligible. In that case, the argument of Mermin applies, which states that a local hidden variable theory has%
+    \nomdef{ALHV}{LHV}{Local hidden variable. Describes a \emph{classical} theory which tries to reproduce some quantum results by making use of additional \emph{unobserved} degrees of freedom}
+bounds on the allowed $F$, $-2\le F\le 2$ \cite{mermin_extreme_1990}. Meanwhile quantum mechanics allows for $\MM=4$ and hence if $\alpha>1/2$ there is the possibility to violate Mermin's version of the Bell inequality.
+
+\begin{figure}
+\centering
+\levincludegraphics{ghz5-conv}
+\caption[False positive and false negative rates versus threshold]
+{\captitle{False negative probability $1-\alpha$ and worst-case value for the false positive probability $\beta$ (definition see text) versus threshold $\nu$.} The horizontal line indicates the necessary constraint on $\alpha$ to violate the Mermin inequality. The measurement time is chosen as $t = 3 / \Gamma_{\text{ci}}$.\label{fig:figure5}}
+\end{figure}%
+\Fref{fig:figure5} shows the variation of the false negative probability $(1-\alpha)$ with threshold $\nu$, so that the required threshold for $\alpha>1/2$ can be read off. Since the derivation of the Bell inequality required factorization of measurement effects, we estimate the corrections to \eref{eq:e1}. In our case, the largest correction will be due to misidentification of states from the subspace $\{\ket{\downarrow\uparrow\uparrow}, \ket{\uparrow\uparrow\downarrow},\ket{\uparrow\downarrow\uparrow}\}$, for which $X=\sum_j \sigma^z_j=1$. We put an upper bound on this misidentification probability $\beta$ by assuming that there is no decay out of this subspace and thus assume that $P_{X=1}(s)$, the distribution of the homodyne signal arising from this subspace, is Gaussian. Under these conditions, one obtains a worst-case estimate of the `false positive' probability $\beta$ as a function of $\nu$.
+
+\Fref{fig:figure5} shows that with a low rate of qubit decay, $\Gamma_\text{ci}/\gamma=20$, we find $\alpha>1/2$ and a low probability of false positives, $\beta\simeq 0.002$, meaning that a meaningful violation of a Bell-type inequality should be possible. Conversely, for a more realistic rate of qubit decay $\Gamma_\text{ci}/\gamma=5$, the requirement $\alpha>1/2$ leads to significant false positive rates $\beta\simeq 0.16$, and factorization of $E_1$ breaks down. We note that the required $\Gamma_\text{ci}/\gamma\simeq 20$ for the violation of the Bell inequality is much more stringent than the experimentally realistic $\Gamma_\text{ci}/\gamma\simeq 4$ that was shown in the previous section to be sufficient for producing states with $\MM>2$.
+
+\section{Conclusions\label{sec:conclusions}}
+In conclusion, we have presented a concrete proposal for efficient statistical production of multi-qubit GHZ states by dispersive measurement in a cQED setup, taking into account the realistic conditions of decoherence and decay. Our proposal is based on the possibility of adjusting the dispersive shifts of individual qubits, which effectively modifies the measurement operator and allows for the generation of entanglement starting from separable input states. Our simulations show that even with experimentally achievable values of $2<\Gamma_\text{ci}/\gamma<4$ it is possible to achieve a $1\%$ efficiency in preparing states with values of the Bell--Mermin operator exceeding its classical bound, $\langle M \rangle>2$.
+
+By using the global dispersive measurement in the same setup, we have also proposed a scheme for implementing parity measurements on the prepared state. Using these measurements, we have studied the sufficient conditions for verifying that such states indeed violate the Bell--Mermin inequality. We find that a signal-to-noise ratio of $\Gamma_\text{ci}/\gamma=20$  will be sufficient to observe a violation of the Mermin bound. While this ratio is larger than currently demonstrated, we hope that the present limits on detector efficiencies in semiconductor amplifiers (\slantfrac{1}{20}\ of the quantum limit) will soon be improved by using superconducting pre-amplifiers \cite{bergeal_analog_2008}.

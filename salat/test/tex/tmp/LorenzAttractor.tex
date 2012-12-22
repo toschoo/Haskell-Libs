@@ -1,0 +1,121 @@
+%
+% imbed javascript animations in PDF files using pdftex
+%
+% version 0004
+% date 20030325
+%
+% by Jochen Skupin
+%
+\documentclass[12pt]{scrartcl}
+
+% use times and Mathematica math fonts
+\usepackage{wrisym}
+% a nice font for the title
+\usepackage[sf]{vivaldi}
+% rm headers
+\renewcommand{\descfont}{\rmfamily}
+\renewcommand{\sectfont}{\rmfamily}
+\normalfont
+
+% a few other packages
+\usepackage{url}
+\usepackage{graphicx}
+
+% load the pdfanim style 
+% (this style is still in an early test phase and not yet available)
+% it is an extension to hyperref.sty and loads it automatically
+\usepackage{pdfanim}
+
+\hypersetup{
+    pdftitle={The Lorenz Attractor},
+    pdfsubject={pdfTeX animation example},
+    pdfauthor={Jochen Skupin},
+    pdfkeywords={strange lorenz attractor pdf tex animation},
+    pdfpagemode=None,
+    plainpages=false,
+    pdfstartview=Fit,
+    breaklinks=true,
+    colorlinks=false,
+    pdfhighlight=/N,
+    % define colors, even if not used
+    linkcolor=blue,
+    citecolor=blue,
+    urlcolor=blue,
+    citebordercolor=1 1 1,
+    filebordercolor=1 1 1,
+    linkbordercolor=1 1 1,
+    menubordercolor=1 1 1,
+    pagebordercolor=1 1 1,
+    urlbordercolor=1 1 1,
+    pdfborder=1 1 1
+  }
+
+\pagestyle{empty}
+
+\begin{document}
+% title
+\begin{center}
+{\sffamily\Huge The Lorenz Attractor}
+\end{center}
+
+\noindent
+The Lorenz attractor is a strange attractor that arises in a system of
+equations describing the \mbox{2-dimensional} flow of fluid of uniform depth, with
+an imposed vertical temperature difference.
+In the early 1960s, Lorenz discovered the chaotic behavior of a
+simplified \mbox{3-dimensional} system of this problem,
+now known as the Lorenz equations:
+
+\begin{eqnarray}
+  \frac{\dd}{\dd t}X &=& \sigma(Y-X) \label{eq:X}\\
+  \frac{\dd}{\dd t}Y &=& -XZ + rX -Y \label{eq:Y}\\
+  \frac{\dd}{\dd t}Z &=& XY - bZ \label{eq:Z}
+\end{eqnarray}
+
+\noindent 
+The following figure shows the numerical solution of equations 
+(\ref{eq:X}) to (\ref{eq:Z}) calculated with
+$\sigma = 3$,
+$r = 26.5$ and
+$b = 1$.
+The complex \mbox{3-dimensional} structure of this attractor is
+hard to see in a \mbox{2-dimensional} plot. Therefore click on 
+the image to start/stop a slow rotation.
+
+\vfill
+
+% load and initialise animation
+% arguments:
+%   - name of the animation (with this name it can be reused
+%     several times in one document)
+%   - first part of file name (xxx)
+%   - number of animation frames / files (n)
+%   - time im ms between two animation frames
+% the animation will be composed of files 
+% xxx0.pdf, xxx1.pdf ... xxx(n-1).pdf
+\PDFAnimLoad{lorenz1}{LorenzPlots/lorenz}{60}{500}
+
+\begin{Form}
+  \centering
+  % put the animation with name "lorenz1" here
+  \PDFAnimation{lorenz1}\\
+\end{Form}
+
+\subsection*{Reference}
+\begin{itemize}
+  \item Lorenz, E. N. "Deterministic Nonperiodic Flow." 
+	{\em J. Atmos. Sci.} 20, 130-141, 1963.
+\end{itemize}
+
+
+% add space for tiny comment line
+\enlargethispage{5\baselineskip}
+% tiny comment line
+\vfill\noindent\tiny
+This page is a demonstration how to imbed javascript animations 
+in PDF files using pdftex.
+\hfill Author: Jochen Skupin (email: \url{jochen.skupin@uni-bremen.de})
+
+\end{document}
+
+

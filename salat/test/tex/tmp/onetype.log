@@ -1,0 +1,15 @@
+This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdftex 2012.5.21)  25 OCT 2012 22:08
+entering extended mode
+ %&-line parsing enabled.
+**onetype.tex
+(./onetype.tex
+! Font \pad=padr9alt at 8.0pt not loadable: Metric (TFM) file not found.
+l.20 \font\pad=padr9alt at 8pt
+                              
+? 
+! Emergency stop.
+l.20 \font\pad=padr9alt at 8pt
+                              
+End of file on the terminal!
+
+!  ==> Fatal error occurred, no output PDF file produced!

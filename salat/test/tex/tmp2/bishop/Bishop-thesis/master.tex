@@ -1,0 +1,449 @@
+\svnid{$Id: master.tex 462 2010-04-10 00:48:59Z lsb $}%
+\chapter{Master equation}\label{ch:master}%
+\lofchap{Master equation}%
+\thumb{Master equation}%
+\lettrine{T}{he} previous chapter was concerned with the behavior of the transmon coupled to a cavity resonator, at the level of the Hamiltonian. This chapter concerns the coupling of the transmon-cavity system to uncontrolled environmental degrees of freedom. Whereas the Hamiltonian dynamics preserves the purity of the wavefunction, the interaction with the environment can cause the system density matrix to become mixed, via such processes as \emph{relaxation} and \emph{dephasing}. These phenomena can be described in the framework of quantum Markovian master equations.
+
+This chapter begins with a definition of \emph{quantum operations}. Then we show how by imposing the Markov property, we can derive the standard Kossakowski and Lindblad forms for the master equation, which describe the most general type of master equation usually considered. The following section then discusses how to derive a master equation for a particular case of a known microscopic coupling between a system and its environment, by the argument of \emph{weak coupling}. Next we make use of this framework to derive standard master equations, for the damped harmonic oscillator and for the qubit (the Bloch equations). The discussion until this point is largely borrowed from standard texts in the fields of decoherence and open systems \cite{hornberger_decoherence_2009, alicki_lendi, breuer_petruccione}. For simplicity of exposition, the system is implicitly assumed to have a discrete, finite Hilbert space, although many of the results generalize to bounded operators over countably infinite Hilbert spaces (and practitioners routinely ignore these restrictions and apply the results to general operators over general Hilbert spaces). The interested reader should consult the literature. The final section of this chapter discusses the appropriate way to apply these methods to derive the master equation for the transmon-cavity system.
+
+\section{Quantum operations}
+\label{sec:positive}
+\subsection{Positive maps}
+We wish to discuss the temporal evolution of the state of a quantum mechanical system. The most general description of the state is via the density matrix $\rho$ which has by definition the properties:
+\begin{enumerate}
+    \item Hermitian: $\rho=\rho\dg$;
+    \item positive semidefinite: $\lambda\ge0$, for all eigenvalues $\lambda$ of $\rho$;
+    \item unit trace: $\tr \rho=1$.
+\end{enumerate}
+(By way of analogy, a classical probability distribution is required to be real, everywhere positive, and to integrate to unity.) We write the transformation describing the state change of the system as
+\be
+    \rho\mapsto\Lambda\rho
+\ee
+using the map $\Lambda$. The density matrix may be formed as a convex probabilistic mixture of other density matrices $\rho=p\rho_1+(1-p)\rho_2$, for $p\in[0,1]$ and we thus require that
+\be
+    \Lambda(p\rho_1+(1-p)\rho_2)=p \Lambda \rho_1 + (1-p)\Lambda\rho_2 .
+\ee
+Thus, $\Lambda$ must be a linear map that preserves the density matrix properties. Such a map is called a \emph{positive, trace-preserving} map.
+
+\subsection{Complete positivity}
+\label{sec:ancilla}
+It is possible to derive a much more stringent requirement on quantum dynamical maps by imagining that there is an $n$-level ancilla system with trivial Hamiltonian $H=0$ placed far away from the open system \SSS\@. Because these systems do not interact, the joint dynamical map $\Lambda_n$ should be of the form $\Lambda\otimes\openone_n$. Obviously, $\Lambda_n$ must be a positive map for all $n=1,2,\ldots.$ This condition on $\Lambda$ is called \emph{complete positivity} and is significantly stronger than plain positivity. It requires that the evolution of the universe must remain positive under $\Lambda$, even if \SSS\ is entangled with some other system. A particular result~\cite{nielsen_chuang} is that any completely positive trace preserving (CPTP) map, also known as a \emph{quantum channel} or \emph{quantum operation}, on an $N$-dimensional system, admits an \emph{operator sum representation}
+\be
+    \label{eq:OSR}
+    \Lambda \rho=\sum_{\alpha=1}^{N^{\mathrlap{2}}} W\pdg_\alpha\rho W\dg_\alpha ,
+\ee
+with a completeness relation
+\be
+    \label{eq:OSR2}
+    \sum_{\alpha=1}^{N^{\mathrlap{2}}} W\dg_\alpha W\pdg_\alpha = \openone_N .
+\ee
+The $W_\alpha$ are called \emph{Kraus operators} and their choice is not unique.
+
+The canonical example of a map which is positive but not completely positive is the transposition map $\rho\mapsto\rho^\text{T}$. The non-complete positivity of the transposition map should be obvious, once we recall that partial transposition is the well-known Peres--Horodecki test for entanglement \cite{peres_ppt_1996, horodecki_separability_1996}: if the density matrix of a bipartite system ceases to be positive semidefinite under transposition of one of the components, then this is a sufficient condition to prove that the system is entangled.
+
+\subsection{Reduced dynamics}
+\label{sec:reduced}
+Instead of the argument of the previous subsection (based on the imaginary ancilla system), an alternative derivation of \eref{eq:OSR} comes from considering the interaction of the open system \SSS\ with the external world, reservoir \RRR\@. Assume that the initial state of the system-reservoir combination is given by a product: $\rho\otimes\omega_R$, and that the combined system undergoes reversible evolution denoted by the unitary operator $U$. The transformation describing the state change of \SSS\ is given by
+\be
+    \label{eq:rhomap}
+    \rho\mapsto\tr_R(U \rho\otimes\omega_R U\dg) ,
+\ee%
+\nomdref{GzomegaR}{$\omega_R$}{Density matrix for the reservoir \RRR}{eq:rhomap}%
+where $\tr_R$ denotes the \emph{partial trace} over \RRR, defined via
+\be
+    \label{eq:partialtrace}
+    \boket{\phi}{\tr_R \gamma}{\psi}=\sum_\nu\boket{\phi\otimes f_\nu}{\gamma}{\psi\otimes f_\nu}
+\ee%
+\nomdref{CtrR}{$\tr_R[\cdot]$}{Partial trace over \RRR}{eq:partialtrace}%
+for all states $\ket{\phi}$, $\ket{\psi}$ of \SSS, all operators $\gamma$ in $\SSS\oplus\RRR$, and any arbitrary orthonormal basis $\{f_\nu\}$ in \RRR\@. By decomposing $\omega_R=\sum_\nu\lambda_\nu\ket{f_\nu}\bra{f_\nu}$ it is possible \cite{alicki_lendi} to construct explicitly the operator sum representation \eref{eq:OSR}, finding the $W_\alpha$ in terms of $U$ and $\omega_R$.
+
+\subsection{Aside: Not completely positive maps?}
+Not everyone is convinced by the above arguments justifying complete positivity. Shaji and Sudarshan \cite{shaji_2005} point out that the argument of \sref{sec:ancilla} based on the possible presence of an ancilla requires that on the one hand we assume the ancilla to be completely isolated from \SSS\ but on the other hand it be entangled with \SSS\@. Similarly, they note that the argument of \sref{sec:reduced} based on reduced dynamics, requires on the one hand we assume the initial state of the combined system is a product $\rho\otimes\omega_R$ and on the other hand the unitary evolution $U$ be such that it causes entanglement between the systems. They thus conclude that the standard arguments are unconvincing and they recommend that positive maps are as good candidates as completely positive maps for describing open quantum evolution. Although this is an interesting point, the remainder of this thesis follows the standard approach of requiring complete positivity. (As we shall see, the class of master equations that maintains complete positivity, even after making the Markov restriction, is still much more general than we need---our problem is to find reasonable assumptions that allow us to restrict the class of maps sufficiently to allow comparisons with experiment.)
+
+\section{Markovian dynamics}
+\label{sec:markov}
+The previous sections discussed the properties of a single dynamical map $\Lambda$. In order to describe the time evolution of an open system we need a one-parameter family of such maps $\{\Lambda_t | t \ge0\}$. Generally $\Lambda_t$ satisfies a complicated integro-differential equation. However,  by making the Markov approximation the evolution becomes quite simple. Specifically, we wish to describe the \emph{quantum dynamical semigroup}, defined as the family $\{\Lambda_t | t \ge0\}$ satisfying
+\begin{enumerate}
+    \item $\Lambda_t$ is a dynamical map (\ie, completely positive and trace preserving);
+    \item $\Lambda_t\Lambda_s=\Lambda_{t+s}$: the semigroup condition or Markov property. (It is a semigroup rather than a group simply because each element may not have a unique inverse---the purpose is to describe \emph{irreversible} dynamics);
+    \item $\tr [(\Lambda_t \rho)A]$ is a continuous function of $t$ for any density matrix $\rho$ and observable $A$.
+\end{enumerate}
+These conditions imply the existence of linear map $L$ called a \emph{generator of the semigroup}, such that
+\be
+    \label{eq:qmme}
+    \dot{\rho_t}=L\rho_t ,
+\ee
+where $\rho_t=\Lambda_t\rho$. \Eref{eq:qmme} is called a \emph{quantum Markovian master equation}. The generator $L$ can be written in \emph{Kossakowski normal form} \cite{Kossakowski1972} as
+\be
+    \label{eq:kossa}
+    L\rho=-\rmi\com{H}{\rho}+\frac{1}{2}\sum_{i,k=1}^{N^2-1}A_{ik}
+        \Bigl(\bigl[F\pdg_i,\rho F\dg_k\bigr]+\bigl[F\pdg_i\rho, F\dg_k\bigr]\Bigr) .
+\ee
+Here $H=H\dg$ is the Hamiltonian describing the dynamics of the open system, including reversible effects due to the environment (for example renormalizations of transition frequencies). To make the decomposition into Hamiltonian and non-Hamiltonian parts unique, we impose
+\be
+    \label{eq:tracelessH}
+    \tr(H)=0.
+\ee
+The \emph{orthonormal matrix set} $\{F_i|i=1,2,\ldots,M=N^2-1\}$ comprises $M$ matrices of dimension $(N\times N)$ and has the properties
+\be
+    \tr(F_i)=0,\qquad \tr(F\pdg_i F\dg_k)=\delta_{ik}.
+\ee
+The quantities describing the irreversible dynamics: the lifetimes, longitudinal and transverse relaxation times, and so on, are contained in the Hermitian $(M\times M)$-matrix $A$, which is constrained to be positive. The requirement that $A$ be positive puts non-trivial constraints among the decoherence parameters, such as the well-known $T_2\le 2 T_1$ constraint for two-level systems (as we shall derive in \sref{sec:bloch}). The choice of $A$ and $H$ is unique, given \eref{eq:tracelessH} and a particular choice of the orthonormal set $\{F_i\}$.
+
+It is frequently helpful to use an alternative representation of the generator $L$, the \emph{Lindblad normal form},\footnote{Lindblad \cite{lindblad_1976} proved that \eref{eq:lindb} is the most general form of the generator, even for infinite Hilbert spaces, with $H$ and $V_i$ bounded operators.} which can be found by diagonalizing the matrix $A$
+\be
+    \label{eq:lindb}
+    L\rho=-\rmi\com{H}{\rho}+\sum_{i=1}^{M}\DD[V_i]\rho ,
+\ee
+where the \emph{dissipator} $\DD$ is defined via
+\be
+    \label{eq:dissip}
+    \DD[A]\rho=A\rho A\dg-\{A\dg A,\rho\}/2 ,
+\ee%
+\nomdref{CDD}{$\DD[\cdot]\cdot$}{Dissipator: $\DD[A]\rho=A\rho A\dg-\{A\dg A,\rho\}/2$}{eq:dissip}%
+\nomdref{Banticomm}{$\{\cdot,\cdot\}$}{Anticommutator: $\{x,y\}=xy+yx$}{eq:dissip}%
+$\{\cdot,\cdot\}$ denoting the anticommutator, and the $V_i$ are called \emph{Lindblad operators} (they are also known as \emph{jump operators}, which terminology will become clear when we consider quantum trajectories in \sref{sec:trajectories}). Note that by construction $\tr(\DD[A]\rho)=0$ so that $L$ preserves the trace of $\rho$.
+
+The choice of the set $\{V_i\}$ is not unique. In particular, the generator is invariant under unitary mixing
+\be
+    V_i\to U_{ij}V_j .
+\ee
+
+\section{Weak coupling}
+\label{sec:weak}
+The previous sections gave the general form of the Markovian master equation. The Kossakowski normal form \eref{eq:kossa} makes it clear that for an $N$-dimensional system, in addition to the unitary dynamics, we need in general to give ${(N^2-1)}^2$ parameters in order to specify fully the irreversible dynamics. However, the discussion so far gives no guidance on how to choose these parameters, beyond the requirement that the matrix $A$ should be positive. This section presents the rigorous microscopic derivation of these parameters, originally due to Davies \cite{davies_quantum_1976}.
+
+Consider the system \SSS\ in contact with the reservoir \RRR\ and assume the coupling is `weak'\footnote{The specific condition is given below, before \eref{eq:Gab}.} so that a perturbative treatment of the interaction is possible. That is, write the Hamiltonian as
+\be
+    H_\text{tot}=H_\text{S}+H_\text{R}+\lambda V .
+\ee
+
+It is convenient to work in the interaction picture, denoted by tilde, in which the von Neumann equation for the state $\sigma$ of the total system reads
+\begin{subal}{\label{eq:int1}}
+    \dot{\tilde\sigma}(t)&=-\rmi\lambda\com{\tilde{V}(t)}{\tilde\sigma(t)}\\
+        &=-\rmi\lambda\com{\tilde{V}(t)}{\tilde\sigma(0)}
+            -\lambda^2\int_0^t\rmd s\com{\tilde{V}(t)}{\com{\tilde{V}(s)}{\tilde\sigma(s)}} \label{eq:vn2}.
+\end{subal}
+In \eref{eq:vn2}, which is still exact, the von Neumann equation in its integral version was inserted into the differential equation version.
+
+The first assumption is the \emph{Born approximation}, which states $\lambda V$ is sufficiently small that we should treat the total state as factorized,
+\be
+    \label{eq:bornaprx}
+    \sigma(t)\simeq\rho(t)\otimes\omega_\text{R} .
+\ee%
+    \nomdref{Gssigma}{$\sigma$}{Density matrix of the universe (both \SSS\ and \RRR)}{eq:bornaprx}%
+    \nomdref{Grrho}{$\rho$}{Density matrix of the system \SSS}{eq:bornaprx}%
+    \nomref{GzomegaR}{eq:bornaprx}%
+Here $\rho(t)$ is the state of \SSS\ and $\omega_\text{R}$ is the state of \RRR, taken to be constant because the reservoir is supposed to be unaffected by the system. \xxx{Difference between Markov and Born approximations?}The idea of this approximation is not that there are no excitations in the reservoir due to the system, but rather that any such excitations decay extremely rapidly and that we are describing the dynamics on a coarse-grained timescale.
+
+The interaction term $V$ can always be expanded in the form
+\be
+    V=\sum_\alpha A_\alpha \otimes B_\alpha ,
+\ee
+where $A_\alpha=A\dg_\alpha$ act only on \SSS\ and $B_\alpha=B\dg_\alpha$ act only on \RRR\@. Additionally we require that $\tr_\text{R}(\omega_\text{R} B_\alpha)=0$.
+
+Taking the partial trace over \RRR\ we can obtain the integro-differential equation for the system density matrix
+\begin{align}\label{eq:int2}
+    \dot{\tilde{\rho}}(t)&=-\lambda^2 \tr_\text{R}
+        \int_0^t\rmd s\com{\tilde{V}(t)}{\com{\tilde{V}(s)}{\tilde\rho(s)\otimes\omega_\text{R}}} \\
+    &=-\lambda^2 \sum_{\alpha,\beta}\biggl\{
+        \int_0^t\rmd s \bigl\langle\tilde{B}_\alpha(t)\tilde{B}_\beta(s)\bigr\rangle
+\bigl[\tilde{A}_\alpha(t)\tilde{A}_\beta(s)\tilde{\rho}(s)-\tilde{A}_\beta(s)\tilde{\rho}(s)\tilde{A}_\alpha(t)\bigr]
+        +\hc\biggr\} . \nonumber
+\end{align}
+
+The next assumption is that the reservoir correlation functions $\bigl\langle\tilde{B}_\alpha(t)\tilde{B}_\beta(s)\bigr\rangle$ decay on a timescale $t-s\sim \tau_\text{R}$ which is much shorter than the timescale on which $\tilde\rho(t)$ evolves significantly. In this case we substitute $s=t-\tau$ and let the upper limit of the integral go to infinity. We also replace $\tilde{\rho}(s)\to\tilde{\rho}(t)$. This is the \emph{Markov approximation} and the resulting equation reads
+\begin{subal}{\label{eq:int3}}
+    \dot{\tilde{\rho}}(t)&=-\lambda^2 \tr_\text{R}
+        \int_0^\infty\!\rmd \tau \com{\tilde{V}(t)}{\com{\tilde{V}(t-\tau)}{\tilde\rho(t)\otimes\omega_\text{R}}} \\
+    \begin{split}
+    &=-\lambda^2 \sum_{\alpha,\beta}\biggl\{
+        \int_0^\infty\!\!\rmd \tau \bigl\langle\tilde{B}_\alpha(t)\tilde{B}_\beta(t-\tau)\bigr\rangle
+\bigl[\tilde{A}_\alpha(t)\tilde{A}_\beta(t-\tau)\tilde{\rho}(t)-\tilde{A}_\beta(t-\tau)\tilde{\rho}(t)\tilde{A}_\alpha(t)\bigr]\\
+    &\qquad\qquad+\hc\biggr\} .
+    \end{split}  \raisetag{35pt}
+%   \\ &=-\lambda^2\int_0^\infty K(\tau)\,\rmd \tau\,\tilde\rho(t)
+\end{subal}
+The Markov approximation effectively means that the reservoir `has no memory', or that once information from the system enters the reservoir it keeps traveling towards infinity, never to return. Indeed a prototypical example of a Markovian reservoir would be a infinitely long transmission line,\footnote{Such a transmission line is also the proper way to include a resistive circuit element, by setting the appropriate characteristic impedance \eref{eq:charimp}.} such that once a photon leaves the system it never reflects off anything and returns, in which case $\tau_\text{R}$ is of the order of the inverse photon frequency $\tau_\text{R}\sim\omega^{-1}$. For cQED with typical frequencies $\omega/2\pi\simeq5\,\text{GHz}$ and decoherence rates $\gamma/2\pi\simeq1\,\text{MHz}$ we see that the Markov approximation is well justified in this case. Conversely a typical example of a non-Markovian environment could be the same transmission line with a kink in it such that a small portion of the outgoing field is reflected back after a delay that is comparable in magnitude to the system decoherence time. (Such an experiment has been performed by Turlot \etal\ \cite{turlot_escape_1989}).
+
+\Eref{eq:int3} is indeed a Markovian master equation, but unfortunately it does not (except in a few trivial cases) generate a quantum dynamical semigroup. In order to produce a completely positive master equation it is necessary to assume that $H_\text{S}$ has a discrete spectrum
+\be
+    H_\text{S}=\sum_E E\ket{E}\bra{E} .
+\ee
+We can expand $\tilde{A}_\alpha(t)$ in terms of \emph{eigenoperators of the Hamiltonian}, $A_\omega^\alpha$, satisfying
+\be
+    \tilde{A}_\alpha(t)=\sum_\omega A_\omega^\alpha \rme^{-\rmi \omega t} ,
+\ee
+where $\{\omega\}$ is the set of energy differences $\{E-E'\}$ and
+\begin{subal}{\label{eq:freqdiff}}
+    A_\omega^\alpha&=\sum_{E-E'=\omega}\ket{E}\boket{E}{A_\alpha}{E'}\bra{E'} ,\\
+    A_{-\omega}^\alpha&={\bigl(A_\omega^\alpha\bigr)}\dg .
+\end{subal}
+Inserting into \eref{eq:int3} yields
+\be
+    \dot{\tilde{\rho}}(t)=-\lambda^2 \adjustlimits\sum_{\alpha,\beta}\sum_{\omega,\omega'}
+        \rme^{\rmi(\omega-\omega')t}\Gamma_{\alpha\beta}(\omega')
+    \bigl[A_{-\omega}^\alpha A_{\omega'}^\beta \tilde{\rho}(t)-A_{\omega'}^\beta\tilde{\rho}(t)A_{-\omega}^\alpha\bigr] +         \hc\ ,
+\ee
+with
+\be
+    \Gamma_{\alpha\beta}(\omega)=\int_0^\infty \rme^{\rmi \omega t}
+        \bigl\langle \tilde{B}_\alpha(t)\tilde{B}_\beta(0)\bigr\rangle\,\rmd t ,
+\ee
+where we assumed that $\omega_\text{R}$ is a stationary state of the reservoir Hamiltonian $\bigl[H_\text{R},\omega_\text{R}\bigr]=0$ in order to be able to write $\Gamma_{\alpha\beta}(\omega)$ as time-independent, although this assumption is not strictly necessary.\footnote{An important example with $\bigl[H_\text{R},\omega_\text{R}\bigr]\neq0$ is when the reservoir is in a squeezed vacuum state, as discussed in \cite[section 3.4.3]{breuer_petruccione}.}
+
+Finally, we assume that only those terms with $\omega=\omega'$ survive, due to all other terms being rapidly rotating. This is equivalent to the assumption that $\lambda$ is small enough that the decoherence is slow compared to $\tau_\text{S}$, the slowest timescale of the system dynamics, given by the largest $\abs{\omega-\omega'}^{-1}$, $\omega\neq\omega'$. We can rewrite $\Gamma$ as
+\be\label{eq:Gab}
+    \Gamma_{\alpha\beta}(\omega)=\frac{1}{2}\gamma_{\alpha\beta}(\omega)+\rmi S_{\alpha\beta}(\omega) ,
+\ee
+with $\gamma_{\alpha\beta}(\omega)$ given by the Fourier transform of the reservoir correlation function,
+\be
+    \gamma_{\alpha\beta}(\omega)=\Gamma_{\alpha\beta}(\omega)+\Gamma^*_{\beta\alpha}(\omega)
+        =\int_{-\infty}^\infty\!\!\rme^{\rmi\omega t}\bigl\langle\tilde{B}_k(t)\tilde{B}_l(0)\bigr\rangle\,\rmd t ,
+\ee
+and the Hermitian matrix $S_{\alpha\beta}$ defined by
+\be
+    S_{\alpha\beta}(\omega)=\frac{1}{2\rmi}\bigl[\Gamma_{\alpha\beta}(\omega)-\Gamma^*_{\beta\alpha}(\omega)\bigr] .
+\ee
+
+In terms of these definitions, the master equation can be rewritten
+\be
+    \label{eq:weakansint}
+    \dot{\tilde\rho}(t)=-\rmi\bigl[H',\tilde\rho(t)\bigr]+\frac{1}{2}\adjustlimits\sum_{\alpha,\beta}\sum_\omega
+        \gamma_{\alpha\beta}(\omega)\Bigl\{
+            \bigl[A_\omega^\alpha\tilde\rho,{A_{-\omega}^\beta}\bigr]
+           +\bigl[A_\omega^\alpha,\tilde\rho{A_{-\omega}^\beta}\bigr] \Bigr\} .
+\ee
+The Hermitian operator
+\be
+    H'=\adjustlimits\sum_{\alpha,\beta}\sum_\omega S_{\alpha\beta}(\omega)A_{-\omega}^\alpha A_\omega^\beta ,
+\ee
+commuting with the system Hamiltonian, $\bigl[H_\text{S},H'\bigr]=0$, describes a renormalization of the system energies due to the coupling to the environment, the \emph{Lamb shift}. We can write \eref{eq:weakansint} in the Schr\"odinger picture as
+\be
+    \label{eq:weakans}
+    \dot{\rho}(t)=-\rmi\bigl[H_\text{S}+H',\rho(t)\bigr]+\frac{1}{2}\adjustlimits\sum_{\alpha,\beta}\sum_{\omega}
+        \gamma_{\alpha\beta}(\omega)\Bigl\{
+            \bigl[A_\omega^\alpha\rho,{A_{-\omega}^\beta}\bigr]
+           +\bigl[A_\omega^\alpha,\rho{A_{-\omega}^\beta}\bigr] \Bigr\} .
+\ee
+It is possible to use Bochner's theorem to show that $\gamma_{\alpha\beta}(\omega)$ is a positive matrix, and thus \eref{eq:weakans} is in the standard form \eref{eq:kossa}, and it describes completely positive Markovian evolution.
+
+We see that the positive-frequency components of the reservoir correlation function are associated with \emph{relaxation} processes with the reservoir absorbing energy from the system, while the negative-frequency components describe a transfer of energy from the reservoir to the system and the \dc\ component describes \emph{dephasing} processes, where no energy is transferred. This concept is expanded further, in the context of a \emph{quantum noise} approach to measurement and amplification, in the pedagogical review of A.~A. Clerk \etal\ \cite{clerk_introduction_2008}.
+
+
+It is not immediately obvious, but \eref{eq:weakans} is significantly less general than \eref{eq:kossa}, due to the nontrivial constraints among $H'$, $\gamma_{\alpha\beta}$ and $A_\omega^\alpha$. There is an example of this in relation to two level systems in \sref{sec:bloch}.
+
+\subsection{Heat bath}
+\label{sec:heatbath}
+The discussion so far has made no particular assumption about the state $\omega_\text{R}$ of the reservoir \RRR\@. If \RRR\ is to be an equilibrium \emph{heat bath} of inverse temperature $\beta=1/kT$, then this implies
+\be
+    \label{eq:thermal}
+    \gamma_{\alpha\beta}(-\omega)=\rme^{-\beta\omega}\gamma_{\beta\alpha}(\omega) .
+\ee
+This in turn implies that the most general form of the heat bath generator is
+\begin{align}
+\label{eq:detailed}
+  L\rho=-\rmi\com{H_\text{eff}}{\rho}+\sum_{\omega>0}\bigl\{\DD [V_\omega]\rho + \rme^{-\beta\omega}\DD[V\dg_\omega]\rho\bigr\} ,
+\end{align}
+with $\com{H_\text{eff}}{H_\text{S}}=0$, and $\rme^{\rmi H_\text{s}t}V_\omega\rme^{-\rmi H_\text{s}t}=\rme^{-\rmi\omega t}V_\omega$. \Eref{eq:detailed} is a type of detailed balance condition, in the following sense: If the spectrum of $H_\text{S}$ is non-degenerate then under \eref{eq:weakans} the diagonal elements of $\rho$ evolve \emph{independently} of the off-diagonal elements, obeying a classical \emph{Pauli master equation}
+\begin{subal}{\label{eq:paulimaster}}
+    \dot{\rho}_{ii}&=\sum_j\Bigl( W_{ij}\rho_{jj} - W_{ji}\rho_{ii}\Bigr) ,\\
+\intertext{where the transition rates $W_{ij}$ are exactly those that could be obtained from Fermi's golden rule}
+    W_{ij}&=\sum_{\alpha,\beta}\gamma_{\alpha\beta}(E_i-E_j)\boket{j}{A_\alpha}{i}\boket{i}{A_\beta}{j} .
+\end{subal}
+
+Even if the reservoir is not in thermal equilibrium, it is possible to take \eref{eq:thermal} as defining an \emph{effective temperature}, as is done in NMR with the \emph{spin temperature}. Of course the effective temperature might in general be frequency dependent, in the case that the system has more than two levels.
+
+\section{Damped harmonic oscillator}
+\label{sec:dampedsho}
+A simple example of the formalism is for the harmonic oscillator, with the coupling to the environment linear in the position and momentum
+\begin{subal}{\label{eq:harmdis}}
+    H_\text{S}&=\omega a\dg a , \\
+    \lambda V&=\gamma_1 (a+a\dg) B_1 + \rmi \gamma_2 (a-a\dg) B_2 ,
+\end{subal}
+with coupling constants $\gamma_i$.
+Because there is only one frequency of the system, the $A_\omega^\alpha$ are simply $a$ and $a\dg$, and the master equation is\footnote{We na\"ively ignore the fact that $H_\text{S}$ is unbounded.}
+\be
+    \label{eq:harmmaster}
+    \dot{\rho}=-\rmi\omega[a\dg a,\rho]+\kappa_-\DD[a]\rho+\kappa_+\DD[a\dg]\rho ,
+\ee%
+\nomdref{Gkkappamp}{$\kappa_-$, $\kappa_+$}{Photon decay, excitation rates}{eq:harmmaster}%
+with constants $\kappa_\pm\ge0$ that are determined by $\gamma_i$ and the reservoir spectral density at $\mp\omega$. Since experiments in cQED are generally performed with cavities having $\omega/2\pi\simeq5\,\text{GHz}$ in a dilution refrigerator at $T\simeq20\,\text{mK}$, corresponding to $\kappa_+/\kappa_-\simeq\exp(-\beta\omega)\simeq10^{-5}$, it is usual to set $\kappa_+=0$ and drop the $\DD[a\dg]$ term (and drop the subscript on $\kappa_-$).
+
+\section{Bloch equations}
+\label{sec:bloch}
+As can be seen from \eref{eq:kossa}, the most general Markovian master equation for the two-level system has 3 parameters describing the Hamiltonian evolution, and 9 parameters describing the dissipation. One way \cite{alicki_lendi} to write this is in terms of the Bloch vector \eref{eq:blochvector}, $\vec{r}=\{x,y,z\}$,
+\begin{subal}{\label{eq:genbloch}}
+    \dot{x}&=-\gamma_3x+(\alpha-\omega_0)y+(\beta-\omega_2)z-\sqrt{2}\lambda, \\
+    \dot{y}&=(\alpha+\omega_0)x-\gamma_2 y+(\delta-\omega_1)z+\sqrt{2}\mu, \\
+    \dot{z}&=(\beta+\omega_2)x+(\delta+\omega_1)y-\gamma_1 z-\sqrt{2}\nu .
+\end{subal}
+Here, $\omega_i$ are the Hamiltonian parameters, and $\alpha$, $\beta$, $\delta$,  $\gamma_i$, $\lambda$, $\mu$, $\nu$ parameterize the dissipation, with constraints
+\begin{subal}{\label{eq:posconstr}}
+      0&\le\gamma_i\le\gamma_j+\gamma_k,\quad\text{$\{i,j,k\}$ a permutation of $\{1,2,3\}$}, \displaybreak[0]\\[0.2ex]
+      4(\alpha^2+    \nu^2)&\le\gamma_1^2-(\gamma_2-\gamma_3)^2,\\[0.2ex]
+      4(\beta^2 +    \mu^2)&\le\gamma_2^2-(\gamma_1-\gamma_3)^2,\\[0.2ex]
+      4(\delta^2+\lambda^2)&\le\gamma_3^2-(\gamma_1-\gamma_2)^2,\displaybreak[0]\\[0.2ex]
+    \begin{split}
+        16(\alpha\beta\delta+{}&\alpha\lambda\mu+\delta\mu\nu)+4\gamma_1(\alpha^2+\nu^2)+4\gamma_2(\beta^2+\mu^2)+4\gamma_3(\delta^2+\lambda^2)\\
+        {}+{}&\gamma_1^2(\gamma_2+\gamma_3)+\gamma_2^2(\gamma_1+\gamma_3)+\gamma_3^2(\gamma_1+\gamma_2)\ge
+            16\beta\lambda\nu+2\gamma_1\gamma_2\gamma_3+\gamma_1^2+\gamma_2^2+\gamma_3^2\\
+        {}+{}&4\gamma_1(\beta^2+\delta^2+\lambda^2+\mu^2)+4\gamma_2(\alpha^2+\delta^2+\lambda^2+\nu^2)+4\gamma_3(\alpha^2+\beta^2+\mu^2+\nu^2) .
+    \end{split}\raisetag{3\baselineskip}
+\end{subal}
+
+Performing a change of basis to rotate the Hamiltonian part to be proportional to $\sigma_z$  is always possible so without loss of generality we may choose $\omega_1=\omega_2=0$. Additionally, choosing as a very special case  $\alpha=\beta=\delta=\lambda=\mu=0$, $\gamma_2=\gamma_3$, and renaming
+\be
+    T_1\triangleq 1/\gamma_1,\qquad T_2\triangleq 1/\gamma_2,\qquad \bar{z}\triangleq -\sqrt{2}\nu T_1 ,
+\ee
+we obtain the usual Bloch equations
+\begin{subal}{\label{eq:blochusual}}
+    \dot{x}&=-\frac{x}{T_2}-\omega_0 y, \\
+    \dot{y}&=\omega_0 x-\frac{y}{T_2}, \\
+    \dot{z}&=-\frac{1}{T_1}(z-\bar{z}),
+\end{subal}%
+\nomdref{CT1T2}{$T_1$, $T_2$}{Bloch equation coherence times}{eq:blochusual}%
+and in this case, the inequalities \eref{eq:posconstr} simply reproduce the well-known condition
+\be
+    T_2\le2T_1 .
+\ee
+
+Although the Bloch equations are a very special case of the general Markovian master equation for a two-level system, they in fact describe the most general master equation that can be derived within the weak coupling formalism. To see that this is true, observe that for a two-level system with bare Hamiltonian
+\be
+    H_\text{S}=\omega_\text{q}\sigma_z/2
+\ee
+there are only three relevant frequencies, $\pm\omega_\text{q}$ and $0$, and that each frequency has only one non-trivial associated eigenoperator $A_\omega$ evolving at that frequency:
+\begin{subal}{\label{eq:blochomegas}}
+    A_{\pm\omega_\text{q}}=\sigma_\pm ,\\
+    A_0=\sigma_z .
+\end{subal}
+This gives the master equation
+\be
+    \label{eq:dampedqubit}
+    \dot{\rho}=-\rmi\bigl[\omega_0\sigma_z/2,\rho\bigr]+\gamma_-\DD[\sigma_-]\rho+\gamma_+
+        \DD[\sigma_+]\rho+\frac{\gamma_\varphi}{2}\DD[\sigma_z]\rho .
+\ee%
+    \nomdref{Gcgamma-}{$\gamma_-$, $\gamma_+$}{Qubit relaxation rate, excitation rate}{eq:dampedqubit}%
+    \nomdef{Gcgammaphi}{$\gamma_\varphi$}{Qubit dephasing rate, see \eref{eq:dampedqubit}. For transmon $\gamma_\varphi=\gamma^\Phi_\varphi+\gamma^\text{C}_\varphi$, see \sref{sec:supersplit}}%
+Here, $\gamma_\pm$ are related to the $\pm\omega_\text{q}$ components of the reservoir correlation function  and $\gamma_\varphi$ to the \dc\ component. \Eref{eq:dampedqubit} is identical to \eref{eq:blochusual} after we make the identification
+\begin{subal}{\label{eq:blochparams}}
+    T_1&=\frac{1}{\gamma_-+\gamma_+},\\
+    T_2&=\frac{2}{\gamma_-+\gamma_+ + 2\gamma_\varphi},\\
+    \bar{z}&=\frac{\gamma_+ - \gamma_-}{\gamma_+ + \gamma_-} .
+\end{subal}
+
+\Eref{eq:dampedqubit} is generally taken as the master equation for a qubit in cQED\@. For the same reasons as described in the previous section, the $\DD[\sigma_+]$ term is usually dropped, corresponding to $\bar{z}=-1$.
+
+\section{Master equation for the transmon-cavity system}
+\label{sec:master}
+The Bloch equations give an excellent description of the behavior of two-level systems in many experimental scenarios, ranging from NMR to quantum optics---there are very few experiments where phenomena have been observed that would require the additional generality of equations \eref{eq:genbloch}. It is also quite hard to imagine how one could reduce the unitary dynamics of a combined system-with-reservoir to the irreversible dynamics of an open system and arrive at a master equation of the form \eref{eq:genbloch}, in any kind of rigorous way. It would therefore be pleasant if we could also use a weak-coupling argument to derive a master equation for the combined transmon and cavity system: this would give a microscopic explanation for the damping, and as an additional advantage there would be far fewer parameters than for the fully-general case. Unfortunately, there are two problems with this approach. The first problem is that we do not know \emph{a priori} which transmon operators $A_\alpha$ are the relevant ones that couple reservoir degrees of freedom, producing dissipation. Unfortunately, most research to date has focussed on the behavior of only the lowest 2 levels of transmons, due to the interest in using transmons as qubits, and there has been little in the way of systematic investigation of dissipation of the higher levels. The behavior of the lower 2 levels is well-described by Bloch equations with $\bar{z}=0$, but the microscopic origin of the $T_1$ and $T_2$ is a topic of active research. The next subsection outlines some plausible microscopic sources of dissipation. The second problem with the weak-coupling argument is of a more fundamental character: the weak-coupling argument requires that there is a separation of frequency scales such that either the frequency differences $\omega-\omega'$ are very large compared to the dissipation, or otherwise that the frequencies are identical. Davies recognized this problem very early on \cite{davies_1978} and derived a more sophisticated version of the weak-coupling argument, where the system Hamiltonian is separated into two commuting pieces
+\begin{subal}{\label{eq:davies2}}
+    H_\text{S}=H_\text{S}^0+H_\text{S}^1 , \\
+    \bigl[H_\text{S}^0,H_\text{S}^1\bigr]=0 ,
+\end{subal}
+where for $H_\text{S}^0$ all the `small' terms $\omega-\omega'$ vanish, and where $H_\text{S}^1$ is small and is treated perturbatively. Although this is an improvement, in practise there are always some frequency differences in the Hamiltonian that are neither very large compared to the dissipation nor negligibly small. For example, for dispersive readout (\sref{sec:readout}) the state-dependent shift $\chi$ of the cavity frequency is typically intentionally chosen to be approximately equal to the cavity linewidth. Since a rigorous application of the weak coupling argument is impossible in this situation, it is usual in cQED to take a rather simplistic approach to this problem and just assume that the master equation for the combined system can be formed by adding the terms from each of the components. For example, for a qubit coupled to a cavity, we combine \eref{eq:JC}, \eref{eq:harmmaster} and \eref{eq:dampedqubit} to get
+\begin{subal}{\label{eq:JCmaster}}
+    \dot{\rho}&=-\rmi\bigl[H,\rho\bigr]+
+        \kappa\DD[a]\rho+\gamma_-\DD[\sigma_-]\rho+\frac{\gamma_\varphi}{2}\DD[\sigma_z]\rho , \label{eq:JCmasterRelax} \\
+    H&=\omr a\dg a+\omega_\text{q}\sigma_z/2+g(a\sigma_+ + a\dg\sigma_-) , \label{eq:jc2}
+\end{subal}
+assuming zero temperature. To reiterate, this is explicitly a Markovian master equation, but it is not one that could be derived from weak coupling. It is worth noting that in cQED we have no direct access to the parameters of the uncoupled system, unlike in atomic cavity QED where it is possible to measure the transition frequencies of the real atoms when they are outside the cavity and to measure the cavity parameters when it is empty. In cQED the cavity and `atom' are permanently attached and this is not possible. Thus $\omr$, $\omega_\text{q}$ and $g$ of \eref{eq:jc2} should perhaps be considered more as renormalized parameters, already including the first-order effects of any Lamb-shift-like effects.\footnote{Since the dissipation terms in \eref{eq:JCmaster} do not come from a weak-coupling master derivation, it is not obvious what Lamb shifts should be associated with them.} Similarly, there is no experimental access to the relaxation parameters of the uncoupled qubit and cavity,  so $\kappa$, $\gamma_-$ and $\gamma_\varphi$ should be thought of as renormalized relaxation parameters not necessarily having the same values as we would measure if we could somehow uncouple the qubit from the cavity.
+
+\subsection{Possible microscopic mechanisms of decoherence for transmons}\label{sec:mmpurcell}
+Koch \etal\ \cite{koch_charge-insensitive_2007} discuss a number of different decoherence mechanisms for the transmon. The ones which are likely to be most important are:
+
+\paragraph{Dipole-like coupling and multimode Purcell effect.} An obvious choice for the coupling operator is the charge operator $n$. This applies in particular to the situation that the transmon couples to an electromagnetic mode, for example an unintended mode of the sample holder. Even more specifically, it applies to the \emph{multimode Purcell effect}. The Purcell effect \cite{purcell__1946} describes the relaxation of the transmon \emph{via the cavity}. It refers to the fact that the dressed-state solutions of the (generalized) Jaynes--Cummings Hamiltonian have both transmon and cavity character, and so the relaxation rates are modified compared to the bare qubit. As such, the Purcell effect is explicitly included in \eref{eq:JCmaster}.  However, recall that in proceeding from \eref{eq:mmcavham} to \eref{eq:smcavham} we dropped all but one modes of the cavity. It is true that at the Hamiltonian level the ignored higher cavity levels have little influence, due to being far detuned from the frequencies of interest, but they can still be relevant to the dissipation.
+\begin{figure}
+ \centering
+ \levincludegraphics{mmpurcell-conv}
+ \caption[Multimode Purcell effect]{\captitle{Multimode Purcell effect.}
+    Comparison of multimode and single-mode models of relaxation. Spontaneous emission lifetimes into a single-mode cavity are symmetric about the cavity frequency, while within the circuit model lifetimes below the cavity are substantially longer than above. The measured $T_1$ for three similar qubits deviates substantially from the single-mode prediction, but agrees well with the circuit model. Two different curves for the multimode model are shown, to illustrate that the multimode model predictions depend on the position of the qubit within the cavity. The expected decay time for radiation into a continuum is shown for comparison.\figthanks{houck_controlling_2008}\label{fig:mmpurcell}}
+\end{figure}%
+Properly including the multimode Purcell effect is, unfortunately, not as simple as taking \eref{eq:JCmaster} and inserting a sum over cavity modes $\DD[a]\rho\to\sum_n \DD[a_n]\rho$, etc. The problem is that the sum does not converge, analogous to other situations in QED where care is needed with high-frequency cutoffs. Houck~\etal\ \cite{houck_controlling_2008} showed that a semiclassical expression, based on a circuit model in which the cavity transforms the $50\,\text{\textohm}$ impedance of the environment as seen by the transmon, fits experimental data rather well, as seen in \fref{fig:mmpurcell}. For the results reported in \chref{ch:vrabi}, the parameters are such that the multimode Purcell effect is expected to be the dominant cause of relaxation.
+
+The component of the charge operator $n$ that oscillates at the transmon frequency is simply $c$ (defined in \eref{eq:transladder}) and the resulting dissipation term is
+\be
+    \label{eq:translax1}
+    \gamma_-\DD[c]\rho + \gamma_+\DD[c\dg]\rho =
+        \gamma_-\DD\Bigl[\sum_j \frac{n_{j,j+1}}{n_{01}}\ket{j}\bra{j+1}\Bigr]\rho +
+        \gamma_+\DD\Bigl[\sum_j \frac{n_{j+1,j}}{n_{01}}\ket{j+1}\bra{j}\Bigr]\rho ,
+\ee
+where the chosen normalization ensures that $\gamma_\pm$ have their usual two-level interpretation in the case that the sum is truncated at the lowest two levels. We ignore non-nearest-neighbor components of $n$  because for $\EJ/\EC\gg1$ these are small (\sref{sec:selectionrules}). \Eref{eq:translax1} assumes that the anharmonicity is small compared to the relaxation, which may or may not be true. In the opposite limit, it is more appropriate to split $n$ into components at each frequency $\omega_{j,j+1}$
+\be
+    \label{eq:translax2}
+      \gamma_- \sum_j\DD\bigl[\frac{n_{j,j+1}}{n_{01}}\ket{j}\bra{j+1}\bigr]\rho +
+      \gamma_+ \sum_j\DD\bigl[\frac{n_{j+1,j}}{n_{01}}\ket{j+1}\bra{j}\bigr]\rho ,
+\ee
+although neither \eref{eq:translax1} nor \eref{eq:translax2} is rigorously justified, given that as described above the frequencies are also shifted by the coupling to the cavity, and there is no simple separation of frequency scales.
+
+\paragraph{Dephasing via charge noise.}  For the Cooper pair box with $\EJ/\EC\simeq 1$ the dephasing is known to be primarily caused by slow fluctuations of the offset charge $\ngate$. The exponential suppression of this effect is precisely the motivation for using $\EJ/\EC\gg1$, so this  mechanism is unlikely to be the dominant cause of dephasing for the lowest levels of the transmon. Due to their larger charge dispersion it is likely relevant for the higher levels, however. Dephasing due to fluctuations of any parameter, $\alpha$, can be incorporated as a coupling to the operator $\pp H/\pp \alpha$. For the case of charge noise, the \dc\ component of $\pp H/\pp \ngate$ is
+\be
+    \label{eq:cdeph}
+    \sum_j \frac{\rmd E_j(\ngate)}{\rmd\ngate}\ket{j}\bra{j} \sim \sin(2\pi\ngate) \sum_j \epsilon_j\ket{j}\bra{j} ,
+\ee
+where $\epsilon_j$ is the charge dispersion, and we have made use of \eref{eq:cosdisp}. Absorbing\footnote{One might wonder that since there is typically no gate electrode for transmons, $\ngate$ is uncontrolled and $\gamma_\varphi^\text{C}$ could vary in time. In this context it is worth noting that in order to improve the signal-to-noise ratio the experiments are typically repeated some $10^5$ to $10^6$ times with averaging, a process that takes some minutes. If the variations of $\ngate$ are fast on this timescale, it is reasonable to treat the $\sin^2(2\pi\ngate)\simeq\smallfrac{1}{2}$.}  $\sin^2(2\pi\ngate)$ into $\gamma_\varphi^\text{C}$ (squared because $\DD[A]\rho$ is quadratic in $A$) and choosing the normalization such that $\gamma_\varphi^\text{C}$ has its two-level interpretation when truncating to the lowest two levels, the dissipation term is thus
+\be
+    \label{eq:cdeph2}
+    \frac{\gamma_\varphi^{\text{C}}}{2} \DD\Bigl[\sum_j\frac{2\epsilon_j}{\epsilon_1-\epsilon_0}\ket{j}\bra{j}\Bigr]\rho .
+\ee%
+    \nomdref{GcgammaphiC}{$\gamma_\varphi^{\text{C}}$}%
+    {Transmon dephasing rate via charge noise, leading to a term in the master equation $\frac{\gamma_\varphi^{\text{C}}}{2} \DD\Bigl[\sum_j\frac{2\epsilon_j}{\epsilon_1-\epsilon_0}\ket{j}\bra{j}\Bigr]\rho$}{eq:cdeph2}
+
+\paragraph{Dephasing via flux noise.} For the transmon, the dephasing of the lowest levels can be caused by an effective fluctuation of the flux, through the squid loop that tunes the transmon. Away from the \emph{flux sweet spots} $\tPhi=j \Phi_0$, integer $j$, at which $\rmd \EJ(\tPhi)/\rmd\tPhi=0$, this is known to be a significant source of dephasing for the lowest levels of the transmon.
+Ignoring the anharmonicity, the dissipation is thus given by
+\be
+    \label{eq:fdeph}
+    \sin(\pi\tPhi/\Phi_0)\DD\bigl[\sum_j j \ket{j}\bra{j}\bigr]\rho
+        \sim \frac{\gamma_\varphi^{\Phi}}{2} \DD\bigl[\sum_j 2j \ket{j}\bra{j}\bigr]\rho ,
+\ee%
+    \nomdref{Gcgammaphip}{$\gamma_\varphi^{\Phi}$}{Transmon dephasing rate via flux noise, leading to a term in the master equation $\frac{\gamma_\varphi^{\Phi}}{2} \DD\bigl[\sum_j 2j \ket{j}\bra{j}\bigr]\rho$}{eq:fdeph}%
+where again the normalization allows the usual interpretation of $\gamma_\varphi^{\Phi}$ in the two-level truncation.
+
+\subsection{Putting the pieces together}
+\label{sec:transmaster}
+Combining the driven generalized Jaynes--Cummings Hamiltonian \eref{eq:genJCrot2} with the dissipation for the resonator \eref{eq:harmmaster} and for the transmon \eref{eq:translax1}, \eref{eq:cdeph2} and \eref{eq:fdeph} gives the master equation in the rotating frame
+\be
+    \label{eq:transmaster}
+    \begin{split}
+    \dot{\rho}&=-\rmi\Bigl[
+            \Delta_\text{r}a\dg a+\sum_j\Delta_j\ket{j}\bra{j}+g\bigl(a\dg c+a c\dg \bigr)
+            + \bigl(a\xi^*+a\dg\xi\bigr) ,\rho\Bigr]\\
+        &\quad+\kappa_-\DD[a]\rho+\kappa_+\DD[a\dg]\rho
+            +\gamma_-\DD[c]\rho + \gamma_+\DD[c\dg]\rho\\
+        &\quad+\frac{\gamma_\varphi^{\text{C}}}{2}
+            \DD\Bigl[\sum_j\frac{2\epsilon_j}{\epsilon_1-\epsilon_0}\ket{j}\bra{j}\Bigr]\rho
+            + \frac{\gamma_\varphi^{\Phi}}{2} \DD\Bigl[\sum_j 2j \ket{j}\bra{j}\Bigr]\rho .
+    \end{split}
+\ee
+
+The parameters of \eref{eq:transmaster} are not independent. Many of the parameters are set during fabrication of a sample, so their interdependence is difficult to see. However, when taking measurements on a given sample there are several control parameters or `knobs' available: the flux $\tPhi$ and the temperature, as well as the frequency $\omd$ and amplitude $\xi$ of the drive.
+If the reservoirs can be considered as heat baths then
+\begin{subal}{\label{eq:transbaths}}
+    \kappa_+&=\rme^{-\beta_\kappa \omr}\kappa_- ,\\
+    \gamma_+&=\rme^{-\beta_\gamma \omega_{01}}\gamma_- ,
+\end{subal}
+where we have allowed for the possibility that the bath to which the cavity relaxes has an inverse temperature $\beta_\kappa$ different from the inverse temperature $\beta_\gamma$ of the bath to which the transmon relaxes. If the transmon relaxation is due to the multimode Purcell effect then there is just one bath and $\beta_\kappa=\beta_\gamma=\beta$. If $\omega_{01}\simeq\omr$ then we can additionally assume that the Boltzmann factors are the same
+\be\label{eq:boltz}
+    r=\frac{\kappa_+}{\kappa_-}=\frac{\gamma_+}{\gamma_-} .
+\ee
+
+Varying the flux explicitly affects $\Delta_j$ and $c$, $c\dg$. It also affects $\gamma_-$ by changing the frequency at which the reservoir correlation functions should be evaluated. However, if we assume that the reservoir correlations are fairly `white' over the frequency range of interest then it is reasonable to ignore this effect. In the case of the multimode Purcell effect, the higher cavity modes that are responsible for the dissipation are detuned by around $\omr$, so if the transmon is being tuned over a frequency range that is small compared to $\omr$, (as we have already assumed in writing the Jaynes--Cummings Hamiltonian) then this will hold. Dephasing due to flux noise is also a function of the applied flux $\gamma_\varphi^\Phi(\tPhi)\sim\cos(\pi\tPhi/\Phi_0)$. This dependence has been observed in experiment \cite{schreier_suppressing_2008}. Nevertheless, when the tuning is only over a relatively small range in frequency, not too close to the flux sweet spot, it is reasonable to treat $\gamma_\varphi^\Phi$ as independent of $\tPhi$.
+
+Changing the drive frequency $\omd$ only explicitly affects $\Delta_\text{r}$ and $\Delta_j$ and there are no parameters other than $\xi$ with an explicit dependence on the drive amplitude.
+
+In addition to these explicit effects, it is also possible to imagine that the dissipation constants might be functions of the control parameters via the reservoir state. For example, if there is some narrow resonance in the reservoir, then tuning the drive frequency $\omd$ through this resonance might drive the reservoir far from equilibrium, significantly altering the reservoir correlation functions and thus potentially affecting the dissipation constants. Another example would be if the reservoir state were affected by the magnetic field that is used to tune the transmon. However, this type of effect has not been observed experimentally\footnote{A simple dependence of the reservoir state on magnetic field has not been observed. However, more complex hysteretic behaviors have been seen. In particular, after large magnetic field swings have been applied, occasionally the dissipation rates of the transmon can increase significantly, and this persists even if the magnetic field is returned to its original value. One way to undo this effect is to warm the sample above the superconducting transition temperature. From this evidence it seems likely that what is going on is creation of trapped vortices in the superconducting ground planes, and these are able to increase the dissipation somehow.} and so we assume that apart from the explicit dependences described above, there is no dependence on the control parameters.
+%
+%We end this chapter with the transmon-cavity master equation with all the dependences on the control parameters $\Phi$, $r$, $\omd$ and $\xi$:
+%\be
+%    \label{eq:transmasterdep}
+%    \boxed{\begin{split}
+%    \dot{\rho}&=-\rmi\Bigl[
+%            (\omr-\omd)a\dg a+\sum_j(\omega_j(\Phi)-\omd)\ket{j}\bra{j}+g\bigl(a\dg c+a c\dg \bigr)
+%            + \bigl(a\xi^*+a\dg\xi\bigr) ,\rho\Bigr]\\
+%        &\quad+\kappa\DD[a]\rho+r\kappa\DD[a\dg]\rho
+%            +\gamma_-\DD[c]\rho + r\gamma_-\DD[c\dg]\rho\\
+%        &\quad+\frac{\gamma_\varphi^{\text{C}}}{2}
+%            \DD\Bigl[\sum_j\frac{2\epsilon_j(\Phi)}{\epsilon_1(\Phi)-\epsilon_0(\Phi)}\ket{j}\bra{j}\Bigr]\rho
+%            + \frac{\gamma_\varphi^{\Phi}}{2} \DD\Bigl[\sum_j 2j \ket{j}\bra{j}\Bigr]\rho .
+%    \end{split}}
+%\ee

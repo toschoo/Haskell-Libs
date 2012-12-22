@@ -1,0 +1,30 @@
+%PLAIN TeX only !!!
+
+\magnification = 6000
+
+\newdimen\fontpt \fontpt=10pt
+\def\newfont{ \font\nextfont = cmr10 at \fontpt \relax \nextfont}
+
+\def\diminuendo#1=#2.#3.{%
+	$#1=$\ #2.\kern-0.8em\fontpt=10pt \newfont \dimin#3\end} 
+
+% recursive macro based on the \length example on p. 219 of the TeXbook
+
+\def\dimin#1{\ifx#1\end \let\next=\relax
+	\else\divide\fontpt by \magstephalf \multiply\fontpt by 1000 
+		\newfont\negthinspace#1\negthinspace \let\next=\dimin\fi \next}
+
+% four prominent examples of its application
+
+\centerline{\diminuendo{1/3}=0.333333333333333333333333333333333333333333.}\par 
+
+\centerline{\diminuendo{\sqrt 2}%
+=1.4142135623730950488016887242096980785696718753769.}\par 
+
+\centerline{\diminuendo
+e=2.71828182845904523536028747135266249775724709369995.}\par 
+
+\centerline{\diminuendo
+\pi=3.1415926535897932384626433832795028841971693993751.}\par 
+
+\bye

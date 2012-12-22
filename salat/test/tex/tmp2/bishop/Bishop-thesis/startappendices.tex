@@ -1,0 +1,8 @@
+\svnid{$Id: startappendices.tex 473 2010-06-20 15:24:00Z lsb $}%
+\appendix
+\cleardoublepage
+\oldphantomsection
+\addcontentsline{toc}{part}{Appendices}
+%..."part" means Appendices are child of this in outline (good) but also means backmatter is children of this (maybe not good)
+%This file exists as its own include file to force it to come ahead of the actual appendices in the ToC! (Due to \immediate vs non-\immediate write-related crap)
+% \usepackage{appendix}, maybe useful? (But it seems to have same problem...)

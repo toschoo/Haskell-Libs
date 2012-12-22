@@ -1,0 +1,73 @@
+\documentclass[12pt]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[a4paper,margin={2cm}]{geometry}
+\usepackage{newcent}
+\usepackage[annataritalic,formal,gothika]{tengwarscript}
+\usepackage[bookmarks=false,pdfstartview=FitH]{hyperref}
+
+\hypersetup{%
+  pdftitle={Tengwar Sample},%
+  pdfauthor={Ignacio Fern\'andez Galv\'an},%
+  pdfsubject={Three tengwar fragments written with TeX},%
+  pdfkeywords={tengwar, Tolkien, The One Ring, West Gate of Moria, Nam\'ari\"e, tengwarscript},%
+}
+
+\begin{document}
+
+\thispagestyle{empty}
+
+\section*{The One Ring (Tengwar Annatar Italic)}
+
+\begin{center}
+\tengwarannataritalic[2.5]
+\tengwa{254}
+\Textendedcalma\TTthreedots\Tnuumen\Tessenuquerna\TTthreedots\Tungwe\Tando\Toore\TTrightcurl\Tumbar\Ttinco\TTthreedots\Tlambealt\TTrightcurl\Tquesse\TTdoublerightcurl
+\Tromanperiod\Ts
+\Textendedcalma\TTthreedots\Tnuumen\Tessenuquerna\TTthreedots\Tungwe\Tungwe\Tumbar\TTnasalizer\TTdot\Ttinco\TTthreedots\Tlambe\TTrightcurl
+\tengwa{255}\\
+\Textendedcalma\TTthreedots\Tnuumen\Tessenuquerna\TTthreedots\Tungwe\Tthuule\Troomen\Tquesse\TTthreedots\Ttinco\TTthreedots\Tlambealt\TTrightcurl\Tquesse\TTdoublerightcurl
+\Tromanperiod\Ts
+\Textendedungwe\TTthreedots\Tumbar\Toore\TTrightcurl\Tesse\Tkern{-0.2}\Tmalta\TTrightcurl\Textendedcalma\TTdot\Ttelco\TTdot\Tquesse\Troomen\Tparma\TTnasalizer\TTdot\Ttinco\TTthreedots\Tlambe\TTrightcurl
+\end{center}
+
+\bigskip
+
+\section*{The West Gate of Moria (Tengwar Formal)}
+
+\begin{center}
+\tengwarformal[2.0]
+\Tyanta\Tnuumen\Tsilmenuquernaalt\Toore\Ts\Tando\Tuure\Troomen\Ttelco\Toore\Ts\Tosse\Troomen\Tosse\Toore\Ts\Tvala\Tanna\Troomen\Ttelco\TTdot\Tosse
+\Ts\Tcentereddot\Ts
+\Tparma\Tyanta\Tando\Tanna\Ts\Tvala\Tyanta\Tlambe\Tlambe\Tanna\Toore\Ts\Tosse\Ts\Tvala\Ttelco\TTdot\Tnuumen\Tanna\\
+\tengmag{0.8}
+\Ttelco\Tvala\Ts\Toore\Tosse\Troomen\Tampa\Ttelco\Ts\Thyarmen\Tosse\TTtwodots\Toore\Ts\Tyanta\Taha\Tosse\Ttinco\TTnasalizer\Tcolon\Ts
+\Tcalma\Tyanta\Tlambe\Tyanta\Tumbar\Troomen\Ttelco\TTdot\Tumbar\TTnasalizer\Tanna\Troomen\Ts\Tanna\Ts\Tyanta\Troomen\Tyanta\Tanga\Ttelco\TTdot\Tanna\Toore\Ts\Ttinco\Tyanta\TTtwodots\Tthuule\Tosse\Ttinco\TTnasalizer\Ts\Ttelco\TTdot\Ts\Tthuule\Ttelco\TTdot\Tvilya\Ts\Thyarmen\Ttelco\TTdot\Toore\Tcolon
+\end{center}
+
+\section*{Nam\'ari\"e (Tengwar Gothika)}
+
+\parindent=0pt
+\parskip=1em
+\tengwargothika[1.2]
+\Tyanta\TTthreedots\Ts\Texclamation\Ts\Tlambe\Tuure\TTthreedots\Troomen\TTdot\Ttelco\TTacute\Ts\Tlambe\TTthreedots\Tanto\TTthreedots\Toore\Ts\Tlambe\TTthreedots\Tessenuquerna\TTdot\Ts\Tsilme\Taara\TTleftcurl\Troomen\TTdot\Tnuumen\TTacute\Tnuumen\Ts\Tcentereddot\\
+\Tanna\TTtwodotsbelow\Taara\TTacute\Tnuumen\TTdot\Ts\Taara\TTleftcurl\Tnuumen\Taara\TTrightcurl\Ttinco\TTdot\Tmalta\TTacute\Ts\Tvala\TTacute\Ts\Troomen\Taara\TTthreedots\Tmalta\TTthreedots\Toore\Ts\Ttelco\TTthreedots\Talda\TTthreedots\Troomen\TTrightcurl\Tnuumen\Ts\Texclamation\\
+\Tanna\TTtwodotsbelow\Taara\TTacute\Tnuumen\TTdot\Ts\Tvala\TTacute\Ts\Tlambe\TTdot\Tanto\TTacute\Ts\Tanna\TTtwodotsbelow\TTleftcurl\Talda\TTthreedots\Toore\Ts\Ttelco\TTthreedots\Tvala\Taara\TTthreedots\Tnuumen\TTdot\Ttelco\TTacute\Toore\\
+\Tmalta\TTdot\Ts\Ttelco\TTrightcurl\Troomen\TTrightcurl\Tmalta\TTthreedots\Tarda\TTdot\Ts\Tlambe\TTdot\Tessenuquerna\TTacute\Tmalta\TTdot\Troomen\TTleftcurl\Tvala\Taara\TTrightcurl\Troomen\TTacute\Tvala\TTthreedots\\
+\Ttelco\TTthreedots\Tando\Taara\TTleftcurl\Tnuumen\TTacute\Ts\Tparma\TTacute\Tlambe\TTdoubler\TTthreedots\Ts\Tcentereddot\Ts\Tvala\TTthreedots\Tarda\TTrightcurl\Ts\Ttinco\TTacute\Tlambe\TTdoubler\TTleftcurl\Tmalta\TTthreedots\Toore\\
+\Tnuumen\TTleftcurl\Ts\Tlambe\Tyanta\TTleftcurl\Tnuumen\TTdot\Ts\Tanna\TTtwodotsbelow\TTthreedots\Tessenuquerna\TTacute\Tnuumen\Ts\Ttinco\TTdot\Tanto\TTdot\Tlambe\TTthreedots\Toore\Ts\Ttelco\TTdot\Ts\Ttelco\TTacute\Tlambe\TTacute\Tnuumen\TTdot\\
+\Taara\TTrightcurl\Tmalta\TTthreedots\Troomen\TTtwodotsbelow\TTrightcurl\Ts\Tyanta\TTthreedots\Troomen\TTacute\Ttinco\Taara\TTthreedots\Troomen\TTdot\Tlambe\Taara\TTdot\Troomen\TTdot\Tnuumen\TTacute\Tnuumen\Ts\Tcolon
+
+\Tsilme\Taara\TTdot\Ts\Tmalta\TTthreedots\Tnuumen\Ts\Ttelco\TTdot\Ts\Tanna\TTtwodotsbelow\TTleftcurl\Tlambe\Tmalta\TTthreedots\Ts\Tnuumen\TTdot\Tnuumen\Ts\Ttelco\TTacute\Tunque\TTthreedots\Tanto\TTleftcurl\Tvala\TTthreedots\Ts\Tquestion
+
+\Ttelco\TTthreedots\Tnuumen\Ts\Tsilme\Taara\TTdot\Ts\Ttinco\TTdot\Tanto\TTthreedots\Tlambe\TTdoubler\TTacute\Ts\Tvala\TTthreedots\Tarda\TTthreedots\Ts\Tyanta\TTrightcurl\Ttelco\TTrightcurl\Tlambe\TTrightcurl\Tessenuquerna\TTacute\Ttelco\TTrightcurl\\
+\Tvala\TTacute\Ts\Tformen\TTthreedots\Tnuumen\TTtwodotsbelow\TTthreedots\Toore\Ts\Tmalta\Taara\TTthreedots\Troomen\TTtwodotsbelow\TTthreedots\Ttinco\Ts\Ttelco\TTacute\Tlambe\TTacute\Tanto\Taara\TTthreedots\Troomen\TTdot\Ts\Ttelco\TTrightcurl\Toore\Ttinco\TTthreedots\Tnuumen\TTacute\\
+\Ttelco\TTthreedots\Toore\Ts\Ttelco\TTdot\Tlambe\TTtwodotsbelow\TTacute\Ts\Ttinco\TTdot\Ttelco\TTacute\Toore\Ts\Ttelco\TTleftcurl\Tando\TTleftcurl\Tlambe\Taara\TTthreedots\Tvala\TTacute\Ts\Tlambe\TTleftcurl\Tumbar\TTleftcurl\Tlambe\TTacute\\
+\Ttelco\TTthreedots\Toore\Ts\Tsilmenuquerna\TTdot\Tando\TTthreedots\Tnuumen\Taara\TTrightcurl\Troomen\TTdot\Ttelco\TTacute\Tlambe\TTdoubler\TTrightcurl\Ts\Tcalma\Tyanta\TTthreedots\Ttinco\TTthreedots\Ts\Tmalta\TTrightcurl\Toore\Tnuumen\TTdot\Ttelco\TTacute\\
+\Ttelco\TTdot\Ts\Tformen\TTthreedots\Tlambe\Tmalta\TTthreedots\Tlambe\TTdot\Tnuumen\TTdoubler\TTthreedots\Toore\Ts\Ttelco\TTdot\Tumbar\TTacute\Ts\Tmalta\TTacute\Ttinco\Ts\Tcentereddot\Ts\Ttelco\TTthreedots\Toore\Ts\Thyarmen\Taara\TTdot\Tsilmenuquerna\TTdot\Ttelco\TTacute\\
+\Ttelco\TTleftcurl\Tanto\Taara\TTleftcurl\Tparma\TTthreedots\Ts\Tcalma\TTthreedots\Tlambe\TTthreedots\Tcalma\TTdot\Troomen\TTtwodotsbelow\TTrightcurl\Ts\Tmalta\Taara\TTdot\Troomen\TTdot\Ts\Tyanta\TTrightcurl\Ttelco\TTthreedots\Tlambe\TTacute\Ts\Tcolon\\
+\Tsilme\Taara\TTdot\Ts\Tvala\TTthreedots\Tnuumen\Tvilya\TTthreedots\Ts\Tnuumen\Taara\TTthreedots\Ts\Tcentereddot\Ts\Troomen\Taara\TTrightcurl\Tmalta\TTacute\Tlambe\TTdoubler\TTrightcurl\Ts\Tvala\TTthreedots\Tnuumen\Tvilya\TTthreedots\Ts\Tcentereddot\Ts\Tvala\TTthreedots\Tlambe\TTdot\Tmalta\TTthreedots\Toore\Ts\Texclamation\\
+\Tnuumen\TTthreedots\Tmalta\Taara\TTthreedots\Troomen\TTdot\Ttelco\TTacute\Ts\Texclamation\Ts\Tnuumen\Tyanta\TTthreedots\Ts\Thyarmen\TTdot\Troomen\TTleftcurl\Tvala\TTthreedots\Tlambe\TTtwodotsbelow\TTacute\Ts\Tvala\TTthreedots\Tlambe\TTdot\Tmalta\TTthreedots\Toore\Ts\Texclamation\\
+\Tnuumen\Tyanta\TTthreedots\Ts\Ttelco\TTacute\Tlambe\TTtwodotsbelow\TTacute\Ts\Thyarmen\TTdot\Troomen\TTleftcurl\Tvala\TTthreedots\Ts\Texclamation\Ts\Tnuumen\TTthreedots\Tmalta\Taara\TTthreedots\Troomen\TTdot\Ttelco\TTacute\Ts\Texclamation
+
+\end{document}

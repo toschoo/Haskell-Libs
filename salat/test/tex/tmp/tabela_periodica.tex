@@ -1,0 +1,1508 @@
+\documentclass[12pt,a4paper,landscape]{article}
+
+%Periodic Table of the elements, written in Portuguese. 
+%Please consider making translations of this document to 
+%other languages and making them available for TeX users 
+%around the world. 
+%
+%Written by Orlando Camargo Rodríguez 
+%Faro, Portugal, 03/04/2003. 
+
+\usepackage{color}
+\def\t{\string\t}
+\RequirePackage{hyperref}
+\hypersetup{
+            pdfpagemode=FullView,
+            colorlinks=true,pdfhighlight=/P,linkbordercolor=1 1 1,
+	    linkcolor=black,citecolor=black,pdftex
+	    }
+
+\pagestyle{empty}
+
+\definecolor{blueii}{rgb}{0.2,0.8,1}
+\definecolor{gray}{rgb}{0.8,0.8,0.8}
+\definecolor{pink}{rgb}{1,0,1}
+
+\newcommand{\hydrogen}[3]{$\mathrel{\mathop{\makebox[9mm]{\colorbox{gray}{\Large\bf #1}}}\limits_{#3}^{#2}}$}
+\newcommand{\metal}[3]{$\mathrel{\mathop{\makebox[9mm]{\colorbox{pink}{\Large\bf #1}}}\limits_{#3}^{#2}}$}
+\newcommand{\metalloid}[3]{$\mathrel{\mathop{\makebox[9mm]{\colorbox{blueii}{\Large\bf #1}}}\limits_{#3}^{#2}}$}
+\newcommand{\noblegas}[3]{$\mathrel{\mathop{\makebox[9mm]{\colorbox{yellow}{\Large\bf #1}}}\limits_{#3}^{#2}}$}
+\newcommand{\nonmetal}[3]{$\mathrel{\mathop{\makebox[9mm]{\colorbox{green}{\Large\bf #1}}}\limits_{#3}^{#2}}$}
+\newcommand{\transitionmetal}[3]{$\mathrel{\mathop{\makebox[9mm]{\colorbox{white}{\Large\bf #1}}}\limits_{#3}^{#2}}$}
+
+%Page setup: 
+
+\headsep-15mm 
+\textwidth280mm
+\textheight240mm
+\oddsidemargin-19mm
+\evensidemargin-19mm 
+
+\begin{document}
+
+\begin{Form}
+\begin{center} 
+\begin{tabular}{||c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c||}\hline\hline
+\multicolumn{18}{|c|}{
+\colorbox{red}{
+\phantom{xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx}
+\bf Grupo 
+\phantom{xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx}
+              }
+                     }\\ \hline \hline
+1     & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10 & 11 & 12 & 13 & 14 & 15 & 16 & 17 & 18 \\ \hline
+IA    &
+IIA   & 
+IIIB  &
+IVB   &
+VB    &
+VIB   &
+VIIB  & 
+\multicolumn{3}{c|}{VIIIB} & 
+IB    &
+IIB   &
+IIIA  &
+IVA   &
+VA    &
+VIA   &
+VIIA  &
+VIIIA \\ \hline\hline 
+\PushButton[
+name=H,bordercolor=0.8 0.8 0.8,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Hidrogénio\t\t\t 
+                    Símbolo: H\t\t\t
+                    Número: 1\t\t\t\t 
+		    Massa atómica: 1,00794\t\t
+		    Configuração electrónica: 1s1 
+		    Temperatura de fusão: -259,14 °C
+		    Temperatura de ebulição: -252,87 °C
+		    Densidade: 0,0899 g/cc\t\t
+		    Descoberto por Cavendish em 1766",1)}
+            ]
+{\hydrogen{\hskip1mm H\hskip1mm}{1}{1,01}}            & 
+\multicolumn{16}{|c|}{\phantom{x}} & 
+\PushButton[
+name=He,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Hélio\t\t\t 
+                    Símbolo: He\t\t\t
+                    Número: 2\t\t\t\t 
+		    Massa atómica: 4,002602\t\t
+		    Configuração electrónica: 1s2 
+		    Temperatura de fusão: -269,7 °C 
+		    Temperatura de ebulição: -268,9 °C
+		    Densidade: 0,179 g/cc\t\t
+		    Descoberto por Janssen em 1868",1)}
+            ]
+{\noblegas{He}{2}{4,00} } \\ \hline 
+\PushButton[
+name=Li,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Lítio\t\t\t 
+                    Símbolo: Li\t\t\t
+                    Número: 3\t\t\t\t 
+		    Massa atómica: 6,941\t\t
+		    Configuração electrónica: [He]2s1 
+		    Temperatura de fusão: 180,5 °C 
+		    Temperatura de ebulição: 1342,0 °C
+		    Densidade: 0,535 g/cc\t\t
+		    Descoberto por Arfvedson em 1817",1)}
+            ]
+{\metal{Li}{3}{6,94} } & 
+\PushButton[
+name=Be,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome:Berílio\t\t\t  
+                    Símbolo: Be\t\t\t
+                    Número: 4\t\t\t\t 
+		    Massa atómica: 9,012182\t\t
+		    Configuração electrónica: [He]2s2
+		    Temperatura de fusão: 1277 °C 
+		    Temperatura de ebulição: 2970 °C
+		    Densidade: 1,848 g/cc\t\t
+		    Descoberto por Vauquelin em 1798",1)}
+            ]
+{ \metal{Be}{4}{9,01} } & 
+\multicolumn{10}{|c|}{\phantom{x}} & 
+\PushButton[
+name=B,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome:Boro\t\t\t 		
+                    Símbolo: B\t\t\t
+                    Número: 5\t\t\t\t  
+		    Massa atómica: 10,811\t\t
+		    Configuração electrónica: 1s2,2s2,2p1
+		    Temperatura de fusão:    2349 K
+		    Temperatura de ebulição: 4200 K
+		    Densidade: 2,460 g/cc\t\t
+		    Descoberto por Gay-Lussac, Thenard e Davy em 1808",1)}
+            ]
+{ \metalloid{\hskip1mm B\hskip1mm}{5}{10,81} } & 
+\PushButton[
+name=C,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Carbono\t\t\t   		
+                    Símbolo: C\t\t\t 
+                    Número: 6\t\t\t\t  
+		    Massa atómica: 12,0107\t\t
+		    Configuração electrónica: 1s2,2s2,2p2
+		    Temperatura de fusão:    3550 °C
+		    Temperatura de ebulição: 4827 °C
+		    Densidade: 2,267 g/cc\t\t
+		    Conhecido desde a Pré-história",1)}
+            ]
+{ \nonmetal{\hskip1mm C\hskip1mm}{6}{12,01} }  & 
+\PushButton[
+name=N,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Azoto\t\t\t		
+                    Símbolo: N\t\t\t 
+                    Número: 7\t\t\t\t 
+		    Massa atómica: 14,00674\t\t
+		    Configuração electrónica: 1s2,2s2,2p3
+		    Temperatura de fusão:    -210,0 °C
+		    Temperatura de ebulição: -195,8 °C
+		    Densidade: 1,251 g/cc\t\t
+		    Descoberto por Rutherford em 1772",1)}
+            ]
+{ \nonmetal{\hskip1mm N\hskip1mm}{7}{14,01} }  & 
+\PushButton[
+name=O,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Oxigénio\t\t\t	     
+                    Símbolo: O\t\t\t
+                    Número: 8\t\t\t\t 
+		    Massa atómica: 15,9994\t\t
+		    Configuração electrónica: 1s2,2s2,2p4
+		    Temperatura de fusão:    -218,4 °C
+		    Temperatura de ebulição: -183,0 °C
+		    Densidade: 1,429 g/cc\t\t
+		    Descoberto por Priestley em 1774",1)}
+            ]
+{ \nonmetal{\hskip1mm O\hskip1mm}{8}{16,00} }  &
+\PushButton[
+name=F,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Flúor\t\t\t   	  
+                    Símbolo: F\t\t\t
+                    Número: 9\t\t\t\t
+		    Massa atómica: 18,9984032\t\t
+		    Configuração electrónica: 1s2,2s2,2p5
+		    Temperatura de fusão:    -219,6 °C
+		    Temperatura de ebulição: -188,1 °C
+		    Densidade: 1,696 g/cc\t\t
+		    Descoberto por Moissan em 1886",1)}
+            ]
+{ \nonmetal{\hskip1mm F\hskip1mm}{9}{19,00} }  &
+\PushButton[
+name=Ne,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Néon\t\t\t   		
+                    Símbolo: Ne\t\t\t 
+                    Número: 10\t\t\t
+		    Massa atómica: 20,1797\t\t
+		    Configuração electrónica: 1s2,2s2,2p6 
+		    Temperatura de fusão:    -248,67 °C
+		    Temperatura de ebulição: -246,05 °C
+		    Densidade: 0,901 g/cc\t\t
+		    Descoberto por Ramsay e Travers em 1898",1)}
+            ]
+{ \noblegas{Ne}{10}{20,18} } \\ \hline 
+\PushButton[
+name=Na,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Sódio\t\t\t   		
+                    Símbolo: Na\t\t\t 
+                    Número: 11\t\t\t
+		    Massa atómica: 22,989770\t\t
+		    Configuração electrónica: [Ne]3s1 
+		    Temperatura de fusão:     97,8 °C
+		    Temperatura de ebulição: 892,0 °C
+		    Densidade: 0,968 g/cc\t\t
+		    Descoberto por Davy em 1807",1)}
+            ]
+{ \metal{Na}{11}{22,99} } & 
+\PushButton[
+name=Mg,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Magnésio\t\t\t 		
+                    Símbolo: Mg\t\t\t
+                    Número: 12\t\t\t 
+		    Massa atómica: 24,3050\t\t
+		    Configuração electrónica: [Ne]3s2
+		    Temperatura de fusão:     648,8 °C
+		    Temperatura de ebulição: 1107,0 °C
+		    Densidade: 1,738 g/cc\t\t
+		    Descoberto por Davy em 1755",1)}
+            ] 
+{ \metal{Mg}{12}{24,31} } &  
+\multicolumn{10}{|c|}{\phantom{x}} & 
+\PushButton[
+name=Al,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Alumínio\t\t\t 		
+                    Símbolo: Al\t\t\t
+                    Número: 13\t\t\t 
+		    Massa atómica: 26,981538\t\t
+		    Configuração electrónica: [Ne]3s2,3p1
+		    Temperatura de fusão:     660,4 °C
+		    Temperatura de ebulição: 2467,0 °C
+		    Densidade: 2,700 g/cc\t\t
+		    Descoberto por Oersted em 1825",1)}
+            ] 
+{ \metal{Al}{13}{26,98} } & 
+\PushButton[
+name=Si,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Silício\t\t\t 		
+                    Símbolo: Si\t\t\t
+                    Número: 14\t\t\t 
+		    Massa atómica: 28,0855\t\t
+		    Configuração electrónica: [Ne]3s2,3p2
+		    Temperatura de fusão:    1410 °C
+		    Temperatura de ebulição: 2355 °C
+		    Densidade: 2,330 g/cc\t\t
+		    Descoberto por Berzelius em 1824",1)}
+            ] 
+{ \metalloid{Si}{14}{28,09} } &
+\PushButton[
+name=P,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Fósforo\t\t\t 		
+                    Símbolo: P\t\t\t
+                    Número: 15\t\t\t 
+		    Massa atómica: 30,973761\t\t
+		    Configuração electrónica: [Ne]3s2,3p3
+		    Temperatura de fusão:     44,1 °C
+		    Temperatura de ebulição: 280,0 °C
+		    Densidade: 1,823 g/cc\t\t
+		    Descoberto por Brand em 1669",1)}
+            ] 
+{ \nonmetal{P}{15}{30,97}  } &
+\PushButton[
+name=S,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Enxofre\t\t\t 		
+                    Símbolo: S\t\t\t
+                    Número: 16\t\t\t 
+		    Massa atómica: 32,066\t\t
+		    Configuração electrónica: [Ne]3s2,3p4
+		    Temperatura de fusão:    119,0 °C
+		    Temperatura de ebulição: 444,6 °C
+		    Densidade: 1,960 g/cc\t\t
+		    Conhecido desde a Pré-história",1)}
+            ] 
+{ \nonmetal{S}{16}{32,06} } & 
+\PushButton[
+name=Cl,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Cloro\t\t\t 		
+                    Símbolo: Cl\t\t\t
+                    Número: 17\t\t\t 
+		    Massa atómica: 35,4527\t\t
+		    Configuração electrónica: [Ne]3s2,3p5
+		    Temperatura de fusão:    -100,9 °C
+		    Temperatura de ebulição:  -34,6 °C
+		    Densidade: 3,165 g/cc\t\t
+		    Descoberto por Scheele em 1774",1)}
+            ] 
+{ \nonmetal{Cl}{17}{35,45} } &
+\PushButton[
+name=Ar,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Árgon\t\t\t 		
+                    Símbolo: Ar\t\t\t
+                    Número: 18\t\t\t 
+		    Massa atómica: 39,948\t\t
+		    Configuração electrónica: [Ne]3s2,3p6 
+		    Temperatura de fusão:    -189,2 °C
+		    Temperatura de ebulição: -185,0 °C
+		    Densidade: 1,784 g/cc\t\t
+		    Descoberto por Rayleigh e Ramsay em 1894",1)}
+            ] 
+{ \noblegas{Ar}{18}{39,95} } \\ \hline 
+\PushButton[
+name=K,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Potássio\t\t\t 		
+                    Símbolo: K\t\t\t
+                    Número: 19\t\t\t 
+		    Massa atómica: 39,0983\t\t
+		    Configuração electrónica: [Ar]4s1
+		    Temperatura de fusão:     63,6 °C
+		    Temperatura de ebulição: 760,0 °C
+		    Densidade: 0,856 g/cc\t\t
+		    Descoberto por Davy em 1807",1)}
+            ] 
+{ \metal{K}{19}{39,10} } & 
+\PushButton[
+name=Ca,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Cálcio\t\t\t 		
+                    Símbolo: Ca\t\t\t
+                    Número: 20\t\t\t 
+		    Massa atómica: 40,078\t\t
+		    Configuração electrónica: [Ar]4s2
+		    Temperatura de fusão:     838 °C
+		    Temperatura de ebulição: 1440 °C
+		    Densidade: 1,550 g/cc\t\t
+		    Descoberto por Davy em 1808",1)}
+            ] 
+{ \metal{Ca}{20}{40,08} } & 
+\PushButton[
+name=Sc,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Escândio\t\t\t 
+                    Símbolo: Sc\t\t\t
+                    Número: 21\t\t\t 
+		    Massa atómica: 44,955910\t\t
+		    Configuração electrónica: [Ar]3d1,4s2
+		    Temperatura de fusão:    1539 °C
+		    Temperatura de ebulição: 2730 °C
+		    Densidade: 1,550 g/cc\t\t
+		    Descoberto por Nilson em 1876",1)}
+            ] 
+{ \transitionmetal{Sc}{21}{44,96} } & 
+\PushButton[
+name=Ti,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Titânio\t\t\t 
+                    Símbolo: Ti\t\t\t
+                    Número: 22\t\t\t 
+		    Massa atómica: 47,867\t\t
+		    Configuração electrónica: [Ar]3d2,4s2
+		    Temperatura de fusão:    1660 °C
+		    Temperatura de ebulição: 3260 °C
+		    Densidade: 4,507 g/cc\t\t
+		    Descoberto por Gregor 1791",1)}
+            ] 
+{ \transitionmetal{Ti}{22}{47,90} } & 
+\PushButton[
+name=V,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Vanádio\t\t\t 
+                    Símbolo: V\t\t\t
+                    Número: 23\t\t\t 
+		    Massa atómica: 50,9415\t\t
+		    Configuração electrónica: [Ar]3d3,4s2
+		    Temperatura de fusão:    1900 °C
+		    Temperatura de ebulição: 3450 °C
+		    Densidade: 6,110 g/cc\t\t
+		    Descoberto por Del Rio em 1801",1)}
+            ] 
+{ \transitionmetal{V}{23}{50,94} } & 
+\PushButton[
+name=Cr,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Crómio\t\t\t 
+                    Símbolo: Cr\t\t\t
+                    Número: 24\t\t\t 
+		    Massa atómica: 51,9961\t\t
+		    Configuração electrónica: [Ar]3d5,4s1
+		    Temperatura de fusão:    1875 °C
+		    Temperatura de ebulição: 2665 °C
+		    Densidade: 7,140 g/cc\t\t
+		    Descoberto por Vauquelin em 1797",1)}
+            ] 
+{ \transitionmetal{Cr}{24}{52,00} } & 
+\PushButton[
+name=Mn,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Manganésio\t\t\t 
+                    Símbolo: Mn\t\t\t
+                    Número: 25\t\t\t 
+		    Massa atómica: 54,938049\t\t
+		    Configuração electrónica: [Ar]3d5,4s2
+		    Temperatura de fusão:    1245 °C
+		    Temperatura de ebulição: 2150 °C
+		    Densidade: 7,470 g/cc\t\t
+		    Descoberto por Gahn, Scheele e Bergman em 1774",1)}
+            ] 
+{ \transitionmetal{Mn}{25}{54,94} } & 
+\PushButton[
+name=Fe,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Ferro\t\t\t 
+                    Símbolo: Fe\t\t\t
+                    Número: 26\t\t\t 
+		    Massa atómica: 55,845\t\t
+		    Configuração electrónica: [Ar]3d6,4s2
+		    Temperatura de fusão:    1535 °C
+		    Temperatura de ebulição: 3000 °C
+		    Densidade: 7,874 g/cc\t\t
+		    Conhecido desde a Pré história",1)}
+            ] 
+{ \transitionmetal{Fe}{26}{55,85} } & 
+\PushButton[
+name=Co,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Cobalto\t\t\t 
+                    Símbolo: Co\t\t\t
+                    Número: 27\t\t\t 
+		    Massa atómica: 58,933200\t\t
+		    Configuração electrónica: [Ar]3d7,4s2
+		    Temperatura de fusão:    1495 °C
+		    Temperatura de ebulição: 2900 °C
+		    Densidade: 8,900 g/cc\t\t
+		    Descoberto por Brandt em 1735",1)}
+            ] 
+{ \transitionmetal{Co}{27}{58,93} } & 
+\PushButton[
+name=Ni,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Níquel\t\t\t 
+                    Símbolo: Ni\t\t\t
+                    Número: 28\t\t\t 
+		    Massa atómica: 58,6934\t\t
+		    Configuração electrónica: [Ar]3d8,4s2
+		    Temperatura de fusão:    1453 °C
+		    Temperatura de ebulição: 2732 °C
+		    Densidade: 8,908 g/cc\t\t
+		    Descoberto por Cronstedt em 1751",1)}
+            ] 
+{ \transitionmetal{Ni}{28}{58,71} } & 
+\PushButton[ 
+name=Cu,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Cobre\t\t\t 
+                    Símbolo: Cu\t\t\t
+                    Número: 29\t\t\t 
+		    Massa atómica: 63,546\t\t
+		    Configuração electrónica: [Ar]3d10,4s1
+		    Temperatura de fusão:    1083,4 °C
+		    Temperatura de ebulição: 2595,0 °C
+		    Densidade: 8,920 g/cc\t\t
+		    Conhecido desde a Pré-história",1)}
+            ] 
+{ \transitionmetal{Cu}{29}{63,55} } & 
+\PushButton[
+name=Zn,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Zinco\t\t\t 
+                    Símbolo: Zn\t\t\t
+                    Número: 30\t\t\t 
+		    Massa atómica: 65,409\t\t
+		    Configuração electrónica: [Ar]3d10,4s2
+		    Temperatura de fusão:    419,6 °C
+		    Temperatura de ebulição: 907,0 °C
+		    Densidade: 7,140 g/cc\t\t
+		    Conhecido desde a Pré-história",1)}
+            ] 
+{ \transitionmetal{Zn}{30}{65,38} } & 
+\PushButton[
+name=Ga,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Gálio\t\t\t 
+                    Símbolo: Ga\t\t\t
+                    Número: 31\t\t\t 
+		    Massa atómica: 69,723\t\t
+		    Configuração electrónica: [Ar]3d10,4s2,4p1\t\t\t 
+		    Temperatura de fusão:      29,8 °C
+		    Temperatura de ebulição: 2403,0 °C
+		    Densidade: 5,904 g/cc\t\t
+		    Descoberto por Boisbaudran em 1875",1)}
+            ] 
+{ \metal{Ga}{31}{69,72} } & 
+\PushButton[
+name=Ge,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Germânio\t\t\t 
+                    Símbolo: Ge\t\t\t
+                    Número: 32\t\t\t 
+		    Massa atómica: 72,61\t\t
+		    Configuração electrónica: [Ar]3d10,4s2,4p2\t\t\t 
+		    Temperatura de fusão:     937,4 °C
+		    Temperatura de ebulição: 2830,0 °C
+		    Densidade: 5,323 g/cc\t\t
+		    Descoberto por Winkler em 1886",1)}
+            ] 
+{ \metalloid{Ge}{32}{72,59} } & 
+\PushButton[
+name=As,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Arsénio\t\t\t 
+                    Símbolo: As\t\t\t
+                    Número: 33\t\t\t 
+		    Massa atómica: 74,9216\t\t
+		    Configuração electrónica: [Ar]3d10,4s2,4p3\t\t\t 
+		    Temperatura de fusão:    613 °C
+		    Temperatura de ebulição: 817 °C
+		    Densidade: 5,727 g/cc\t\t
+		    Descoberto por Albertus Magnus em 1250 A.C",1)}
+            ] 
+{ \metalloid{As}{33}{74,92} } & 
+\PushButton[
+name=Se,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Selénio\t\t\t 
+                    Símbolo: Se\t\t\t
+                    Número: 34\t\t\t 
+		    Massa atómica: 78,96\t\t
+		    Configuração electrónica: [Ar]3d10,4s2,4p4\t\t\t 
+		    Temperatura de fusão:    217,0 °C
+		    Temperatura de ebulição: 684,9 °C
+		    Densidade: 4,819 g/cc\t\t
+		    Descoberto por Berzelius em 1817",1)}
+            ] 
+{ \nonmetal{Se}{34}{78,96} } & 
+\PushButton[
+name=Br,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Bromo\t\t\t 
+                    Símbolo: Br\t\t\t
+                    Número: 35\t\t\t 
+		    Massa atómica: 79,904\t\t
+		    Configuração electrónica: [Ar]3d10,4s2,4p5\t\t\t 
+		    Temperatura de fusão:    -7,2 °C
+		    Temperatura de ebulição: 58,8 °C
+		    Densidade: 3,121 g/cc\t\t
+		    Descoberto por Balard em 1826",1)}
+            ] 
+{ \nonmetal{Br}{35}{79,90} } & 
+\PushButton[
+name=Kr,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Krípton\t\t\t 
+                    Símbolo: Kr\t\t\t
+                    Número: 36\t\t\t 
+		    Massa atómica: 83,798\t\t
+		    Configuração electrónica: [Ar]3d10,4s2,4p6\t\t\t 
+		    Temperatura de fusão:    -157,3 °C
+		    Temperatura de ebulição: -152,0 °C
+		    Densidade: 3,733 g/cc\t\t
+		    Descoberto por Ramsay e Travers em 1898",1)}
+            ] 
+{ \noblegas{Kr}{36}{83,80} } \\ \hline 
+\PushButton[
+name=Rb,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Rubídio\t\t\t 
+                    Símbolo: Rb\t\t\t
+                    Número: 37\t\t\t 
+		    Massa atómica: 85,4678\t\t
+		    Configuração electrónica: [Kr]5s1
+		    Temperatura de fusão:     38,9 °C
+		    Temperatura de ebulição: 688,0 °C
+		    Densidade: 1,532 g/cc\t\t
+		    Descoberto por Bunsen e Kirchoff em 1861",1)}
+            ] 
+{ \metal{Rb}{37}{85,47} } & 
+\PushButton[
+name=Sr,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Estrôncio\t\t\t 
+                    Símbolo: Sr\t\t\t
+                    Número: 38\t\t\t 
+		    Massa atómica: 87,62\t\t
+		    Configuração electrónica: [Kr]5s2 
+		    Temperatura de fusão:     769 °C
+		    Temperatura de ebulição: 1384 °C
+		    Densidade: 2,630 g/cc\t\t
+		    Descoberto por Crawford em 1790",1)}
+            ] 
+{ \metal{Sr}{38}{87,62} } & 
+\PushButton[
+name=Y,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Ítrio\t\t\t 
+                    Símbolo: Y\t\t\t
+                    Número: 39\t\t\t 
+		    Massa atómica: 88,90585\t\t
+		    Configuração electrónica: [Kr]4d1,5s2
+		    Temperatura de fusão:    1509 °C
+		    Temperatura de ebulição: 2927 °C
+		    Densidade: 4,472 g/cc\t\t
+		    Descoberto por Gadolin em 1794",1)}
+            ] 
+{ \transitionmetal{Y}{39}{88,91} } & 
+\PushButton[
+name=Zr,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Zircónio\t\t\t 
+                    Símbolo: Zr\t\t\t
+                    Número: 40\t\t\t 
+		    Massa atómica: 91,224\t\t
+		    Configuração electrónica: [Kr]4d2,5s2
+		    Temperatura de fusão:    1852 °C
+		    Temperatura de ebulição: 3580 °C
+		    Densidade: 6,511 g/cc\t\t
+		    Descoberto por Klaproth em 1789",1)}
+            ] 
+{ \transitionmetal{Zr}{40}{91,22} } & 
+\PushButton[
+name=Nb,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Nióbio\t\t\t 
+                    Símbolo: Nb\t\t\t
+                    Número: 41\t\t\t 
+		    Massa atómica: 92,90638\t\t
+		    Configuração electrónica: [Kr]4d4,5s1
+		    Temperatura de fusão:    2468 °C
+		    Temperatura de ebulição: 4742 °C
+		    Densidade: 8,570 g/cc\t\t
+		    Descoberto por Hatchett em 1801",1)}
+            ] 
+{ \transitionmetal{Nb}{41}{92,91} } & 
+\PushButton[
+name=Mo,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Molibdénio\t\t\t 
+                    Símbolo: Mo\t\t\t
+                    Número: 42\t\t\t 
+		    Massa atómica: 95,94\t\t
+		    Configuração electrónica: [Kr]4d5,5s1
+		    Temperatura de fusão:    2610 °C
+		    Temperatura de ebulição: 5560 °C
+		    Densidade: 10,280 g/cc\t\t
+		    Descoberto por Scheele em 1778",1)}
+            ] 
+{ \transitionmetal{Mo}{42}{95,94} } & 
+\PushButton[
+name=Tc,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Tecnécio\t\t\t 
+                    Símbolo: Tc\t\t\t
+                    Número: 43\t\t\t 
+		    Massa atómica: 98,9062\t\t
+		    Configuração electrónica: [Kr]4d6,5s1
+		    Temperatura de fusão:    2430 K 
+		    Temperatura de ebulição: 4538 K 
+		    Densidade: 11,500 g/cc\t\t
+		    Descoberto por Perrier e Segre em 1937",1)}
+            ] 
+{ \transitionmetal{Tc}{43}{(98)} } & 
+\PushButton[
+name=Ru,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Ruténio\t\t\t 
+                    Símbolo: Ru\t\t\t
+                    Número: 44\t\t\t 
+		    Massa atómica: 101,07\t\t
+		    Configuração electrónica: [Kr]4d7,5s1
+		    Temperatura de fusão:    2250 °C
+		    Temperatura de ebulição: 3900 °C
+		    Densidade: 12,370 g/cc\t\t
+		    Descoberto por Klaus em 1844",1)}
+            ] 
+{ \transitionmetal{Ru}{44}{101,07} } & 
+\PushButton[
+name=Rh,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Ródio\t\t\t 
+                    Símbolo: Rh\t\t\t
+                    Número: 45\t\t\t 
+		    Massa atómica: 102,9055\t\t
+		    Configuração electrónica: [Kr]4d8,5s1
+		    Temperatura de fusão:    1966 °C
+		    Temperatura de ebulição: 3727 °C
+		    Densidade: 12,450 g/cc\t\t
+		    Descoberto por Wollaston em 1803",1)}
+            ] 
+{ \transitionmetal{Rh}{45}{102,91} } & 
+\PushButton[
+name=Pd,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Paládio\t\t\t 
+                    Símbolo: Pd\t\t\t
+                    Número: 46\t\t\t 
+		    Massa atómica: 106,42\t\t
+		    Configuração electrónica: [Kr]4d10,5s0
+		    Temperatura de fusão:    1554 °C
+		    Temperatura de ebulição: 3980 °C
+		    Densidade: 12,023 g/cc\t\t
+		    Descoberto por Wollaston em 1803",1)}
+            ] 
+{ \transitionmetal{Pd}{46}{106,4} } & 
+\PushButton[
+name=Ag,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Prata\t\t\t 
+                    Símbolo: Ag\t\t\t
+                    Número: 47\t\t\t 
+		    Massa atómica: 107,86815\t\t
+		    Configuração electrónica: [Kr]4d10,5s1 
+		    Temperatura de fusão:     961,9 °C
+		    Temperatura de ebulição: 2210,0 °C
+		    Densidade: 10,490 g/cc\t\t
+		    Conhecido desde a Pré-história",1)}
+            ] 
+{ \transitionmetal{Ag}{47}{107,87} } & 
+\PushButton[
+name=Cd,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Cádmio\t\t\t 
+                    Símbolo: \t\t\t
+                    Número: 48\t\t\t 
+		    Massa atómica: 112,41\t\t
+		    Configuração electrónica: [Kr]4d10,5s2 
+		    Temperatura de fusão:    320,9 °C
+		    Temperatura de ebulição: 765,0 °C
+		    Densidade: 8,650 g/cc\t\t
+		    Descoberto por Stromeyer em 1817",1)}
+            ] 
+{ \transitionmetal{Cd}{48}{112,40} } & 
+\PushButton[
+name=In,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Índio\t\t\t 
+                    Símbolo: In\t\t\t
+                    Número: 49\t\t\t 
+		    Massa atómica: 114,818\t\t
+		    Configuração electrónica: [Kr]4d10,5s2,5p1\t\t\t 
+		    Temperatura de fusão:     156,6 °C
+		    Temperatura de ebulição: 2000,0 °C
+		    Densidade: 7,130 g/cc\t\t
+		    Descoberto por Riech e Richter em 1863",1)}
+            ] 
+{ \metal{In}{49}{114,82} } & 
+\PushButton[
+name=Sn,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Estanho\t\t\t 
+                    Símbolo: Sn\t\t\t
+                    Número: 50\t\t\t 
+		    Massa atómica: 118,69\t\t
+		    Configuração electrónica: [Kr]4d10,5s2,5p2\t\t\t 
+		    Temperatura de fusão:     232 °C
+		    Temperatura de ebulição: 2270 °C
+		    Densidade: 7,310 g/cc\t\t
+		    Conhecido desde a Pré-história",1)}
+            ] 
+{ \metal{Sn}{50}{118,69} } & 
+\PushButton[
+name=Sb,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Antimónio\t\t\t 
+                    Símbolo: Sb\t\t\t
+                    Número: 51\t\t\t 
+		    Massa atómica: 121,75\t\t
+		    Configuração electrónica: [Kr]4d10,5s2,5p3\t\t\t 
+		    Temperatura de fusão:     630 °C
+		    Temperatura de ebulição: 1380 °C
+		    Densidade: 6,697 g/cc\t\t
+		    Conhecido desde a Pré-história",1)}
+            ] 
+{ \metalloid{Sb}{51}{121,75} } & 
+\PushButton[
+name=Te,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Telúrio\t\t\t 
+                    Símbolo: Te\t\t\t
+                    Número: 52\t\t\t 
+		    Massa atómica: 127,60\t\t
+		    Configuração electrónica: [Kr]4d10,5s2,5p4\t\t\t 
+		    Temperatura de fusão:    449,5 °C
+		    Temperatura de ebulição: 989,8 °C
+		    Densidade: 6,240 g/cc\t\t
+		    Descoberto por Reichenstein em 1782",1)}
+            ] 
+{ \metalloid{Te}{52}{127,60} } & 
+\PushButton[
+name=I,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Iodo\t\t\t 
+                    Símbolo: I\t\t\t
+                    Número: 53\t\t\t 
+		    Massa atómica: 126,90447\t\t
+		    Configuração electrónica: [Kr]4d10,5s2,5p5\t\t\t 
+		    Temperatura de fusão:    113,5 °C
+		    Temperatura de ebulição: 184,3 °C
+		    Densidade: 4,660 g/cc\t\t
+		    Descoberto por Courtois em 1811",1)}
+            ] 
+{ \nonmetal{I}{53}{126,90} } & 
+\PushButton[
+name=Xe,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Xénon\t\t\t 
+                    Símbolo: Xe\t\t\t
+                    Número: 54\t\t\t 
+		    Massa atómica: 131,30\t\t
+		    Configuração electrónica: [Kr]4d10,5s2,5p6\t\t\t 
+		    Temperatura de fusão:    -111,9 °C
+		    Temperatura de ebulição: -108,0 °C
+		    Densidade: 5,861 g/cc\t\t
+		    Descoberto por Ramsay e Travers em 1898",1)}
+            ] 
+{ \noblegas{Xe}{54}{131,30} } \\ \hline 
+\PushButton[
+name=Cs,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Césio\t\t\t 
+                    Símbolo: Cs\t\t\t
+                    Número: 55\t\t\t 
+		    Massa atómica: 132,90545\t\t
+		    Configuração electrónica: [Xe]6s1
+		    Temperatura de fusão:     28,4 °C
+		    Temperatura de ebulição: 690,0 °C
+		    Densidade: 1,879 g/cc\t\t
+		    Descoberto por Bunsen e Kirchoff em 1860",1)}
+            ] 
+{ \metal{Cs}{55}{132,91} } & 
+\PushButton[
+name=Ba,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Bário\t\t\t 
+                    Símbolo: Ba\t\t\t
+                    Número: 56\t\t\t 
+		    Massa atómica: 137,327\t\t
+		    Configuração electrónica: [Xe]6s2
+		    Temperatura de fusão:     725 °C
+		    Temperatura de ebulição: 1640 °C
+		    Densidade: 3,510 g/cc\t\t
+		    Descoberto Davy em 1808",1)}
+            ] 
+{ \metal{Ba}{56}{137,34} } & 
+\PushButton[
+name=La,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Lantânio\t\t\t 
+                    Símbolo: La\t\t\t
+                    Número: 57\t\t\t 
+		    Massa atómica: 138,9055\t\t
+		    Configuração electrónica: [Xe]5d1,6s2
+		    Temperatura de fusão:     920 °C
+		    Temperatura de ebulição: 3470 °C
+		    Densidade: 6,146 g/cc\t\t
+		    Descoberto por Mosander em 1839",1)}
+            ] 
+{ \transitionmetal{\small La*}{57}{138,91} } & 
+\PushButton[
+name=Hf,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Háfnio\t\t\t 
+                    Símbolo: Hf\t\t\t
+                    Número: 72\t\t\t 
+		    Massa atómica: 178,49\t\t
+		    Configuração electrónica: [Xe]4f14,5d2,6s2\t\t\t 
+		    Temperatura de fusão:    2227 °C
+		    Temperatura de ebulição: 5400 °C
+		    Densidade: 13,310 g/cc\t\t
+		    Descoberto por Coster e Hevesy em 1923",1)}
+            ] 
+{ \transitionmetal{Hf}{72}{178,49} } & 
+\PushButton[
+name=Ta,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Tântalo\t\t\t 
+                    Símbolo: Ta\t\t\t
+                    Número: 73\t\t\t 
+		    Massa atómica: 180,9479\t\t
+		    Configuração electrónica: [Xe]4f14,5d3,6s2\t\t\t 
+		    Temperatura de fusão:    2996 °C
+		    Temperatura de ebulição: 5425 °C
+		    Densidade: 16,650 g/cc\t\t
+		    Descoberto por Ekeberg em 1801",1)}
+            ] 
+{ \transitionmetal{Ta}{73}{180,95} } & 
+\PushButton[
+name=W,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Tungsténio\t\t\t 
+                    Símbolo: W\t\t\t
+                    Número: 74\t\t\t 
+		    Massa atómica: 183,84\t\t
+		    Configuração electrónica: [Xe]4f14,5d4,6s2\t\t\t 
+		    Temperatura de fusão:    3410 °C
+		    Temperatura de ebulição: 5930 °C
+		    Densidade: 19,250 g/cc\t\t
+		    Descoberto por d´Elheiyar em 1783",1)}
+            ] 
+{ \transitionmetal{W}{74}{183,85} } & 
+\PushButton[
+name=Re,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Rénio\t\t\t 
+                    Símbolo: Re\t\t\t
+                    Número: 75\t\t\t 
+		    Massa atómica: 186,207\t\t
+		    Configuração electrónica: [Xe]4f14,5d5,6s2\t\t\t 
+		    Temperatura de fusão:    3180 °C
+		    Temperatura de ebulição: 5627 °C
+		    Densidade: 21,020 g/cc\t\t
+		    Descoberto por Noddack, Berg e Tacke em 1925",1)}
+            ] 
+{ \transitionmetal{Re}{75}{186,21} } & 
+\PushButton[
+name=Os,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Ósmio\t\t\t 
+                    Símbolo: Os\t\t\t
+                    Número: 76\t\t\t 
+		    Massa atómica: 190,23\t\t
+		    Configuração electrónica: [Xe]4f14,5d6,6s2\t\t\t 
+		    Temperatura de fusão:    3000 °C
+		    Temperatura de ebulição: 5400 °C
+		    Densidade: 22,610 g/cc\t\t
+		    Descoberto por Tennant em 1803",1)}
+            ] 
+{ \transitionmetal{Os}{76}{190,2} } & 
+\PushButton[
+name=Ir,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Irídio\t\t\t 
+                    Símbolo: Ir\t\t\t
+                    Número: 77\t\t\t 
+		    Massa atómica: 192,217\t\t
+		    Configuração electrónica: [Xe]4f14,5d7,6s2\t\t\t 
+		    Temperatura de fusão:    2410 °C
+		    Temperatura de ebulição: 4130 °C
+		    Densidade: 22,650 g/cc\t\t
+		    Descoberto por Tennant em 1803",1)}
+            ] 
+{ \transitionmetal{Ir}{77}{192,22} } & 
+\PushButton[
+name=Pt,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Platina\t\t\t 
+                    Símbolo: Pt\t\t\t
+                    Número: 78\t\t\t 
+		    Massa atómica: 195,078\t\t
+		    Configuração electrónica: [Xe]4f14,5d9,6s1\t\t\t 
+		    Temperatura de fusão:    1769 °C
+		    Temperatura de ebulição: 3827 °C
+		    Densidade: 21,090 g/cc\t\t
+		    Descoberto por Ulloa 1735",1)}
+            ] 
+{ \transitionmetal{Pt}{78}{195,09} } & 
+\PushButton[
+name=Au,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Ouro\t\t\t 
+                    Símbolo: Au\t\t\t
+                    Número: 79\t\t\t 
+		    Massa atómica: 196,96655\t\t
+		    Configuração electrónica: [Xe]4f14,5d10,6s1\t\t\t 
+		    Temperatura de fusão:    1063 °C
+		    Temperatura de ebulição: 2970 °C
+		    Densidade:  19,300 g/cc\t\t
+		    Conhecido desde a Pré-história",1)}
+            ] 
+{ \transitionmetal{Au}{79}{196,97} } & 
+\PushButton[
+name=Hg,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Mercúrio\t\t\t 
+                    Símbolo: Hg\t\t\t
+                    Número: 80\t\t\t 
+		    Massa atómica: 200,59\t\t
+		    Configuração electrónica: [Xe]4f14,5d10,6s2\t\t\t 
+		    Temperatura de fusão:    -38,84 °C
+		    Temperatura de ebulição: 356,58 °C
+		    Densidade: 13,594 g/cc\t\t
+		    Conhecido desde a Pré-história",1)}
+            ] 
+{ \transitionmetal{Hg}{80}{200,59} } & 
+\PushButton[
+name=Tl,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Tálio\t\t\t 
+                    Símbolo: Tl\t\t\t
+                    Número: 81\t\t\t 
+		    Massa atómica: 204,3833\t\t
+		    Configuração electrónica: [Xe]4f14,5d10,6s2,6p1\t\t
+		    Temperatura de fusão:     303,5 °C
+		    Temperatura de ebulição: 1457,0 °C
+		    Densidade: 11,850 g/cc\t\t
+		    Descoberto por Crookes em 1861",1)}
+            ] 
+{ \metal{Tl}{81}{204,37} } & 
+\PushButton[
+name=Pb,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Chumbo\t\t\t 
+                    Símbolo: Pb\t\t\t
+                    Número: 82\t\t\t 
+		    Massa atómica: 207,2\t\t
+		    Configuração electrónica: [Xe]4f14,5d10,6s2,6p2\t\t
+		    Temperatura de fusão:     327,4 °C
+		    Temperatura de ebulição: 1740,0 °C
+		    Densidade: 11,340 g/cc\t\t
+		    Conhecido desde a Pré-história",1)}
+            ] 
+{ \metal{Pb}{82}{207,2} } & 
+\PushButton[
+name=Bi,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Bismuto\t\t\t 
+                    Símbolo: Bi\t\t\t
+                    Número: 83\t\t\t 
+		    Massa atómica: 208,98038\t\t
+		    Configuração electrónica: [Xe]4f14,5d10,6s2,6p3\t\t
+		    Temperatura de fusão:     271,3 °C
+		    Temperatura de ebulição: 1560,0 °C
+		    Densidade: 9,780 g/cc\t\t
+		    Descoberto por Geoffroy em 1753",1)}
+            ] 
+{ \metal{Bi}{83}{208,96} } & 
+\PushButton[
+name=Po,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Polónio\t\t\t 
+                    Símbolo: Po\t\t\t
+                    Número: 84\t\t\t 
+		    Massa atómica: 209,98\t\t
+		    Configuração electrónica: [Xe]4f14,5d10,6s2,6p4\t\t
+		    Temperatura de fusão:    254 °C
+		    Temperatura de ebulição: 962 °C
+		    Densidade: 9,196 g/cc\t\t
+		    Descoberto por Marie Curie em 1898",1)}
+            ] 
+{ \metal{Po}{84}{(209)} } & 
+\PushButton[
+name=At,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Ástato\t\t\t 
+                    Símbolo: At\t\t\t
+                    Número: 85\t\t\t 
+		    Massa atómica: 209,99\t\t
+		    Configuração electrónica: [Xe]4f14,5d10,6s2,6p5\t\t
+		    Temperatura de fusão:    575 °K
+		    Temperatura de ebulição: 610 °K
+		    Descoberto por Corson, Mackenzie e Segre em 1940",1)}
+            ] 
+{ \nonmetal{At}{85}{(210)} } & 
+\PushButton[
+name=Rn,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Rádon\t\t\t 
+                    Símbolo: Rn\t\t\t
+                    Número: 86\t\t\t 
+		    Massa atómica: 222,02\t\t
+		    Configuração electrónica: [Xe]4f14,5d10,6s2,6p6\t\t
+		    Temperatura de fusão:    -71,0 °C
+		    Temperatura de ebulição: -61,8 °C
+		    Densidade: 9,911 g/cc\t\t
+		    Descoberto por Dorn em 1900",1)}
+            ] 
+{ \noblegas{Rn}{86}{(222)} } \\ \hline 
+\PushButton[
+name=Fr,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Frâncio\t\t\t 
+                    Símbolo: Fr\t\t\t
+                    Número: 87\t\t\t 
+		    Massa atómica: 223,02\t\t
+		    Configuração electrónica: [Rn]7s1
+		    Temperatura de fusão:     27 °C
+		    Temperatura de ebulição: 677 °C
+		    Densidade: 2,412 g/cc\t\t
+		    Descoberto por Perey em 1939",1)}
+            ] 
+{ \metal{Fr}{87}{(223)} } & 
+\PushButton[
+name=Ra,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Rádio\t\t\t
+                    Símbolo: Ra\t\t\t
+                    Número: 88\t\t\t 
+		    Massa atómica: 226,0254\t\t
+		    Configuração electrónica: [Rn]7s2
+		    Temperatura de fusão:     700 °C
+		    Temperatura de ebulição: 1300 °C
+		    Densidade: 5,000 g/cc\t\t
+		    Descoberto por Curie em 1898",1)}
+            ] 
+{ \metal{Ra}{88}{226,03} } & 
+\PushButton[
+name=Ac,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Actínio\t\t\t
+                    Símbolo: Ac\t\t\t
+                    Número: 89\t\t\t 
+		    Massa atómica: 227,03\t\t
+		    Configuração electrónica: [Rn]6d1,7s2
+		    Temperatura de fusão:    1050 °C
+		    Temperatura de ebulição: 3300 °C
+		    Densidade: 10,070 g/cc\t\t
+		    Descoberto por Debierne em 1899",1)}
+            ] 
+{ \transitionmetal{\small Ac**}{89}{(227)} } &
+\PushButton[
+name=Rf,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Rutherfórdio\t\t\t
+                    Símbolo: Rf\t\t\t
+                    Número: 104\t\t\t 
+		    Massa atómica: (261)\t\t
+		    Configuração electrónica: [Rn]5f14,6d2,7s2\t\t\t
+		    Descoberto separadamente por Lawrence Berkeley (USA) / Dubna (Rússia), em 1964",1)}
+            ]
+{ \transitionmetal{Rf}{104}{(261)} } & 
+\PushButton[
+name=Db,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Dúbnio\t\t\t
+                    Símbolo: Db\t\t\t
+                    Número: 105\t\t\t 
+		    Massa atómica: (262)\t\t
+		    Configuração electrónica: [Rn]5f14,6d3,7s2\t\t\t
+		    Descoberto separadamente por Lawrence Berkeley (USA) / Dubna (Rússia), em 1967",1)}
+            ] 
+{ \transitionmetal{Db}{105}{(262)} } & 
+\PushButton[
+name=Sg,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Seaborgium\t\t\t
+                    Símbolo: Sg\t\t\t
+                    Número: 106\t\t\t 
+		    Massa atómica: (263)\t\t
+		    Configuração electrónica: [Rn]5f14,6d4,7s2\t\t\t
+		    Descoberto separadamente por Lawrence Berkeley (USA) / Dubna (Rússia), em 1974",1)}
+            ] 
+{ \transitionmetal{Sg}{106}{(263)} } & 
+\PushButton[
+name=Bh,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Bóhrio\t\t\t
+                    Símbolo: Bh\t\t\t
+                    Número: 107\t\t\t 
+		    Massa atómica: (262)\t\t
+		    Configuração electrónica: [Rn]5f14,6d5,7s2\t\t\t 
+		    Descoberto por Armbruster, Münzenber et al. em 1981",1)}
+            ] 
+{ \transitionmetal{Bh}{107}{(262)} } & 
+\PushButton[
+name=Hs,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Hássio\t\t\t
+                    Símbolo: Hs\t\t\t
+                    Número: 108\t\t\t 
+		    Massa atómica: (265)\t\t
+		    Configuração electrónica: [Rn]5f14,6d6,7s2\t\t\t 
+		    Descoberto por Armbruster, Münzenber et al. em 1984",1)}
+            ] 
+{ \transitionmetal{Hs}{108}{(265)} } & 
+\PushButton[
+name=Mt,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Meitnério\t\t\t
+                    Símbolo: Mt\t\t\t
+                    Número: 109\t\t\t 
+		    Massa atómica: (266)\t\t
+		    Configuração electrónica: [Rn]5f14,6d7,7s2\t\t\t 
+		    Descoberto por Armbruster, Münzenber et al. em 1982",1)}
+            ] 
+{ \transitionmetal{Mt}{109}{(266)} } & 
+\PushButton[
+name=Uun,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Ununnílio\t\t\t
+                    Símbolo: Uun\t\t\t
+                    Número: 110\t\t\t 
+		    Massa atómica: (269)\t\t
+		    Configuração electrónica: [Rn]5f14,6d9,7s1",1)}
+            ] 
+{ \transitionmetal{\small Uun}{110}{(269)} } & 
+\PushButton[
+name=Uuu,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Ununúnio\t\t\t
+                    Símbolo: Uuu\t\t\t
+                    Número: 111\t\t\t 
+		    Massa atómica: (272)\t\t
+		    Configuração electrónica: [Rn]5f14,6d10,7s1",1)}
+            ] 
+{ \transitionmetal{\small Uuu}{111}{(272)} } & 
+\PushButton[
+name=Uub,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Unúmbio\t\t\t
+                    Símbolo: Uub\t\t\t
+                    Número: 112\t\t\t 
+		    Massa atómica: (277)\t\t
+		    Configuração electrónica: [Rn]5f14,6d10,7s2",1)}
+            ] 
+{ \transitionmetal{\small Uub}{112}{(277)} } & 
+\PushButton[
+name=Uut,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Símbolo: Uut\t\t\t
+                    Número: 113",1)}
+            ] 
+{ \transitionmetal{\small Uut}{113}{(282)} } & 
+\multicolumn{5}{|c|}{\phantom{x}} \\ \hline \hline 
+\multicolumn{18}{c}{ \phantom{x}} \\ \hline \hline
+\multicolumn{2}{|c|}{\bf *Lantan\'\i deos} & 
+\PushButton[
+name=Ce,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Cério\t\t\t
+                    Símbolo: Ce\t\t\t
+                    Número: 58\t\t\t 
+		    Massa atómica: 140,116\t\t
+		    Configuração electrónica: [Xe]4f2,5d0,6s2\t\t\t
+		    Temperatura de fusão:      795 °C
+		    Temperatura de ebulição: 3468 °C
+		    Densidade: 6,689 g/cc\t\t
+		    Descoberto por Berzelius, Hisinger e Klaproth em 1803",1)}
+            ] 
+{ \transitionmetal{Ce}{58}{140,11} } & 
+\PushButton[
+name=Pr,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Praseodímio\t\t\t
+                    Símbolo: Pr\t\t\t
+                    Número: 59\t\t\t 
+		    Massa atómica: 140,90765\t\t
+		    Configuração electrónica: [Xe]4f3,5d0,6s2\t\t\t
+		    Temperatura de fusão:      935 °C
+		    Temperatura de ebulição: 3127 °C
+		    Densidade: 6,640 g/cc\t\t
+		    Descoberto por von Weisbach 1885",1)}
+            ] 
+{ \transitionmetal{Pr}{59}{140,91} } & 
+\PushButton[
+name=Nd,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Neodímio\t\t\t
+                    Símbolo: Nd\t\t\t
+                    Número: 60\t\t\t 
+		    Massa atómica: 144,24\t\t
+		    Configuração electrónica: [Xe]4f4,5d0,6s2\t\t\t
+		    Temperatura de fusão:    1024 °C
+		    Temperatura de ebulição: 3027 °C
+		    Densidade: 6,800 g/cc\t\t
+		    Descoberto por von Weisbach 1885",1)}
+            ] 
+{ \transitionmetal{Nd}{60}{144,24} } & 
+\PushButton[
+name=Pm,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Promécio\t\t\t
+                    Símbolo: Pm\t\t\t
+                    Número: 61\t\t\t 
+		    Massa atómica: 146,92\t\t
+		    Configuração electrónica: [Xe]4f5,5d0,6s2\t\t\t
+		    Temperatura de fusão:    1168 °C
+		    Temperatura de ebulição: 2730 °C
+		    Densidade: 7,264 g/cc\t\t
+		    Descoberto por Marinsky et al. em 1945",1)}
+            ] 
+{ \transitionmetal{Pm}{61}{(145)} } & 
+\PushButton[
+name=Sm,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Samário\t\t\t
+                    Símbolo: Sm\t\t\t
+                    Número: 62\t\t\t 
+		    Massa atómica: 150,36\t\t
+		    Configuração electrónica: [Xe]4f6,5d0,6s2\t\t\t
+		    Temperatura de fusão:    1072 °C
+		    Temperatura de ebulição: 1900 °C
+		    Densidade: 7,353 g/cc\t\t
+		    Descoberto por Boisbaudran em 1879",1)}
+            ] 
+{ \transitionmetal{Sm}{62}{150,36} } & 
+\PushButton[
+name=Eu,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Európio\t\t\t
+                    Símbolo: Eu\t\t\t
+                    Número: 63\t\t\t 
+		    Massa atómica: 151,964\t\t
+		    Configuração electrónica: [Xe]4f7,5d0,6s2\t\t\t
+		    Temperatura de fusão:     826 °C
+		    Temperatura de ebulição: 1439 °C
+		    Densidade: 5,244 g/cc\t\t
+		    Descoberto por Demarcay em 1901",1)}
+            ] 
+{ \transitionmetal{Eu}{63}{151,96} } & 
+\PushButton[
+name=Gd,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Gadolínio\t\t\t
+                    Símbolo: Gd\t\t\t
+                    Número: 64\t\t\t 
+		    Massa atómica: 157,25\t\t
+		    Configuração electrónica: [Xe]4f7,5d1,6s2\t\t\t
+		    Temperatura de fusão:    1312 °C
+		    Temperatura de ebulição: 3000 °C
+		    Densidade: 7,901 g/cc\t\t
+		    Descoberto por Marignac em 1880",1)}
+            ] 
+{ \transitionmetal{Gd}{64}{157,25} } & 
+\PushButton[
+name=Tb,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Térbio\t\t\t
+                    Símbolo: Tb\t\t\t
+                    Número: 65\t\t\t 
+		    Massa atómica: 158,92534\t\t
+		    Configuração electrónica: [Xe]4f9,5d0,6s2\t\t\t
+		    Temperatura de fusão:    1356 °C
+		    Temperatura de ebulição: 2800 °C
+		    Densidade: 8,219 g/cc\t\t
+		    Descoberto por Mosander em 1843",1)}
+            ] 
+{ \transitionmetal{Tb}{65}{158,92} } & 
+\PushButton[
+name=Dy,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Disprósio\t\t\t
+                    Símbolo: Dy\t\t\t
+                    Número: 66\t\t\t 
+		    Massa atómica: 162,500\t\t
+		    Configuração electrónica: [Xe]4f10,5d0,6s2\t\t\t
+		    Temperatura de fusão:    1407 °C
+		    Temperatura de ebulição: 2600 °C
+		    Densidade: 8,551 g/cc\t\t
+		    Descoberto por Boisbaudran em 1886",1)}
+            ] 
+{ \transitionmetal{Dy}{66}{162,50} } & 
+\PushButton[
+name=Ho,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Hólmio\t\t\t
+                    Símbolo: Ho\t\t\t
+                    Número: 67\t\t\t 
+		    Massa atómica: 164,93032\t\t
+		    Configuração electrónica: [Xe]4f11,5d0,6s2\t\t\t
+		    Temperatura de fusão:    1461 °C
+		    Temperatura de ebulição: 2600 °C
+		    Densidade: 8,795 g/cc\t\t
+		    Descoberto por Delafontaine e Soret em 1878",1)}
+            ] 
+{ \transitionmetal{Ho}{67}{164,93} } & 
+\PushButton[
+name=Er,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Érbio\t\t\t
+                    Símbolo: Er\t\t\t
+                    Número: 68\t\t\t 
+		    Massa atómica: 167,26\t\t
+		    Configuração electrónica: [Xe]4f12,5d0,6s2\t\t\t
+		    Temperatura de fusão:    1497 °C
+		    Temperatura de ebulição: 2900 °C
+		    Densidade: 9,066 g/cc\t\t
+		    Descoberto por Mosander em 1842",1)}
+            ] 
+{ \transitionmetal{Er}{68}{167,26} } & 
+\PushButton[
+name=Tm,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Túlio\t\t\t
+                    Símbolo: Tm\t\t\t
+                    Número: 69\t\t\t 
+		    Massa atómica: 168,93421\t\t
+		    Configuração electrónica: [Xe]4f13,5d0,6s2\t\t\t
+		    Temperatura de fusão:    1545 °C
+		    Temperatura de ebulição: 1727 °C
+		    Densidade: 9,321 g/cc\t\t
+		    Descoberto por Cleve em 1879",1)}
+            ] 
+{ \transitionmetal{Tm}{69}{168,93} } & 
+\PushButton[
+name=Yb,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Itérbio\t\t\t
+                    Símbolo: Yb\t\t\t
+                    Número: 70\t\t\t 
+		    Massa atómica: 173,04\t\t
+		    Configuração electrónica: [Xe]4f14,5d0,6s2\t\t\t
+		    Temperatura de fusão:     824 °C
+		    Temperatura de ebulição: 1427 °C
+		    Densidade: 6,570 g/cc\t\t
+		    Descoberto por Marignac em 1878",1)}
+            ] 
+{ \transitionmetal{Yb}{70}{173,04} } & 
+\PushButton[
+name=Lu,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Lutécio\t\t\t
+                    Símbolo: Lu\t\t\t
+                    Número: 71\t\t\t 
+		    Massa atómica: 174,967\t\t
+		    Configuração electrónica: [Xe]4f14,5d1,6s2\t\t\t
+		    Temperatura de fusão:    1652 °C
+		    Temperatura de ebulição: 3327 °C
+		    Densidade: 9,841 g/cc\t\t
+		    Descoberto por Urbain em 1907",1)}
+            ] 
+{ \transitionmetal{Lu}{71}{174,97} } & 
+\multicolumn{2}{|c|}{\phantom{x}} \\ \hline
+\multicolumn{2}{|c|}{\bf **Actin\'\i deos} & 
+\PushButton[
+name=Th,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Tório\t\t\t
+                    Símbolo: Th\t\t\t
+                    Número: 90\t\t\t 
+		    Massa atómica: 232,0381\t\t
+		    Configuração electrónica: [Rn]6d2,7s2 
+		    Temperatura de fusão:    1750 °C
+		    Temperatura de ebulição: 3850 °C
+		    Densidade: 11,724 g/cc\t\t
+		    Descoberto por Berzelius em 1828",1)}
+            ] 
+{ \transitionmetal{Th}{90}{232,04} } & 
+\PushButton[
+name=Pa,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Protactínio\t\t\t
+                    Símbolo: Pa\t\t\t
+                    Número: 91\t\t\t 
+		    Massa atómica: 231,0359\t\t
+		    Configuração electrónica: [Rn]5f2,6d1,7s2\t\t\t
+		    Temperatura de fusão:    1841 K
+		    Temperatura de ebulição: 4300 K
+		    Densidade: 15,370 g/cc\t\t
+		    Descoberto por Fajans e Gohring em 1913",1)}
+            ] 
+{ \transitionmetal{Pa}{91}{231,04} } & 
+\PushButton[
+name=U,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Urânio\t\t\t
+                    Símbolo: U\t\t\t
+                    Número: 92\t\t\t 
+		    Massa atómica: 238,029\t\t
+		    Configuração electrónica: [Rn]5f3,6d1,7s2\t\t\t
+		    Temperatura de fusão:    1132 °C
+		    Temperatura de ebulição: 3818 °C
+		    Densidade: 19,050 g/cc\t\t
+		    Descoberto por Klaproth em 1789",1)}
+            ] 
+{ \transitionmetal{U}{92}{238,03} } & 
+\PushButton[
+name=Np,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Neptúnio\t\t\t
+                    Símbolo: Np\t\t\t
+                    Número: 93\t\t\t 
+		    Massa atómica: 237,0482\t\t
+		    Configuração electrónica: [Rn]5f4,6d1,7s2\t\t\t
+		    Temperatura de fusão:     910 K
+		    Temperatura de ebulição: 4273 K
+		    Densidade: 20,450 g/cc\t\t
+		    Descoberto por McMillan e Adelson em 1940",1)}
+            ] 
+{ \transitionmetal{Np}{93}{237,05} } & 
+\PushButton[
+name=Pu,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Plutónio\t\t\t
+                    Símbolo: Pu\t\t\t
+                    Número: 94\t\t\t 
+		    Massa atómica: 239,13\t\t
+		    Configuração electrónica: [Rn]5f6,6d0,7s2\t\t\t
+		    Temperatura de fusão:     912,5 K
+		    Temperatura de ebulição: 3503   K
+		    Densidade: 19,816 g/cc\t\t
+		    Descoberto por Seaborg, McMillan, Kennedy e Wahl em 1940",1)}
+            ] 
+{ \transitionmetal{Pu}{94}{(244)} } & 
+\PushButton[
+name=Am,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Amerício\t\t\t
+                    Símbolo: Am\t\t\t
+                    Número: 95\t\t\t 
+		    Massa atómica: 241,06\t\t
+		    Configuração electrónica: [Rn]5f7,6d0,7s2\t\t\t
+		    Temperatura de fusão:    1449 K
+		    Temperatura de ebulição: 2880 K
+		    Densidade: 13,722 g/cc\t\t
+		    Descoberto por Seaborg, James, Morgan e Ghiorso em 1944",1)}
+            ] 
+{ \transitionmetal{Am}{95}{(243)} } & 
+\PushButton[
+name=Cm,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Cúrio\t\t\t
+                    Símbolo: Cm\t\t\t
+                    Número: 96\t\t\t 
+		    Massa atómica: 244,06\t\t
+		    Configuração electrónica: [Rn]5f7,6d1,7s2\t\t\t
+		    Temperatura de fusão:    1613 K
+		    Temperatura de ebulição: 3383 K
+		    Densidade: 13,510 g/cc\t\t
+		    Descoberto por Seaborg, James e Ghiorso em 1944",1)}
+            ] 
+{ \transitionmetal{Cm}{96}{(247)} } & 
+\PushButton[
+name=Bk,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Berquélio\t\t\t
+                    Símbolo: Bk\t\t\t
+                    Número: 97\t\t\t 
+		    Massa atómica: 249,08\t\t
+		    Configuração electrónica: [Rn]5f9,7s2 
+		    Temperatura de fusão: 1259 K
+		    Densidade: 14,780 g/cc\t\t
+		    Descoberto por Seaborg, Thompson e Ghiorso em 1949",1)}
+            ] 
+{ \transitionmetal{Bk}{97}{(247)} } & 
+\PushButton[
+name=Cf,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Califórnio\t\t\t
+                    Símbolo: Cf\t\t\t
+                    Número: 98\t\t\t 
+		    Massa atómica: 252,08\t\t
+		    Configuração electrónica: [Rn]5f10,7s2
+		    Temperatura de fusão: 1173 K
+		    Densidade: 15,112 g/cc\t\t
+		    Descoberto por Seaborg et al. em 1950",1)}
+            ] 
+{ \transitionmetal{Cf}{98}{(251)} } & 
+\PushButton[
+name=Es,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Einstêinio\t\t\t
+                    Símbolo: Es\t\t\t
+                    Número: 99\t\t\t 
+		    Massa atómica: 252,08\t\t
+		    Configuração electrónica: [Rn]5f11,6d0,7s2\t\t\t
+		    Temperatura de fusão: 1133 K
+		    Descoberto por Ghiorso et al. em 1952",1)}
+            ] 
+{ \transitionmetal{Es}{99}{(252)} } & 
+\PushButton[
+name=Fm,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Férmio\t\t\t
+                    Símbolo: Fm\t\t\t
+                    Número: 100\t\t\t 
+		    Massa atómica: 257,10\t\t
+		    Configuração electrónica: [Rn]5f12,6d0,7s2\t\t\t
+		    Temperatura de fusão: 1800 K
+		    Descoberto por Ghiorso et al. em 1952",1)}
+            ] 
+{ \transitionmetal{Fm}{100}{(257)} } & 
+\PushButton[
+name=Md,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Mendelévio\t\t\t
+                    Símbolo: Md\t\t\t
+                    Número: 101\t\t\t 
+		    Massa atómica: 258,10\t\t
+		    Configuração electrónica: [Rn]5f13,6d0,7s2\t\t\t
+		    Temperatura de fusão: 1100 K
+		    Descoberto por Ghiorso et al. em 1955",1)}
+            ] 
+{ \transitionmetal{Md}{101}{(258)} } & 
+\PushButton[
+name=No,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Nobélio\t\t\t
+                    Símbolo: No\t\t\t
+                    Número: 102\t\t\t 
+		    Massa atómica: 259,10\t\t
+		    Configuração electrónica: [Rn]5f14,6d0,7s2\t\t\t 
+		    Temperatura de fusão: 1100 K
+		    Descoberto por Ghiorso et al. em 1958",1)}
+            ] 
+{ \transitionmetal{No}{102}{(259)} } & 
+\PushButton[
+name=Lr,color=0 0 1,bordercolor=0 0 0,borderstyle=B,borderwidth=1.5,
+onclick={app.alert("Nome: Laurêncio\t\t\t
+                    Símbolo: Lr\t\t\t
+                    Número: 103\t\t\t 
+		    Massa atómica: 262,11\t\t
+		    Configuração electrónica: [Rn]5f14,6d1,7s2\t\t\t
+		    Temperatura de fusão: 1900 K
+		    Descoberto por Ghiorso et al. em 1961",1)}
+            ] 
+{ \transitionmetal{Lr}{103}{(260)} } & 
+\multicolumn{2}{|c|}{\phantom{x}} \\ \hline\hline
+\multicolumn{18}{c}{\phantom{x}}
+\end{tabular}
+\colorbox{pink}{\framebox[45mm][c]{\em Metais}}\hskip5mm
+\colorbox{green}{\framebox[45mm][c]{\em Metal\'oides}}\hskip5mm
+\colorbox{white}{\framebox[45mm][c]{\em Metais de transi\c c\~ao}}\hskip5mm
+\colorbox{blueii}{\framebox[45mm][c]{\em N\~ao-metais}}\hskip5mm
+\colorbox{yellow}{\framebox[45mm][c]{\em Gases nobres}}\hskip5mm
+\end{center} 
+\end{Form}
+
+\end{document}

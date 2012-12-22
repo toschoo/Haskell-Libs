@@ -1,0 +1,63 @@
+\input{figuremacros.tex}
+\input{../glyphtounicode.tex}
+\input{glyphtounicode-cmr.tex}
+\pdfgentounicode=1
+\usepackage{pgfplots}
+\pgfplotsset{compat=newest} 
+\begin{document}
+    \begin{tikzpicture}
+        \begin{axis}[
+        xmin=-1,xmax=1,
+        width=1 in, height=2in, scale only axis=true,
+        title={$\EJ/\EC=1$},
+        xlabel=$\ngate$,ylabel=$E_j/\EC$,
+        no markers, smooth]
+        \foreach \l in {1,...,5}
+            \addplot file {raw/dispersion/disp1-\l.dat};
+        %\legend{$j=0$,$j=1$,$j=2$,$j=3$,$j=4$};
+       \end{axis}
+    \end{tikzpicture}
+\foreach \ejec in {5,10,50}{
+    \begin{tikzpicture}
+        \begin{axis}[
+        xmin=-1,xmax=1,
+        width=1 in, height=2in, scale only axis=true,
+        title={$\EJ/\EC=\ejec$},
+        xlabel=$\ngate$,%ylabel=$E$,
+        no markers, smooth]
+        \foreach \l in {1,...,5}
+            \addplot file {raw/dispersion/disp\ejec -\l.dat};
+%        \legend{$j=0$,$j=1$,$j=2$};
+       \end{axis}
+    \end{tikzpicture}
+}
+
+
+
+%\usepackage{tikz}
+%\begin{document}
+%
+%\newcommand{\hg}{2 in}
+%\newcommand{\wh}{1 in}
+%\newcommand{\longtick}{2 mm}
+%\newcommand{\shorttick}{\longtick/2}
+%\foreach \ejec/\ym/\stp in {1/25/5,5/25/5,10/30/10,50/80/10}{
+%\begin{tikzpicture}
+%    \begin{scope}[x=\wh/2,y=\hg/\ym]
+%        \pgfmathsetmacro{\div}{\stp/2}
+%        \foreach \x in {-1.0,-0.5,...,1}
+%            \draw (\x,\hg-\longtick)--(\x,\hg) (\x,\longtick)--(\x,0) node[below]{\tiny$\x$};
+%        \foreach \x in {-1,-0.75,...,1}
+%            \draw (\x,\hg-\shorttick)--(\x,\hg) (\x,\shorttick)--(\x,0);
+%        \foreach \y in {0,\stp,...,\ym}
+%            \draw (1,0) +(-\longtick,\y)--+(0,\y) (-1,0) +(\longtick,\y)-- +(0,\y) node[left]{\tiny $\y$};
+%        \foreach \y in {0,\div,...,\ym}
+%            \draw (1,0) +(-\shorttick,\y)--+(0,\y) (-1,0) +(\shorttick,\y)-- +(0,\y);
+%        \node[at={(-1,\ym)},above right]{\scriptsize$\EJ/\EC=\ejec$};
+%        \draw [clip] (-1,0) rectangle (1,\hg);
+%        \foreach \l/\c in {1/red,2/green,3/blue,4/orange,5/cyan}
+%            \draw[\c] plot [smooth] file {raw/dispersion/disp\ejec -\l.dat};
+%    \end{scope}
+%\end{tikzpicture}}
+%
+\end{document}

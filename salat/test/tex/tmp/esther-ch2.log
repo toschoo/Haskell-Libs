@@ -1,0 +1,16 @@
+This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdftex 2012.5.21)  25 OCT 2012 22:08
+entering extended mode
+ %&-line parsing enabled.
+**esther-ch2.tex
+(./esther-ch2.tex
+! I can't find file `makor2'.
+l.2 \input makor2
+                 
+(Press Enter to retry, or Control-D to exit)
+Please type another input file name: 
+! Emergency stop.
+l.2 \input makor2
+                 
+End of file on the terminal!
+
+!  ==> Fatal error occurred, no output PDF file produced!

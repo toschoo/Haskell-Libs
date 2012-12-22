@@ -1,0 +1,47 @@
+%&pdflatex
+\documentclass[11pt]{article}
+\usepackage{amsmath,amsthm,amscd}\usepackage{amssymb}\usepackage[all]{xy}
+
+\textwidth = 6.5 in
+\textheight = 9 in
+\oddsidemargin = 0.0 in
+\evensidemargin = 0.0 in
+\topmargin = 0.0 in
+\headheight = 0.0 in
+\headsep = 0.0 in
+\parskip = 0.2cm
+\parindent = 0.0in
+
+\listfiles
+\newtheorem{thm}{Theorem}
+
+\title{\huge 
+	Representing Homology Classes by Locally Flat	Surfaces of Minimum Genus%
+\thanks{This is an excerpt from a paper published under the same title
+in the American Journal of Mathematics \textbf{119} (1997), 1119--1137.
+Typeset by the authors using \LaTeX\ 
+with packages from \AmS\ and \Xy-pic.}
+}
+\author{Ronnie Lee and Dariusz M.~Wilczy\'{n}ski\\
+\small\scshape Yale University\\
+\small\scshape Utah State University}
+\date{}
+\begin{document}
+
+\maketitle
+\thispagestyle{empty}
+
+\section{Introduction}
+
+A necessary and sufficient condition will be given for a nontrivial homology classof a simply connected \text{4-manifold} to be represented by a simple, topologicallylocally flat embedding of a compact Riemann surface.
+
+\section{Splittings of Hermitian Modules}
+
+We begin with an algebraic result.
+
+\begin{thm}
+The following is a commutative diagram of pointed hermitian modules.\\ %\CompileMatrices \[\xymatrix{ (M,h,z) \ar[dd]^{\pi_0} \ar[dr]^\alpha_\cong \ar[rr]^{\pi_1} && (M_1,h_1,0) \ar'[d]^-{\pi_{1d}}[dd] \ar[dr]^{\alpha_1}_\cong \\ & (M',h',z')\oplus H(\Lambda^k) \ar[dd]^<(.25){\pi_0} \ar[rr]^<(.25){\pi_1} && (M'_1,h'_1,0)\oplus H(\Lambda_1^k) \ar[dd]^{\pi_{1d}} \\ (M_0,h_0,z_0) \ar@{=}[dd] \ar[dr]^{\alpha_0}_\cong \ar'[r]^<(.6){\pi_{0d}}[rr] && (M_d,h_d,0) \ar@{=}'[d][dd] \ar[dr]^{\alpha_d}_\cong \\ & (M'_0,h'_0,z'_0)\oplus H(\Lambda_0^k) \ar[dd]^<(.25){\beta'_0\oplus\text{id}}_<(.25)\cong\ar[rr]^<(.25){\pi_{0d}} && (M'_d,h'_d,0)\oplus H(\Lambda_d^k) \ar[dd]^{\beta'_d\oplus\text{id}}_\cong \\ (M_0,h_0,z_0) \ar[dr]^{\beta_0}_\cong \ar'[r]^<(.6){\pi_{0d}}[rr] && (M_d,h_d,0) \ar[dr]^{\beta_d}_\cong \\ & (L,\lambda,x)\oplus H(\Lambda_0^k) \ar[rr]^{\pi_{0d}} && (L_d,\lambda_d,0)\oplus H(\Lambda_d^k) }\]
+\end{thm}
+
+\vphantom{X}
+\end{document}

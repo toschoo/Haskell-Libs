@@ -1,0 +1,188 @@
+%README for Lev's thesis...
+\endinput
+
+Document structure (lines indicate which files \include or \input which other ones):
+Main document structure:
+bishop-thesis.tex
+|---preamble.tex
+|   |---draftfinal.tex
+|   \---macros.tex
+|---chapter1.tex
+...
+\---chapterN.tex
+
+psfrag figures:
+raw/figXXX.tex
+|---figuremacros.tex
+|   \---macros.tex
+\---raw/XXX.eps
+
+pgf figures:
+raw/pgfXXX.tex
+\---figuremacros.tex
+|   \---macros.tex
+\---raw/XXX/XXX.dat
+
+rename bishop-thesis.xxx to your-thesis.xxx, for xxx in {tex,xmpdata}.
+To compile from scratch (with mixtex):
+cd figures; make        # generate the cropped pdf versions of the psfragged figures
+pdflatex your-thesis    # generates the .aux files
+bibtex8 -H bu1          # for the Publication List section. "bibtex bu1" may work for non miktex
+bibtex8 -H bu2          # for the Copyright Permissions section
+bibtex8 -H your-thesis  # for the main bibliography
+makeindex -s nomenlev.ist -o your-thesis.nls your-thesis.nlo # Sorts & categorizes nomenclature
+pdflatex your-thesis    # finds the citations
+pdflatex your-thesis    # makes the bibliography
+pdflatex your-thesis    # puts in the bibliographic backreferences
+pdflatex your-thesis    # updates any repaginations due to the above
+
+Files you need to edit:
+draftfinal.tex:
+    For configuring which version/which parts of the file to compile. This is a separate file, so that the svn history doesn't get clogged up with frequent changes.
+your-thesis.xmpdata:
+    This is the metadata that will end up in the pdf file (author, title, keywords, etc). Don't forget to change it with your own details.
+macros.tex:
+    All the command definitions, notation shortcuts, and such, that you want to be consistent between both the main text and any psfrag replacements in figures (this gets included in both places).
+minionpro2dub.cfl:
+    This contains the parameters I used for the dropped capitals. You'll need to edit it if you start a chapter with a different letter from one of the ones I started chapters with (at least, if you want to be as anal as me about fine-tuning the spacing).
+Thesis.bib:
+    The main bibliography.
+figures/Makefile:
+    Makes figures. The procedure is a little convoluted but it works. Simpler versions seemed to have problems with getting the bounding boxes right.
+    Most figs use eps raw figures with psfrag, which are converted to pdf:
+    raw/xxx.eps & raw/figxxx.tex -> xxx.dvi -> xxx.ps -> xxx.eps -> xxx-conv-uncrop.pdf -> xxx-conv.pdf
+    ...and if needed (eg for follow-up journal articles) this can also be converted back to eps:
+    xxx-conv.pdf -> xxx-conv-nobb.eps -> xxx-conv.eps
+    A few figures I did with tikz/pgf:
+    raw/pgfxxx.tex -> xxx-uncrop.pdf -> ...
+    You can do
+        "make pdf" to make the pdfs,
+        "make eps" to make the epss,
+        "make merged.pdf" to make a big pdf with all the figures for checking them, and
+        "make view" to do all the above and open the big pdf to check it out.
+        "make mostlyclean" kills the intermediate files.
+        "make clean" kills all the generated files
+figures/raw/xxx.eps & figures/raw/figxxx.tex:
+    turned into xxx-conv.pdf and/or xxx-conv.eps
+figures/raw/pgfxxx.tex & figures/raw/xxx/*.dat:
+    turned into xxx-conv.pdf and/or xxx-conv.eps
+other-files.tex
+    the meat of the thesis...
+
+Other files, you shouldn't have to change (much):
+thesis.prj:
+    winedt project file
+WinEdt_20090621_sumatra.ini:
+    My configuration file for winedt
+demon.sh:
+    automates starting latexdaemon
+preamble.tex:
+    Contains all the preamble stuff. In a separate file to avoid clogging up the main tex file and also so that you can precompile it to make things faster (eg, using latexdaemon).
+figures/figuremacros.tex:
+    Does the same job as preamble.tex only for the figures. Keep the relevant parts synchronized with preamble.tex. Gets precompiled into a format by the Makefile.
+nag-abort.cfg, nag-experimental.cfg, nag-l2tabu.cfg, nag-orthodox.cfg:
+    For some reason miktex doesn't include these files which are needed if you want to use the nag package.
+ocg.sty:
+    This is an experimental package I found (not on ctan) for using pdf layers. I hacked it a little to make it less noisy in the tex log file. I use it only in draft mode, to make the showkeys annotations be on a separate layer so you can turn them on or off in acrobat depending on whether they are cluttering things or useful.
+pdfxLSB.sty, pdfa-1b.xmp, glyphtounicode.tex, sRGBIEC1966-2.1.icm:
+    These are files needed for making the pdf conform to the pdf/a standard (archival pdfs, so that the document should still be readable in the distant future when we have acrobat version 42 or whatever). Some of these files are not available on ctan. The .sty was quite buggy, so I made a few ugly changes to get it to compile. In the .xmp file, I chose to switch off the flag that actually asserts pdf/a conformance, because it causes acrobat 9 to go into a stupid pdf/a mode where it stupidly doesn't follow links.
+bibunitsLSB.sty:
+    My modified version of bibunits. Hacked so that: 1) hyperref is compatible; 2) to avoid errors when using ocg.sty; 3) to work more nicely when using \include (so you don't need to rerun bibtex each time you change the \includeonly list). I submitted these changes upstream, but I don't know if they will be accepted. Run bibtex on each of the bu? as well as on the main xxx-thesis. I bound a winedt command to a macro to do this.
+utphysLSB.bst:
+    My bibstyle file, that puts in hyperlinks from DOIs, understands arXiv preprints (and links to them), plays nicely with backref, deals with oldstyle/lining figures the way I like them. The new "long" bibstyles with revtex 4.1 do many of the same things, so you may prefer to use those instead, but those didn't exist when I started writing my thesis.
+utphysLSB2.bst:
+    As above, but writes author names in full, doesn't include the title, and does include the copyright field. I use it for the copyright permissions chapter.
+natbib.sty:
+    This is the standard natbib.sty slightly tweaked by me so that [3-6] causes backrefs ("Cited on page..." in the bibliography) for [4] and [5] as well as [3] and [6]. I submitted this change upstream, but I doubt it will be used.
+nomenlev.sty:
+    This is my package that I wrote for making my nomenclature. You use commands \nomdef{key}{symbol}{explanation}, \nomref{key}{label}, \nomdref{key}{symbol}{explanation}{label} to introduce symbols. (nomdref is a shortcut for doing both nomdef and nomref). The "key" field should start with:
+        A:Abbreviations
+        B:Symbols
+        C:Latin Letters
+        G:Greek Letters
+        X:Superscripts
+        Z:Subscripts
+    and will be used for sorting by makeindex (so be especially careful with greek letters to get the proper alphabetization). In draft mode, the "key" field is shown in the margin.
+    To alphabetize the greek properly, I use the conventions:
+        a=alpha
+        b=beta
+        c=gamma
+        d=delta
+        e=epsilon
+        f=zeta
+        k=kappa
+        o=xi
+        r=rho
+        s=sigma
+        w=phi
+        x=chi
+        z=omega
+nomenlev.ist:
+    This is the makeindex style file for my nomenclature that takes the .nlo file and turns it into a sorted .nls file.
+    I have the miktex command bound to shift-alt-t in winedt:
+    Run('makeindex -s nomenlev.ist -o "%N.nls" "%N.nlo"','%P',0,1);
+
+Starting a chapter:
+The name of the chapter goes in a few places:
+    WinEdt puts it into its own navigation tab
+    It gets displayed on the first page of the chapter
+    It gets used for the running heading
+    It goes into the pdf outline tree
+    It goes into the table of contents
+    [It (maybe, if there are >0 figures in this chapter) goes into the list of figures]
+    [It goes into the thumbindex list on the 1st page]
+Most of the time, the command \chapter{title} is enough, and puts the title into all 5 places (ie, the last 2 [bracketed] ones still have to be done manually). However, each of these uses for the title text different constraints (maybe you want linebreaks, footnotes, font changes, etc on the 1st page of the chapter, but these can't be used elsewhere; the running heading and the pdf outline have length limitations; the pdf outline cannot contain most mathematical symbols--they come out as chinese). Here is an extreme example, where the title is quite long so I used slight variations for each place)
+\chapter[%Generating and detecting Greenberger--Horne--Zeilinger states]   % This is for WinEdt's benefit
+    \texorpdfstring{
+        Generating and detecting Greenberger--Horne--Zeilinger states}%    % For the table of contents
+    {Generating and detecting GHZ states}]                                 % For the pdf outline
+    {\fontseries{mc}\selectfont% Use a condensed font to make it fit on one line
+        Generating and detecting Greenberger--Horne--Zeilinger states}\label{ch:ghz}% for the title page of the chapter
+    \chaptermark{GHZ states}%                                              % For the running heading
+    \lofchap{Generating and detecting Greenberger--Horne--Zeilinger states}% For the list of figures
+\thumb{Generating and detecting Greenberger--Horne--Zeilinger states}%       For the thumbindex page
+
+General thesis-writing advice:
+*) dual monitors makes for much higher productivity.
+*) use synctex for synchronizing between the pdf and the source file (in both directions, called forward and backward searching). This can be set up with sumatrapdf and winedt, (need to download an extra macro package for winedt). Texworks can do it too. Presumably can be set up with other combinations of editor/viewer, too
+*) upgrade to latest version of all tex packages at start of writing and be very careful about upgrading later since there doesn't seem to be any way to downgrade if something goes wrong.
+
+For windows (may partially apply to other o/s):
+*) use miktex
+*) use sumatrapdf. It's fast, doesn't lock the pdf, automatically refreshes when it's changed, and supports synctex
+*) a good tex editor is winedt and it supports synctex. I customized my installation to:
+    1) forward and backward pdfsync with sumatrapdf
+    2) compile all the bibunits bibliographies with one keypress
+    3) run my makindex to generate the nomenclature with one keypress
+    4) use bibtex8 -H to handle the large bibliography
+*) use the "project" feature of winedt, to keep files together, get a contents list, etc
+*) latexdaemon allows automatic rebuilding of the tex when something changes. It's very fast because it builds the preamble stuff into a format file, and because it takes care not to delete all the .aux files every time you make a typo.
+
+file management and backups:
+*) an external svn server extremely desirable, both for very quick backups and for being able to undo changes even ones that go back a long way. Saved my bacon a couple times.
+*) tortoise svn (windows) is a much nicer way to interact with svn than the commandline
+*) svn only tracks the document files. use a whole-disk imaging program to backup your whole computer to an external harddrive, so that if something goes wrong you don't need to spend days reinstalling and reconfiguring all your software and getting your working environment back how you like it. norton ghost or acronis trueimage can do this. Make sure to use the disk cloning modes of these programs, and make sure the recovery environment actually works on your machine before you consider the software fully installed. Ideally, the external harddrive is a laptop drive that will slot straight into your laptop, so that in the event of HDD failure or major corruption you can just switch drives and keep working.
+
+Reference management:
+*) zotero (firefox plugin) is awesome for keeping track of references quickly and finding them again later. The bibtex entries it produces generally need a little manual tweaking though...
+*) ...jabref is very nice for doing final tweaks on bib entries. It integrates nicely with winedt too.
+*) zotero & jabref both work on windows and mac.
+*) check out my thesis.bib for my way to cite arXiv articles, books, etc.
+*) Peculiarities of how I do references:
+    *) levpapers.bib: has my own papers in it, so I can use it for my CV. I use the "key" field, so that I can sort my papers chronologically (with finer granularity than the year field allows).
+    *) levisspecial.bib/levisordinary.bib: I put myself in the author list via the shortcut string LSB so that I can choose whether to highlight myself (eg in small caps for my CV) or not (for everything else).
+    *) Copyright field: My bibstyle uses this field for making the "Copyright permissions" section.
+    *) levapsjour.bib/levfulljour.bib: I enter abbreviated journal names eg natphys, pra, prl, then use these files to choose between full form "Physical Review Letters" and abbreviated form "Phys. Rev. Lett." without changing the database
+
+Figures:
+*) make your figures in such a way that they can be rebuilt if you change your mind about notation or whatever. psfrag is useful if you have figures already made and just want to update labels. I think pgfplots is a good way to go for generating new graphs from scratch, but i didn't fully use it, and it can't do everything.  You just export a set of numbers from matlab/mathematica/igor for plotting. Which is a good thing, because then you can change the formatting, or make another set of graphs with similar parameters very easily. Exporting graphics from mathematica/igor/matlab is faster in the first instance, but in my experience gets too painful later on....
+*) other figure-drawing solutions that I didn't have time to investigate: There are a couple of interesting python solutions, and asymptote looks nice and is getting lots of development.
+*) it's probably too slow to directly build the figures from the main document, even if e.g. pgfplots can do so. Best to build the figures separately. There are a number of ways to do this. I went with one tex file per figure. This also solves the psfrag issue because I could use plain latex for those figures and pdflatex for the ones needing pdf features. By putting all the macro definitions in a file that is included by both the figures and by the main text, it's easy to decide that you want to change the fontsize or notation everywhere at once.
+*) however you do it, you need to be able to rebuild the figures with a makefile (or similar), completely automatically.
+*) build the figures at the proper size, don't resize them with the main your-thesis.tex \includegraphics line. If you are building the figures automatically, this doesn't prevent you from changing the overall size, but it keeps line weights and font sizes consistent.
+*) I used a nifty tool called pdfsizeopt to crush the size of my figures by many megabytes, losslessly (ie, it doesn't rasterize, flatten, downsample, or otherwise degrade your files--you should be doing that by hand before you hand over to this tool to do the final crushing). Installing it is kind of a pain though, so you probably don't want to bother with it (I installed it in a vmware linux image which I can send you if you like). It's pretty beta-ish at the current time and has a few bugs (eg, use --do-unify-fonts=false or \mathcal{} characters will go missing).
+
+Common misteaks:
+*) ACRONYM. New sentence [space too small] => ACRONYM\@. New sentence.
+*) here is an abbrev. that I like [space too big] => here is an abbrev.\ that I like
+*) bare \ref, \eqref [improper hyperlink] => \cref \sref \tref \aref \eref etc

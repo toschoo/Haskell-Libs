@@ -1,0 +1,73 @@
+%% Kanji writing practice sheets
+
+%% Note: This is a ConTeXt file, to be compiled using
+%% texexec --xtx sheet.tex
+
+\setuplayout[top=1cm,header=0pt,bottom=1cm,footer=0pt]
+%% Select the font to use here (end of line):
+\definetypeface[base][rm][Xserif][STKaiti]
+\setupbodyfont[base, 12pt]
+\setuppagenumber[state=stop]
+\setupindenting[none]
+
+%% Change for different size:
+\def\kanjisize{15mm}
+\definefont[bigfont][Regular at \kanjisize]
+
+\startuseMPgraphic{line}
+  pickup pencircle scaled .7pt;
+  picture c, box;
+  c=\sometxt{\MPvar{c}};
+  draw unitsquare scaled \kanjisize\space withcolor 0.25white;
+  pickup pencircle scaled 0.5pt;
+  draw .5[llcorner currentpicture,lrcorner currentpicture] --
+    .5[ulcorner currentpicture,urcorner currentpicture]
+    withcolor 0.5white;
+  draw .5[llcorner currentpicture,ulcorner currentpicture] --
+    .5[lrcorner currentpicture,urcorner currentpicture]
+    withcolor 0.5white;
+  box := currentpicture;
+  setbounds box to boundingbox box enlarged -1pt;
+  currentpicture := nullpicture;
+  
+  numeric imax;
+  imax = 180mm/bbwidth(box);
+  for i = 0 step 1 until imax:
+    draw c shifted ((center box)-(center c) + (i*bbwidth(box), 0pt))
+      withcolor (0.5+i/(imax+15))*white;
+    draw box shifted (i*bbwidth(box), 0pt);
+  endfor;
+\stopuseMPgraphic
+
+\def\line#1{{%
+  \par
+  \leavevmode
+  \hskip-1.75cm
+  \bigfont
+  \useMPgraphic{line}{c=#1}%
+  \par
+}}
+
+\starttext
+有り難う – あ\cdot り\cdot がと\cdot う – Danke
+\line{有}
+\line{難}
+下さい – くだ\cdot さい – Bitte (geben Sie mir)
+\line{下}
+お願いします – お\cdot ねが\cdot いします – Bitte (um etwas)
+\line{願}
+大丈夫 – だい\cdot じょう\cdot ぶ – Alles in Ordnung
+\line{大}
+\line{丈}
+\line{夫}
+駄目 – だ\cdot め – Schlecht, nicht in Ordnung
+\line{駄}
+\line{目}
+乾杯 – かん\cdot ぱい – Prost
+\line{乾}
+\line{杯}
+お腹いっぱい – お\cdot なか\cdot いっぱい – satt, nicht hungrig
+\line{腹}
+
+\stoptext
+

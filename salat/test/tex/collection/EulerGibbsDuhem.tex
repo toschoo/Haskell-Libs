@@ -1,0 +1,122 @@
+\documentclass[12pt]{article}
+%\usepackage{tex4ht}
+\author{Stephen R. Addison}
+\title{The Euler Equation and the Gibbs-Duhem Equation}
+\date{February 25, 2003}
+\newcommand{\inex}{\mathrm{d\llap{$^-$}}}
+\newcommand{\ex}{\mathrm{e}}
+\newcommand{\de}{\mathrm{d}}
+\begin{document}
+\maketitle
+
+\noindent This document was included in the \TeX-showcase. This paragraph was added by
+Gerben Wierda to display how \TeX 4ht displays the formatting of terms like
+\LaTeX\ and \TeX.
+
+\section{Intensive Functions and Extensive Functions}
+Thermodynamics Variables are either extensive or intensive.  To illustrate the difference between these kings of variables, think of mass and density.  The mass of an object depends on the amount of material in the object, the density does not.  Mass is an extensive variable, density is an intensive variable.  In thermodynamics, $T$, $p$, and $\mu$ are intensive, the other variables that we have met,  $U$, $S$ , $V$, $N$, $H$, $F$, and $G$ are extensive.  We can develop some useful formal relationships between thermodynamic variables by relating these elementary properties of thermodynamic variables to the theory of homogeneous functions.
+\section{Homogeneous Polynomials and Homogeneous Functions}
+A polynomial
+\[
+a_0+a_1x+a_2x^2+\cdots+a_nx^n
+\]
+is of degree $n$ if $a_n\neq0$.
+A polynomial in more than one variable is said to be homogeneous if all its terms are of the same degree, thus, the polynomial in two variables
+\[
+x^2+5xy+13y^2
+\]
+is \emph{homogeneous} of degree two.
+
+We can extend this idea to functions, if for arbitrary $\lambda$
+\[
+f(\lambda x)=g(\lambda)f(x)
+\]
+it can be shown that
+\[
+f(\lambda x)=\lambda^nf(x)
+\]
+a function for which this holds is said to be homogeneous of degree $n$ in the variable $x$.   For reasons that will soon become obvious $\lambda$ is called the scaling function.  Intensive functions are homogeneous of degree zero, extensive functions are homogeneous of degree one.
+\subsection{Homogeneous Functions and Entropy}
+Consider
+\[
+S=S(U,V,n),
+\]
+this function is homogeneous of degree one in the variables $U$, $V$, and $n$, where $n$ is the number of moles.  Using the ideas developed above about homogeneous functions, it is obvious that we can write:
+\[
+S(\lambda U,\lambda V, \lambda n)=\lambda^1S(U,V,n),
+\]
+ 
+ where $\lambda$ is, as usual, arbitrary.  We can gain some insight into the properties of such functions by choosing a particular value for $\lambda$.  In this case we will choose $\lambda=\frac{1}{n}$ so that our equation becomes
+ \[
+ S\left(\frac{U}{n},\frac{V}{n},1\right)=\frac{1}{n}S(U,V,n)
+ \]
+ Now, we can define $\frac{U}{n}=u$, $\frac{V}{n}=v$ and $S(u,v,1)=s(u,v)$, the internal energy, volume and entropy per mole respectively.  Thus the equation becomes
+ \[
+ ns(u,v)=S(U,V,n),
+ \]
+ and the reason for the term \emph{scaling function} becomes obvious.
+ \section{The Euler Equation}
+ Consider
+ \[
+ U(\lambda S,\lambda V, \lambda n)=\lambda U(S,V,n)
+ \]
+differentiating with respect to $\lambda$ (and changing sides of the equation) this becomes
+ \[
+ U(S,V,n)=\left(\frac{\partial U}{\partial(\lambda S)}\right)_{V,n}\frac{\partial(\lambda S)}{\partial\lambda} +\left(\frac{\partial U}{\partial(\lambda V)}\right)_{S,n}\frac{\partial(\lambda V)}{\partial\lambda} +\left(\frac{\partial U}{\partial(\lambda n)}\right)_{S,V}\frac{\partial(\lambda n)}{\partial\lambda}    
+ \] 
+which simplifies to
+\[
+ U(S,V,n)=\left(\frac{\partial U}{\partial(\lambda S)}\right)_{V,n} S +\left(\frac{\partial U}{\partial(\lambda V)}\right)_{S,n}V +\left(\frac{\partial U}{\partial(\lambda n)}\right)_{S,V}n.
+\] 
+Recalling that $\lambda$ is arbitrary, we now choose $\lambda=1$, resulting in
+\[
+ U(S,V,n)=\left(\frac{\partial U}{\partial S}\right)_{V,n} S +\left(\frac{\partial U}{\partial V}\right)_{S,n}V +\left(\frac{\partial U}{\partial n}\right)_{S,V}n,
+ \]
+ and recognizing that the partial derivatives in this equations are now just the definitions of the extensive variables $T$, $p$, and $n$, we can rewrite this as
+ \[
+ U=TS-pV+\mu n.
+ \]
+ This equation, arrived at by purely formal manipulations, is the Euler equation, an equation that relates seven thermodynamic variables.
+ \subsection{The relationship between $G$ and $\mu$}
+ Starting from
+ \[
+ U=TS-pV+\mu n.
+ \]
+ and using
+ \[
+ G=U+pV-TS
+ \]
+ we have
+ \[
+ G=TS-pV+\mu n+pV-TS=\mu n.
+ \]
+ So for a one component system $G=\mu n$, for a $j$-component system, the Euler equation is
+ \[
+ U=TS-pV+\sum_{i=1}^{j}\mu_in_i
+ \]
+ and so for a $j$-component system
+ \[
+ G= \sum_{i=1}^{j}\mu_in_i
+ \]
+ 
+ \section{The Gibbs-Duhem Equation}
+The energy form of the Euler equation
+ \[
+ U=TS-pV+\mu n
+ \]
+ expressed in differentials is
+\[
+\de U=\de(TS)-\de(pV)+\de(\mu n)=T\de S+S\de T-p\de V-V\de p+\mu\de n+n\de\mu
+\]
+but, we know that
+\[
+\de U=T\de S-p\de V+\mu\de n
+\]
+and so we find
+\[
+0=S\de T-V\de p+n\de\mu.
+\]
+This is the Gibbs-Duhem equation.  It shows that three intensive variables are not independent -- if we know two of them, the value of the third can be determined from the Gibbs-Duhem equation.
+
+
+\end{document}

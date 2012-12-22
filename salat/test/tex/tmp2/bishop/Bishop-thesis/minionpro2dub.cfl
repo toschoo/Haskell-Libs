@@ -1,0 +1,13 @@
+%% Lettrine options for minion pro at 12pt, onehalfspacing
+%\svnid{$Id: minionpro2dub.cfl 375 2009-11-08 22:57:46Z lsb $}%
+% C
+\LettrineOptionsFor{C}{nindent=0.3em}
+% F
+\LettrineOptionsFor{F}{nindent=0.3em}
+% N
+\LettrineOptionsFor{N}{loversize=0.012}
+% P
+\LettrineOptionsFor{P}{nindent=0em,loversize=0.02}
+% T
+\LettrineOptionsFor{T}{lhang=0.2,nindent=0.em}
+\endinput

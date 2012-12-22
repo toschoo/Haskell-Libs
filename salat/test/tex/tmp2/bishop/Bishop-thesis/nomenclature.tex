@@ -1,0 +1,47 @@
+\svnid{$Id: nomenclature.tex 456 2010-03-15 10:02:21Z lsb $}%
+\chapter{Nomenclature}
+\thumb{Nomenclature}
+\renewcommand*{\nompreamble}{%
+    \begin{list}{}{%
+    \renewcommand{\makelabel}[1]{\eqparbox[b]{listlab}{##1}}%
+    \setlength{\labelwidth}{\eqboxwidth{listlab}}%
+    \setlength{\labelsep}{4pt}%
+    \setlength{\parsep}{3pt}%
+%    \setlength{\itemsep}{0pt}%
+    \setlength{\leftmargin}{\labelwidth+\labelsep}%
+    \setlength{\rightmargin}{0pt}}%
+    \rightskip\RaggedRightRightskip%
+}
+\renewcommand*{\nomornmnt}{\Pisymbol{MinionPro-Extra}{120}}
+\renewcommand*{\nompostamble}{\end{list}}
+\renewcommand*{\nomenlist}[1]{\cref{#1}}
+\renewcommand*{\nomgroupfont}[1]{{\large\textit{#1:}}}
+\renewcommand*{\nomformatlbl}[1]{\color{lightgray}\fbox{#1}} % should I put in the OCG magic?
+\begin{singlespace}
+% run
+% makeindex -s nomenlev.ist -o your-thesis.nls your-thesis.nlo
+% to sort the nomenclature entries into alphabetic order
+%    \nomdef{key}{symbol}{explanation}, \nomref{key}{label}, \nomdref{key}{symbol}{explanation}{label} to introduce symbols. (nomdref is a shortcut for doing both nomdef and nomref). The "key" field should start with:
+%        A:Abbreviations
+%        B:Symbols
+%        C:Latin Letters
+%        G:Greek Letters
+%        X:Superscripts
+%        Z:Subscripts
+%    and will be used for sorting by makeindex (so be especially careful with Greek letters to get the proper alphabetization). In draft mode, the "key" field is shown in the margin.
+%    To alphabetize the Greek properly, I use the conventions:
+%        a=alpha
+%        b=beta
+%        c=gamma
+%        d=delta
+%        e=epsilon
+%        f=zeta
+%        k=kappa
+%        o=xi
+%        r=rho
+%        s=sigma
+%        w=phi
+%        x=chi
+%        z=omega
+\printnomens
+\end{singlespace}

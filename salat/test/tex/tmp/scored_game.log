@@ -1,0 +1,111 @@
+This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdftex 2012.5.21)  25 OCT 2012 22:08
+entering extended mode
+ %&-line parsing enabled.
+**scored_game.tex
+(./scored_game.tex (/usr/share/texmf-texlive/tex/plain/plgraph/miniltx.tex
+\@tempcnta=\count27
+\@tempcntb=\count28
+\@tempdima=\dimen16
+\@tempdimb=\dimen17
+\@tempdimc=\dimen18
+\@tempboxa=\box16
+\@tempskipa=\skip18
+\@tempskipb=\skip19
+\@temptokena=\toks13
+\leftmarginv=\dimen19
+\leftmarginvi=\dimen20
+\@ovxx=\dimen21
+\@ovyy=\dimen22
+\@ovdx=\dimen23
+\@ovdy=\dimen24
+\@ovro=\dimen25
+\@ovri=\dimen26
+\@xdim=\dimen27
+\@ydim=\dimen28
+\@linelen=\dimen29
+\@dashdim=\dimen30
+\fboxsep=\dimen31
+\fboxrule=\dimen32
+)
+(/usr/share/texmf-texlive/tex/latex/graphics/graphicx.sty
+graphicx: 1999/02/16 v1.0f Enhanced LaTeX Graphics (DPC,SPQR)
+
+(/usr/share/texmf-texlive/tex/latex/graphics/keyval.sty
+keyval: 1999/03/16 v1.13 key=value parser (DPC)
+\KV@toks@=\toks14
+)
+(/usr/share/texmf-texlive/tex/latex/graphics/graphics.sty
+graphics: 2009/02/05 v1.0o Standard LaTeX Graphics (DPC,SPQR)
+
+(/usr/share/texmf-texlive/tex/latex/graphics/trig.sty
+trig: 1999/03/16 v1.09 sin cos tan (DPC)
+)
+(/etc/texmf/tex/latex/config/graphics.cfg
+graphics.cfg: 2009/08/28 v1.8 graphics configuration of TeX Live
+)
+graphics: Driver file: pdftex.def
+
+(/usr/share/texmf-texlive/tex/latex/pdftex-def/pdftex.def
+pdftex.def: 2010/03/12 v0.04p Graphics/color for pdfTeX
+\Gread@gobject=\count29
+
+(/usr/share/texmf-texlive/tex/context/base/supp-pdf.mkii
+[Loading MPS to PDF converter (version 2006.09.02).]
+\scratchcounter=\count30
+\scratchdimen=\dimen33
+\scratchbox=\box17
+\nofMPsegments=\count31
+\nofMParguments=\count32
+\everyMPshowfont=\toks15
+\MPscratchCnt=\count33
+\MPscratchDim=\dimen34
+\MPnumerator=\count34
+\everyMPtoPDFconversion=\toks16
+)))
+\Gin@req@height=\dimen35
+\Gin@req@width=\dimen36
+) (/usr/share/texmf-texlive/tex/eplain/eplain.tex
+ifpdf: 2009/04/10 v2.0 Provides the ifpdf switch (HO)
+ifpdf: pdfTeX in pdf mode detected
+)
+File `scorecard-1.pdf' not found
+! pdftex.def: File `scorecard-1.pdf' not found.
+\x ...dftex.def: File `scorecard-1.pdf' not found}
+                                                  
+\GPT@error ...ackageError {pdftex.def}{#1}{#2}}\x 
+                                                  \endgroup 
+<argument> ...for this image.\MessageBreak \@ehc }
+                                                  \Gin@drafttrue \fi 
+\@secondoftwo #1#2->#2
+                      
+\Gin@setfile ...se #1\fi \endcsname {\Gin@base #2}
+                                                  \else \Gin@nosize {#3}\fi ...
+
+\Ginclude@graphics ...sname {\Gin@base \Gin@ext }}
+                                                  \fi \endgroup 
+...
+l.47 ...s[height=\hsize,angle=90]{scorecard-1.pdf}
+                                                  
+? 
+! Emergency stop.
+\x ...dftex.def: File `scorecard-1.pdf' not found}
+                                                  
+\GPT@error ...ackageError {pdftex.def}{#1}{#2}}\x 
+                                                  \endgroup 
+<argument> ...for this image.\MessageBreak \@ehc }
+                                                  \Gin@drafttrue \fi 
+\@secondoftwo #1#2->#2
+                      
+\Gin@setfile ...se #1\fi \endcsname {\Gin@base #2}
+                                                  \else \Gin@nosize {#3}\fi ...
+
+\Ginclude@graphics ...sname {\Gin@base \Gin@ext }}
+                                                  \fi \endgroup 
+...
+l.47 ...s[height=\hsize,angle=90]{scorecard-1.pdf}
+                                                  
+Using draft setting for this image.
+Try typing  <return>  to proceed.
+If that doesn't work, type  X <return>  to quit.
+
+!  ==> Fatal error occurred, no output PDF file produced!

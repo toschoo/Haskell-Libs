@@ -1,0 +1,124 @@
+\documentclass[12pt,twoside,openany]{book}
+\usepackage{amsmath}
+\usepackage{longtable}
+\usepackage[rigidchapters]{titlesec}
+\titleformat{\chapter}[display]
+  {\filcenter\large}{CHAPTER\ \thechapter}{20pt}{\filcenter\bfseries\Large\uppercase}
+  \titlespacing{\chapter}{0pt}{3\baselineskip minus .5ex}{6\baselineskip minus 1.5ex}
+\usepackage[titles]{tocloft}
+\renewcommand{\contentsname}{CONTENTS}
+%\ChNameUpperCase
+%\ChTitleUpperCase
+%\ChNameVar{\centering\large}
+%\ChNumVar{\centering\large}
+%\ChTitleVar{\centering\bfseries\Large}
+\usepackage{wrapfig}
+\usepackage{enumitem}
+\usepackage{ulem}
+\usepackage{multicol}
+\usepackage{marginnote}
+\usepackage[fulloldstylenums]{kpfonts}
+\usepackage{hanging}
+\usepackage{tikz}
+\usepackage[hyperfootnotes=false]{hyperref}
+\hypersetup{colorlinks=true, linkcolor=black, pdfauthor=Bertrand Russell, pdftitle=Introduction to Mathematical Philosophy, pdfcreator=Kevin C. Klement, pdfsubject=Philosophy}
+\usepackage[paper=a5paper,vmargin=1.5cm,lmargin=1cm,rmargin=1.5cm]{geometry}
+%
+% Typical LaTeX title and author, though these aren't actually used anywhere
+\title{Introduction to Mathematical Philosophy}
+\author{Bertrand Russell}
+\date{London: George Allen \& Unwin, Ltd. May 1919.\\ Second Edition April 1920.}
+%
+%
+% Basic paragraph types
+% -- normal paragraph
+\newcommand{\kkparagraph}[1]{
+
+#1}
+% -- Hanging display
+\newcommand{\kkdisplay}[1]%
+{\begin{description}[noitemsep,labelindent=1em,leftmargin=4em,rightmargin=0em]
+  \item #1
+ \end{description}
+}
+% -- Index entry
+\newcommand{\kkie}[1]{
+
+\hangpara{1.6em}{1} #1}
+%
+% Page number markers; anchors for links
+\newcommand{\kkpageindicate}[2]{\hypertarget{#2}{\ensuremath{\textcolor{red}{\mathbf{\vert}}}} \marginnote{#1}}
+% Page indicators at start of chapter
+\newcommand{\kkpageindicatechapstart}[3]{\marginnote{#1}\hypertarget{#2}{#3}}
+% Page indicators at end of paragraph/beginning of next
+\newcommand{\kkpnoteonly}[2]{\marginnote{#1}{\hypertarget{#2}{\vphantom{x}}}}
+\newcommand{\kkpmarkonly}{\ensuremath{\textcolor{red}{\mathbf{\vert}}}}
+%
+% For use if the version has hyperlinks
+\newcommand{\kklinked}[1]{}
+%
+% Commands used only in certain versions
+\newcommand{\ltronly}[1]{}    % Letter version only; unused
+\newcommand{\lxonly}[1]{}       % two sided letter version only; unused
+\newcommand{\afouronly}[1]{}    % One sided A4 version only; unused
+\newcommand{\aftonly}[1]{#1}      % Two sided A4 version only; used
+\newcommand{\ebkonly}[1]{}      % Ebook size only; unused 
+\newcommand{\iphoneonly}[1]{}   % iPhone size only; unused
+%
+% Commands used in all but certain versions
+\newcommand{\allbutaf}[1]{#1}
+\newcommand{\allbutiphone}[1]{#1}
+%
+% Set up title page spacing
+\newlength{\titlepagetop}
+\setlength{\titlepagetop}{30pt}
+\newlength{\titlepageby}
+\setlength{\titlepageby}{50pt}
+\newlength{\titlepagemiddle}
+\setlength{\titlepagemiddle}{165pt}
+%
+\newcommand{\figone}{\begin{wrapfigure}[10]{l}{2in}
+\begin{tikzpicture}
+\usetikzlibrary{calc}
+\pgfsetarrows{latex-latex};
+\pgfsetarrowsend{latex};
+\path node (z) at (0.5,-2.8) [shape=circle,inner sep=1pt,outer sep=4pt,fill,label=below:$z$] {}
+      node (w) at (4.5,-2.8) [shape=circle,inner sep=1pt,outer sep=4pt,fill,label=below:$w$] {}
+      node (x) at (0.5,-0.3) [shape=circle,inner sep=1pt,outer sep=4pt,fill,label={[label distance=-3pt]above:$x\vphantom{y}$}] {}
+      node (y) at (4.5,-0.3) [shape=circle,inner sep=1pt,outer sep=4pt,fill,label={[label distance=-3pt]above:$y$}] {};
+\draw [->,thick,>=stealth] (z) to (w);
+\draw [->,thick,>=stealth] (x) to (z);
+\draw [->,thick,>=stealth] (y) to (w);
+\draw [->,thick,>=stealth] (x) to (y);
+\node [label=below:Q] (q) at ($(z)!.5!(w)$) {};
+\node [outer sep=4pt,label={[label distance=-3pt]above:P}] (p) at ($(x)!.5!(y)$) {};
+\node [label=left:S] (p) at ($(x)!.5!(z)$) {};
+\node [label=right:S] (p) at ($(w)!.5!(y)$) {};
+\end{tikzpicture}
+\end{wrapfigure}}
+%
+\newcommand{\figtwo}{\begin{wrapfigure}[12]{l}{1.55in}
+\begin{tikzpicture}
+\path node (d) at (0.5,-2.3) [shape=circle,inner sep=1pt,outer sep=4pt,fill,label=below:$d$] {}
+      node (c) at (3.9,-2.3) [shape=circle,inner sep=1pt,outer sep=4pt,fill,label=below:$c$] {} 
+      node (a) at (0.5,-0.3) [shape=circle,inner sep=1pt,outer sep=4pt,fill,label=above:$a$] {}
+      node (b) at (3.9,-0.3) [shape=circle,inner sep=1pt,outer sep=4pt,fill,label=above:$b$] {}
+      node (e) at (2.2,-3.8) [shape=circle,inner sep=1pt,outer sep=4pt,fill,label=below:$e$] {};
+\draw [->,thick,>=stealth] (a) to (b);
+\draw [->,thick,>=stealth] (a) to (c);
+\draw [->,thick,>=stealth] (a) to (d);
+\draw [->,thick,>=stealth] (b) to (c);
+\draw [->,thick,>=stealth] (c) to (e);
+\draw [->,thick,>=stealth] (d) to (c);
+\draw [->,thick,>=stealth] (d) to (e);
+\end{tikzpicture}
+\end{wrapfigure}}
+%
+%
+\setlength{\parskip}{0pt}
+\widowpenalty=5000
+\clubpenalty=5000
+%
+%
+\input{imp-core}%
+
