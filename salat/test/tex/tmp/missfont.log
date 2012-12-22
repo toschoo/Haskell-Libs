@@ -1,3 +1,0 @@
-mktexpk --mfmode / --bdpi 600 --mag 1+336/600 --dpi 936 TengwarGothika050
-mktextfm padr9alt
-mktexpk --mfmode / --bdpi 600 --mag 1+336/600 --dpi 936 TengwarGothika050
