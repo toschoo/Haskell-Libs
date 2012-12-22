@@ -61,7 +61,7 @@ where
         5  -> do m <- arbmathtype -- math except Dollar
                  x <- arbitrary
                  return $ TeXMathX m x []
-        6  -> do x <- TeXRaw . T.pack <$> arbstring 10 -- Dollar
+        6  -> do x <- arbdollar -- Dollar
                  return $ TeXMathX Dollar x []
         7  -> do a <- choose (1::Int,5::Int)
                  let (d,u) | a == 5    = (Just 10.0, "pt")
@@ -107,6 +107,38 @@ where
                3 -> EqEnv
                4 -> Parentheses
                _ -> Square
+
+  arbdollar :: Gen LaTeX
+  arbdollar = do
+    x <- arbitrary
+    if check4math x
+      then arbdollar
+      else return x
+
+  check4math :: LaTeX -> Bool
+  check4math l =
+    case l of 
+      TeXMathX{}      -> True
+      TeXComm  _ as   -> checkArgs4math as
+      TeXEnv   _ as b -> if not (checkArgs4math as)
+                           then check4math b
+                           else True
+      TeXBraces     b -> check4math b
+      TeXSeq x y      -> if not (check4math x)
+                           then check4math y
+                           else True
+      _               -> False
+
+  checkArgs4math :: [TeXArg] -> Bool
+  checkArgs4math []     = False
+  checkArgs4math (x:xs) = checkArg4math x || checkArgs4math xs
+
+  checkArg4math :: TeXArg -> Bool
+  checkArg4math a =
+    case a of
+      OptArg l -> check4math l
+      FixArg l -> check4math l
+      _        -> False
 
   arbinenv :: Gen LaTeX
   arbinenv = do
