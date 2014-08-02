@@ -1,3 +1,4 @@
+{-# LANGUAGE NoMonomorphismRestriction #-}
 module Main
 where
 
@@ -12,19 +13,22 @@ where
   import           System.Exit 
   import qualified System.IO as IO
   import           Text.LaTeX.Base.Parser
-  import           Text.LaTeX.Base.ConduitParser
   import           Text.LaTeX.Base.Syntax
   import           Text.LaTeX.Base.Render (render)
   import           Data.Text.Encoding (decodeUtf8)
   import           Data.Text(Text)
   import qualified Data.Text as T
   import           Data.Char (toLower)
-  import           Data.Conduit (($$), ($=)) 
+  import           Data.Conduit (($$), ($=), (=$=)) 
   import qualified Data.Conduit        as C
   import qualified Data.Conduit.Binary as CB
   import qualified Data.Conduit.Text   as CT
   import qualified Data.Conduit.Util   as CU
+  import           Data.Conduit.Attoparsec
   import qualified Data.ByteString as BS
+
+  -- import           ConduitParser3
+  -- import           Text.LaTeX.Base.ConduitParser
 
   ind,oud :: FilePath
   ind = "test/tex/in"
@@ -65,7 +69,7 @@ where
     x <- doesFileExist (ind </> f) 
     if x then do 
       putStrLn $ "Testing " ++ f
-      E.catch ((inout f >> comp f) >> return True) 
+      E.catch (inout f >> comp f) 
               (\e -> do putStrLn $ "Error on " ++ ind </> f ++ ": "
                         print (e::E.SomeException)
                         return False)
@@ -138,19 +142,14 @@ where
                                               Right () -> texCompare c1 c2
                                               Left  x  -> Left x
 
-  texCompare (TeXMath _) (TeXMath _) = Right ()
+  texCompare l1@(TeXMath e1 m1) 
+             l2@(TeXMath e2 m2) | e1 /= e2  = Left (l1, l2)
+                                | otherwise = texCompare m1 m2
 
-  texCompare l1@(TeXMathX e1 m1 _) 
-             l2@(TeXMathX e2 m2 _) | e1 /= e2  = Left (l1, l2)
-                                   | otherwise = texCompare m1 m2
-
-  texCompare (TeXNewLine _) (TeXNewLine _) = Right ()
-
-  texCompare l1@(TeXLineBreak n1 u1 b1)
-             l2@(TeXLineBreak n2 u2 b2) | n1 /= n2  = Left (l1, l2)
-                                        | u1 /= u2  = Left (l1, l2)
-                                        | b1 /= b2  = Left (l1, l2)
-                                        | otherwise = Right ()
+  texCompare l1@(TeXLineBreak m1 b1)
+             l2@(TeXLineBreak m2 b2) | m1 /= m2  = Left (l1, l2)
+                                     | b1 /= b2  = Left (l1, l2)
+                                     | otherwise = Right ()
 
   texCompare (TeXBraces b1) 
              (TeXBraces b2) = texCompare b1 b2
@@ -191,17 +190,23 @@ where
   -- LaTeX Parser Conduit
   ------------------------------------------------------------------------
   parse :: C.MonadResource m => C.Conduit Text m LaTeX
-  parse = conduitParser latexBlockParser 
+  parse = conduitParser latexBlockParser =$= dropPosition -- latexAtOnce -- =$= sndC -- latexAtOnce
+    where dropPosition = C.awaitForever $ \(_, i) -> C.yield i
+
+  -- sndC :: C.MonadResource m => C.Conduit (PositionRange, LaTeX) m LaTeX 
+  -- sndC = C.awaitForever $ \(_, i) -> C.yield i
 
   ------------------------------------------------------------------------
   -- Render output (dropping everything following the main doc)
   ------------------------------------------------------------------------
+  {-
   renderDocC :: C.MonadResource m => C.Conduit LaTeX m Text
   renderDocC = CU.conduitState True push close
     where push  True  i = return $ CU.StateProducing (not $ isMainDoc i) 
                                                      [render i]
           push  False _ = return $ CU.StateFinished Nothing []
           close _       = return []
+  -}
 
   ------------------------------------------------------------------------
   -- Render output 

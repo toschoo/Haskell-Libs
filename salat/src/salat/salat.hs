@@ -2,12 +2,12 @@ module Main
 where
 
   import           Control.Monad.Trans (liftIO)
+  import           Control.Monad.Trans.Resource (MonadResource, runResourceT)
   import           Control.Monad (unless)
   import           Control.Exception (try, SomeException)
   import           System.Directory (doesFileExist)
   import           System.Environment (getArgs, getEnv)
   import           Text.LaTeX.Base.Parser
-  import           Text.LaTeX.Base.ConduitParser
   import           Text.LaTeX.Base.Syntax
   import           Text.LaTeX.Base.Render (render)
   import           Data.Text(Text)
@@ -17,6 +17,7 @@ where
   import qualified Data.Conduit.Binary as CB
   import qualified Data.Conduit.Text   as CT
   import qualified Data.Conduit.List   as CL
+  import           Data.Conduit.Attoparsec  
   import           Data.List.Split (endBy)
   import           Data.Char       (toUpper)
   import           Data.Monoid
@@ -55,15 +56,15 @@ where
         txtbuf    = length d > 0 
         l         = foldl (.) id (a ++ b)
         t         = foldl (.) id (c ++ d)
-     in C.runResourceT $ CB.sourceFile i   $= 
-                         CT.decode CT.utf8 $= 
-                         parse             $=
-                         buffer texbuf     $= 
-                         tex2tex l         $=
-                         renderC           $=
-                         buffer txtbuf     $= 
-                         txt2txt t         $=
-                         CT.encode CT.utf8 $$ CB.sinkFile o
+     in runResourceT $ CB.sourceFile i   $= 
+                       CT.decode CT.utf8 $= 
+                       parse             $=
+                       buffer texbuf     $= 
+                       tex2tex l         $=
+                       renderC           $=
+                       buffer txtbuf     $= 
+                       txt2txt t         $=
+                       CT.encode CT.utf8 $$ CB.sinkFile o
 
   ------------------------------------------------------------------------
   -- Command defines a function and whether it needs buffering
@@ -112,6 +113,7 @@ where
   parseOp :: String -> String -> Command
   parseOp p s = case map toUpper $ white s of
                   "VERSIFY" -> Txt (False, versify)
+                  "PERIOD"  -> Txt (False, period)
                   "INCLUDE" -> Tex (True , include p)
                   _         -> error $ "Unknown operation: " ++ s
     where white = takeWhile (/= ' ') . dropWhile (== ' ')
@@ -132,54 +134,55 @@ where
   ------------------------------------------------------------------------
   -- LaTeX Parser Conduit
   ------------------------------------------------------------------------
-  parse :: C.MonadResource m => C.Conduit Text m LaTeX
-  parse = conduitParser latexBlockParser
+  parse :: MonadResource m => C.Conduit Text m LaTeX
+  parse = conduitParser latexBlockParser =$= dropPosition
+    where dropPosition = C.awaitForever $ \(_, i) -> C.yield i
 
   ------------------------------------------------------------------------
   -- Render output 
   ------------------------------------------------------------------------
-  renderC :: C.MonadResource m => C.Conduit LaTeX m Text
-  renderC = C.awaitForever $ \i -> C.yield (render i)
+  renderC :: MonadResource m => C.Conduit LaTeX m Text
+  renderC = C.awaitForever (C.yield . render)
 
   ------------------------------------------------------------------------
   -- To stdout - just for debugging
   ------------------------------------------------------------------------
-  out :: C.MonadResource m => C.Sink Text m () 
-  out = C.awaitForever $ \i -> liftIO $ putStrLn $ T.unpack i
+  out :: MonadResource m => C.Sink Text m () 
+  out = C.awaitForever (liftIO . putStrLn . T.unpack) 
 
   ------------------------------------------------------------------------
   -- LaTeX Transformer Conduit
   ------------------------------------------------------------------------
-  tex2tex :: C.MonadResource m => (LaTeX -> LaTeX) -> C.Conduit LaTeX m LaTeX
+  tex2tex :: MonadResource m => (LaTeX -> LaTeX) -> C.Conduit LaTeX m LaTeX
   tex2tex = x2x 
 
   ------------------------------------------------------------------------
   -- Text Transformer Conduit
   ------------------------------------------------------------------------
-  txt2txt :: C.MonadResource m => (Text -> Text) -> C.Conduit Text m Text
+  txt2txt :: MonadResource m => (Text -> Text) -> C.Conduit Text m Text
   txt2txt = x2x
 
   ------------------------------------------------------------------------
   -- Transformer Conduit
   ------------------------------------------------------------------------
-  x2x :: C.MonadResource m => (a -> a) -> C.Conduit a m a
-  x2x proc = C.awaitForever $ \i -> C.yield (proc i)
+  x2x :: MonadResource m => (a -> a) -> C.Conduit a m a
+  x2x proc = C.awaitForever (C.yield . proc)
 
   ------------------------------------------------------------------------
   -- Buffering
   ------------------------------------------------------------------------
-  buffer :: (C.MonadResource m, Monoid a) => Bool -> C.Conduit a m a
+  buffer :: (MonadResource m, Monoid a) => Bool -> C.Conduit a m a
   buffer True  = CL.sequence CL.consume =$= collapse 
   buffer False = putThrough
 
   ------------------------------------------------------------------------
   -- Mconcat Conduit
   ------------------------------------------------------------------------
-  collapse :: (C.MonadResource m, Monoid a) => C.Conduit [a] m a
-  collapse = C.awaitForever $ \i -> C.yield (mconcat i)
+  collapse :: (MonadResource m, Monoid a) => C.Conduit [a] m a
+  collapse = C.awaitForever (C.yield . mconcat)
 
   ------------------------------------------------------------------------
   -- Do nothing conduit
   ------------------------------------------------------------------------
-  putThrough :: (C.MonadResource m, Monoid a) => C.Conduit a m a
-  putThrough = C.awaitForever $ \i -> C.yield i
+  putThrough :: (MonadResource m, Monoid a) => C.Conduit a m a
+  putThrough = C.awaitForever C.yield

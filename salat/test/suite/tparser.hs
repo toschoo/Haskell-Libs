@@ -46,7 +46,7 @@ where
     arbitrary = do
       i <- choose (1::Int,20::Int)
       case i of
-        1  -> TeXRaw . T.pack <$> arbstring 10
+        1  -> TeXRaw . T.pack <$> arbstring 100
         2  -> do c  <- choose ('a','z')
                  n  <- choose (1,5)
                  as <- arguments n
@@ -60,15 +60,15 @@ where
                  return $ TeXEnv nm as x
         5  -> do m <- arbmathtype -- math except Dollar
                  x <- arbitrary
-                 return $ TeXMathX m x []
+                 return $ TeXMath m x
         6  -> do x <- arbdollar -- Dollar
-                 return $ TeXMathX Dollar x []
+                 return $ TeXMath Dollar x 
         7  -> do a <- choose (1::Int,5::Int)
-                 let (d,u) | a == 5    = (Just 10.0, "pt")
-                           | otherwise = (Nothing,   "")
+                 let m | a == 5    = Just $ Pt 10
+                       | otherwise = Nothing
                  b <- choose (1::Int,3::Int)
                  let str = b == 3
-                 return $ TeXLineBreak d u str
+                 return $ TeXLineBreak m str
         8  -> TeXRaw . T.pack <$> arbstring 10 -- operator 
                                                -- currently not used
         9  -> TeXBraces <$> arbitrary
@@ -100,12 +100,9 @@ where
 
   arbmathtype :: Gen MathType
   arbmathtype = do
-    i <- choose (1::Int,5::Int)
+    i <- choose (1::Int,2::Int)
     return $ case i of
-               1 -> MathEnv
-               2 -> DispEnv
-               3 -> EqEnv
-               4 -> Parentheses
+               1 -> Parentheses
                _ -> Square
 
   arbdollar :: Gen LaTeX
@@ -118,7 +115,7 @@ where
   check4math :: LaTeX -> Bool
   check4math l =
     case l of 
-      TeXMathX{}      -> True
+      TeXMath{}       -> True
       TeXComm  _ as   -> checkArgs4math as
       TeXEnv   _ as b -> if not (checkArgs4math as)
                            then check4math b

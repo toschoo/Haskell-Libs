@@ -1,8 +1,8 @@
-module Rules (versify, include)
+module Rules (versify, include, period)
 where
 
   import           Text.LaTeX.Base.Syntax
-  import           Data.Text(Text, snoc, append)
+  import           Data.Text(Text, cons, snoc, append)
   import qualified Data.Text as T
 
   --------------------------------------------------------------------
@@ -18,13 +18,24 @@ where
                       | otherwise = (x >|< verse )    <> go (y:ys)
 
   --------------------------------------------------------------------
+  -- | Substitute comma by "\period"
+  --------------------------------------------------------------------
+  period :: Text -> Text
+  period = T.pack . unlines . map go . (lines . T.unpack)
+    where go ""                 = ""
+          go (x:xs) | x == ',' &&
+                      null xs   = " \\period"
+                    | x == ','  = " \\period\\ " ++ go xs
+                    | otherwise =              x :  go xs
+                      
+  --------------------------------------------------------------------
   -- | Replace \"inputbase\"
   --------------------------------------------------------------------
   include :: String -> LaTeX -> LaTeX
   include path (TeXComm "inputbase" args) = TeXComm "input" $ 
                                               replaceBase path args
   include path (TeXEnv s a b) = TeXEnv s a $ include path b
-  include path (TeXMath    b) = TeXMath    $ include path b
+  include path (TeXMath  t b) = TeXMath  t $ include path b
   include path (TeXBraces  b) = TeXBraces  $ include path b
   include path (TeXSeq   x y) = TeXSeq (include path x) (include path y)
   include _    x              = x 
@@ -47,6 +58,10 @@ where
 
   verse :: Text
   verse = T.pack "\\\\\n"
+
+  infixr 6 <|
+  (<|) :: Char -> Text -> Text
+  (<|) = cons
 
   infixr 6 |>
   (|>) :: Text -> Char -> Text 

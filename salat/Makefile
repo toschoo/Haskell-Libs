@@ -9,16 +9,16 @@ ALL = $(TEXDIR)/Text/LaTeX.hs \
       $(TEXDIR)/Text/LaTeX/Base/Class.hs \
       $(TEXDIR)/Text/LaTeX/Base/Commands.hs \
       $(TEXDIR)/Text/LaTeX/Base/Parser.hs \
-      $(TEXDIR)/Text/LaTeX/Base/ConduitParser.hs \
       $(TEXDIR)/Text/LaTeX/Base/Render.hs \
       $(TEXDIR)/Text/LaTeX/Base/Syntax.hs \
       $(TEXDIR)/Text/LaTeX/Base/Types.hs \
+      $(TEXDIR)/Text/LaTeX/Base/ConduitParser2.hs \
       $(TEXDIR)/Text/LaTeX/Base/Warnings.hs \
-      $(TEXDIR)/Text/LaTeX/Base/Writer.hs \
-      $(TEXDIR)/Text/LaTeX/Base/Math.hs \
+      $(TEXDIR)/Text/LaTeX/Base/Writer.hs 
 
 SALL =	$(SALATDIR)/salat.hs \
-	$(SALATDIR)/Rules.hs
+	$(SALATDIR)/Rules.hs 
+	# $(SALATDIR)/ConduitParser3.hs
 
 test:		$(TDIR)/tparser
 smoke:		$(TDIR)/smoke
@@ -46,7 +46,7 @@ $(TDIR)/tparser:	$(TDIR)/tparser.hs $(ALL)
 			$(GHC) $(FLGS) $(INC) $@
 
 $(TDIR)/samples:	$(TDIR)/samples.hs $(ALL)
-		$(GHC) $(FLGS) $(INC) $@
+			$(GHC) $(FLGS) $(INC) $(SALATINC) $@
 
 $(TDIR)/smoke:	$(TDIR)/smoke.hs $(ALL)
 		$(GHC) $(FLGS) $(INC) $@
@@ -60,7 +60,7 @@ $(SALATDIR)/salat:	$(ALL) $(SALL)
 			$(GHC) $(FLGS) $(SALATINC) $@
 			strip $@
 
-install:	salat /usr/local/bin/salat
+install:	salat
 		sudo cp $(SALATDIR)/salat /usr/local/bin/
 
 
