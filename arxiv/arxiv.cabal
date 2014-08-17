@@ -1,0 +1,27 @@
+Name:            arxiv
+Version:         0.0.1
+Cabal-Version:   >= 1.8
+Copyright:       Copyright (c) Tobias Schoofs, 2014
+License:         LGPL
+license-file:    license/lgpl-3.0.txt
+Author:          Tobias Schoofs
+Maintainer:      Tobias Schoofs <tobias dot schoofs at gmx dot net>
+Homepage:        http://github.com/toschoo/libs
+Category:        Network, API, NetworkAPI, Arxiv
+Build-Type:      Simple
+Synopsis:        A client for the Arxiv API
+Description:
+
+  More information, examples and a test suite are available 
+  on <http://github.com/toschoo/libs/arxiv>.
+
+Library
+  Build-Depends:   base        >= 4.0 && <= 5.0,
+                   parsec      >= 3.1.5,
+                   tagsoup     >= 0.13
+
+  hs-source-dirs: src, .
+                   
+  Exposed-Modules: Network.Api.Arxiv
+  other-modules: 
+

@@ -1,0 +1,319 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <link href="http://arxiv.org/api/query?search_query%3Dau%3Aaaronson%20AND%20ti%3Acomplexity%26id_list%3D%26start%3D0%26max_results%3D10" rel="self" type="application/atom+xml"/>
+  <title type="html">ArXiv Query: search_query=au:aaronson AND ti:complexity&amp;id_list=&amp;start=0&amp;max_results=10</title>
+  <id>http://arxiv.org/api/QaFK0NGJKYPAyOTKoqVbf7ZrwjI</id>
+  <updated>2014-08-15T00:00:00-04:00</updated>
+  <opensearch:totalResults xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/">9</opensearch:totalResults>
+  <opensearch:startIndex xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/">0</opensearch:startIndex>
+  <opensearch:itemsPerPage xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/">10</opensearch:itemsPerPage>
+  <entry>
+    <id>http://arxiv.org/abs/cs/0406061v1</id>
+    <updated>2004-06-30T06:28:35Z</updated>
+    <published>2004-06-30T06:28:35Z</published>
+    <title>The Complexity of Agreement</title>
+    <summary>  A celebrated 1976 theorem of Aumann asserts that honest, rational Bayesian
+agents with common priors will never "agree to disagree": if their opinions
+about any topic are common knowledge, then those opinions must be equal.
+Economists have written numerous papers examining the assumptions behind this
+theorem. But two key questions went unaddressed: first, can the agents reach
+agreement after a conversation of reasonable length? Second, can the
+computations needed for that conversation be performed efficiently? This paper
+answers both questions in the affirmative, thereby strengthening Aumann's
+original conclusion.
+  We first show that, for two agents with a common prior to agree within
+epsilon about the expectation of a [0,1] variable with high probability over
+their prior, it suffices for them to exchange order 1/epsilon^2 bits. This
+bound is completely independent of the number of bits n of relevant knowledge
+that the agents have. We then extend the bound to three or more agents; and we
+give an example where the economists' "standard protocol" (which consists of
+repeatedly announcing one's current 
+expectation) nearly saturates the bound,
+while a new "attenuated protocol" does better. Finally, we give a protocol that
+would cause two Bayesians to agree within epsilon after exchanging order
+1/epsilon^2 messages, and that can be simulated by agents with limited
+computational resources. By this we mean that, after examining the agents'
+knowledge and a transcript of their conversation, no one would be able to
+distinguish the agents from perfect Bayesians. The time used by the simulation
+procedure is exponential in 1/epsilon^6 but not in n.
+</summary>
+    <author>
+      <name>Scott Aaronson</name>
+    </author>
+    <arxiv:comment xmlns:arxiv="http://arxiv.org/schemas/atom">27 pages, 4 figures</arxiv:comment>
+    <link href="http://arxiv.org/abs/cs/0406061v1" rel="alternate" type="text/html"/>
+    <link title="pdf" href="http://arxiv.org/pdf/cs/0406061v1" rel="related" type="application/pdf"/>
+    <arxiv:primary_category xmlns:arxiv="http://arxiv.org/schemas/atom" term="cs.CC" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CC" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.GT" scheme="http://arxiv.org/schemas/atom"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/quant-ph/0210020v1</id>
+    <updated>2002-10-02T22:03:37Z</updated>
+    <published>2002-10-02T22:03:37Z</published>
+    <title>Quantum Certificate Complexity</title>
+    <summary>  Given a Boolean function f, we study two natural generalizations of the
+certificate complexity C(f): the randomized certificate complexity RC(f) and
+the quantum certificate complexity QC(f). Using Ambainis' adversary method, we
+exactly characterize QC(f) as the square root of RC(f). We then use this result
+to prove the new relation R0(f) = O(Q2(f)^2 Q0(f) log n) for total f, where R0,
+Q2, and Q0 are zero-error randomized, bounded-error quantum, and zero-error
+quantum query complexities respectively. Finally we give asymptotic gaps
+between the measures, including a total f for which C(f) is superquadratic in
+QC(f), and a symmetric partial f for which QC(f) = O(1) yet Q2(f) = Omega(n/log
+n).
+</summary>
+    <author>
+      <name>Scott Aaronson</name>
+    </author>
+    <arxiv:comment xmlns:arxiv="http://arxiv.org/schemas/atom">9 pages</arxiv:comment>
+    <link href="http://arxiv.org/abs/quant-ph/0210020v1" rel="alternate" type="text/html"/>
+    <link title="pdf" href="http://arxiv.org/pdf/quant-ph/0210020v1" rel="related" type="application/pdf"/>
+    <arxiv:primary_category xmlns:arxiv="http://arxiv.org/schemas/atom" term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CC" scheme="http://arxiv.org/schemas/atom"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/1108.1791v3</id>
+    <updated>2011-08-14T03:41:35Z</updated>
+    <published>2011-08-08T19:59:11Z</published>
+    <title>Why Philosophers Should Care About Computational Complexity</title>
+    <summary>  One might think that, once we know something is computable, how efficiently
+it can be computed is a practical question with little further philosophical
+importance. In this essay, I offer a detailed case that one would be wrong. In
+particular, I argue that computational complexity theory---the field that
+studies the resources (such as time, space, and randomness) needed to solve
+computational problems---leads to new perspectives on the nature of
+mathematical knowledge, the strong AI debate, computationalism, the problem of
+logical omniscience, Hume's problem of induction, Goodman's grue riddle, the
+foundations of quantum mechanics, economic rationality, closed timelike curves,
+and several other topics of philosophical interest. I end by discussing aspects
+of complexity theory itself that could benefit from philosophical analysis.
+</summary>
+    <author>
+      <name>Scott Aaronson</name>
+    </author>
+    <arxiv:comment xmlns:arxiv="http://arxiv.org/schemas/atom">58 pages, to appear in "Computability: G\"odel, Turing, Church, and
+  beyond," MIT Press, 2012. Some minor clarifications and corrections; new
+  references added</arxiv:comment>
+    <link href="http://arxiv.org/abs/1108.1791v3" rel="alternate" type="text/html"/>
+    <link title="pdf" href="http://arxiv.org/pdf/1108.1791v3" rel="related" type="application/pdf"/>
+    <arxiv:primary_category xmlns:arxiv="http://arxiv.org/schemas/atom" term="cs.CC" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CC" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/cs/0001013v3</id>
+    <updated>2000-0
+6-23T20:51:29Z</updated>
+    <published>2000-01-19T17:32:35Z</published>
+    <title>Query Complexity: Worst-Case Quantum Versus Average-Case Classical</title>
+    <summary>  In this note we investigate the relationship between worst-case quantum query
+complexity and average-case classical query complexity. Specifically, we show
+that if a quantum computer can evaluate a total Boolean function f with bounded
+error using T queries in the worst case, then a deterministic classical
+computer can evaluate f using O(T^5) queries in the average case, under a
+uniform distribution of inputs. If f is monotone, we show furthermore that only
+O(T^3) queries are needed. Previously, Beals et al. (1998) showed that if a
+quantum computer can evaluate f with bounded error using T queries in the worst
+case, then a deterministic classical computer can evaluate f using O(T^6)
+queries in the worst case, or O(T^4) if f is monotone. The optimal bound is
+conjectured to be O(T^2), but improving on O(T^6) remains an open problem.
+Relating worst-case quantum complexity to average-case classical complexity may
+suggest new ways to reduce the polynomial gap in the ordinary worst-case versus
+worst-case setting.
+</summary>
+    <author>
+      <name>Scott Aaronson</name>
+    </author>
+    <arxiv:comment xmlns:arxiv="http://arxiv.org/schemas/atom">Withdrawn. The results in the paper only work for a certain subclass
+  of Boolean functions, in which block sensitivity has properties similar to
+  those of ordinary sensitivity. They don't work in general</arxiv:comment>
+    <link href="http://arxiv.org/abs/cs/0001013v3" rel="alternate" type="text/html"/>
+    <link title="pdf" href="http://arxiv.org/pdf/cs/0001013v3" rel="related" type="application/pdf"/>
+    <arxiv:primary_category xmlns:arxiv="http://arxiv.org/schemas/atom" term="cs.CC" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CC" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="F.1.2" scheme="http://arxiv.org/schemas/atom"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/1001.1433v5</id>
+    <updated>2012-10-29T09:50:18Z</updated>
+    <published>2010-01-11T16:30:20Z</published>
+    <title>Relative complexity of random walks in random sceneries</title>
+    <summary>  Relative complexity measures the complexity of a probability preserving
+transformation relative to a factor being a sequence of random variables whose
+exponential growth rate is the relative entropy of the extension. We prove
+distributional limit theorems for the relative complexity of certain zero
+entropy extensions: RWRSs whose associated random walks satisfy the
+\alpha-stable CLT ($1&lt;\alpha\le2$). The results give invariants for relative
+isomorphism of these.
+</summary>
+    <author>
+      <name>Jon Aaronson</name>
+    </author>
+    <arxiv:doi xmlns:arxiv="http://arxiv.org/schemas/atom">10.1214/11-AOP688</arxiv:doi>
+    <link title="doi" href="http://dx.doi.org/10.1214/11-AOP688" rel="related"/>
+    <arxiv:comment xmlns:arxiv="http://arxiv.org/schemas/atom">Published in at http://dx.doi.org/10.1214/11-AOP688 the Annals of
+  Probability (http://www.imstat.org/aop/) by the Institute of Mathematical
+  Statistics (http://www.imstat.org)</arxiv:comment>
+    <arxiv:journal_ref xmlns:arxiv="http://arxiv.org/schemas/atom">Annals of Probability 2012, Vol. 40, No. 6, 2460-2482</arxiv:journal_ref>
+    <link href="http://arxiv.org/abs/1001.1433v5" rel="alternate" type="text/html"/>
+    <link title="pdf" href="http://arxiv.org/pdf/1001.1433v5" rel="related" type="application/pdf"/>
+    <arxiv:primary_category xmlns:arxiv="http://arxiv.org/schemas/atom" term="math.DS" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math.DS" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="math.PR" scheme="http://arxiv.org/schemas/atom"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/quant-ph/0408119v1</id>
+    <updated>2004-08-19T09:05:05Z</updated>
+    <published>2004-08-19T09:05:05Z</published>
+    <title>Quantum Computing and Hidden Variables II: The Complexity of Sampling
+  Histories</title>
+    <summary>  This paper shows that, if we could examine the entire history of a hidden
+variable, then we could efficiently solve problems that are believed to be
+intractable even for quantum computers. In particular, under any
+hidden-variable theory satisfying a reasonable axiom called "indifference to
+the identity," we could solve the Graph Isomorphism and Approximate Shortest
+Vector problems in polynomial time, as well as an oracle problem that is known
+to require quantum exponential time. We could also search an N-item database
+using O(N^{1/3}) queries, as opposed to O(N^{1/2}) queries with Grover's search
+algorithm. On the other hand, the N^{1/3} bound is optimal, meaning that we
+could probably not solve NP-complete problems in polynomial time. We thus
+obtain the first good example of a model of computation that appears slightly
+more powerful than the quantum computing model.
+</summary>
+    <author>
+      <name>Scott Aaronson</name>
+    </author>
+    <arxiv:comment xmlns:arxiv="http://arxiv.org/schemas/atom">14 pages. Together with Part I (quant-ph/0408035), subsumes the
+  earlier paper quant-ph/0205059. Can be read independently of Part I</arxiv:comment>
+    <link href="http://arxiv.org/abs/quant-ph/0408119v1" rel="alternate" type="text/html"/>
+    <link title="pdf" href="http://arxiv.org/pdf/quant-ph/0408119v1" rel="related" type="application/pdf"/>
+    <arxiv:primary_category xmlns:arxiv="http://arxiv.org/schemas/atom" term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/1011.3245v1</id>
+    <updated>2010-11-14T18:36:44Z</updated>
+    <published>2010-11-14T18:36:44Z</published>
+    <title>The Computational Complexity of Linear Optics</title>
+    <summary>  We give new evidence that quantum computers -- moreover, rudimentary quantum
+computers built entirely out of linear-optical elements -- cannot be
+efficiently simulated by classical computers. In particular, we define a model
+of computation in which identical photons are generated, sent through a
+linear-optical network, then nonadaptively measured to count the number of
+photons in each mode. This model is not known or believed to be universal for
+quantum computation, and indeed, we discuss the prospects for realizing the
+model using current technology. On the other hand, we prove that the model is
+able to solve sampling problems and search problems that are classically
+intractable under plausible assumptions. Our first result says that, if there
+exists a polynomial-time classical algorithm that samples from the same
+probability distribution as a linear-optical network, then P^#P=BPP^NP, and
+hence the polynomial hierarchy collapses to the third level. Unfortunately,
+this result assumes an extremely accurate simulation. Our main result suggests
+that even an approximate or noisy classical simulation would already imply a
+collapse of the polynomial hierarchy. For this, we need two unproven
+conjectures: the "Permanent-of-Gaussians Conjecture", which says that it is
+#P-hard to approximate the permanent of a matrix A of independent N(0,1)
+Gaussian entries, with high probability over A; and the "Permanent
+Anti-Concentration Conjecture", which says that |Per(A)|&gt;=sqrt(n!)/poly(n) with
+high probability over A. We present evidence for these conjectures, both of
+which seem interesting even apart from our application. This paper does not
+assume knowledge of quantum optics. Indeed, part of its goal is to develop the
+beautiful theory of noninteracting bosons underlying our model, and its
+connection to the permanent function, in a self-contained way accessible to
+theoretical computer scientists.
+</summary>
+    <author>
+      <name>Scott Aaronson</name>
+    </author>
+    <author>
+      <name>Alex Arkhipov</name>
+    </author>
+    <arxiv:comment xmlns:arxiv="http://arxiv.org/schemas/atom">94 pages, 4 figures</arxiv:comment>
+    <link href="http://arxiv.org/abs/1011.3245v1" rel="alternate" type="text/html"/>
+    <link title="pdf" href="http://arxiv.org/pdf/1011.3245v1" rel="related" type="application/pdf"/>
+    <arxiv:primary_category xmlns:arxiv="http://arxiv.org/schemas/atom" term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CC" scheme="http://arxiv.org/schemas/atom"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/0902.3175v2</id>
+    <updated>2009-02-21T17:45:49Z</updated>
+    <published>2009-02-18T15:57:37Z</published>
+    <title>The One-Way Communication Complexity of Group Membership</title>
+    <summary>  This paper studies the one-way communication complexity of the subgroup
+membership problem, a classical problem closely related to basic questions in
+quantum computing. Here Alice receives, as input, a subgroup $H$ of a finite
+group $G$; Bob receives an element $x \in G$. Alice is permitted to send a
+single message to Bob, after which he must decide if his input $x$ is an
+element of $H$. We prove the following upper bounds on the classical
+communication complexity of this problem in the bounded-error setting: (1) The
+problem can be solved with $O(\log |G|)$ communication, provided the subgroup
+$H$ is normal; (2) The problem can be solved with $O(d_{\max} \cdot \log |G|)$
+communication, where $d_{\max}$ is the maximum of the dimensions of the
+irreducible complex representations of $G$; (3) For any prime $p$ not dividing
+$|G|$, the problem can be solved with $O(d_{\max} \cdot \log p)$ communication,
+where $d_{\max}$ is the maximum of the dimensions of the irreducible
+$\F_p$-representations of $G$.
+</summary>
+    <author>
+      <name>Scott Aaronson</name>
+    </author>
+    <author>
+      <name>Fra
+nÃ§ois Le Gall</name>
+    </author>
+    <author>
+      <name>Alexander Russell</name>
+    </author>
+    <author>
+      <name>Seiichiro Tani</name>
+    </author>
+    <link href="http://arxiv.org/abs/0902.3175v2" rel="alternate" type="text/html"/>
+    <link title="pdf" href="http://arxiv.org/pdf/0902.3175v2" rel="related" type="application/pdf"/>
+    <arxiv:primary_category xmlns:arxiv="http://arxiv.org/schemas/atom" term="cs.CC" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CC" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="quant-ph" scheme="http://arxiv.org/schemas/atom"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/1405.6903v1</id>
+    <updated>2014-05-27T13:21:57Z</updated>
+    <published>2014-05-27T13:21:57Z</published>
+    <title>Quantifying the Rise and Fall of Complexity in Closed Systems: The
+  Coffee Automaton</title>
+    <summary>  In contrast to entropy, which increases monotonically, the "complexity" or
+"interestingness" of closed systems seems intuitively to increase at first and
+then decrease as equilibrium is approached. For example, our universe lacked
+complex structures at the Big Bang and will also lack them after black holes
+evaporate and particles are dispersed. This paper makes an initial attempt to
+quantify this pattern. As a model system, we use a simple, two-dimensional
+cellular automaton that simulates the mixing of two liquids ("coffee" and
+"cream"). A plausible complexity measure is then the Kolmogorov complexity of a
+coarse-grained approximation of the automaton's state, which we dub the
+"apparent complexity." We study this complexity measure, and show analytically
+that it never becomes large when the liquid particles are non-interacting. By
+contrast, when the particles do interact, we give numerical evidence that the
+complexity reaches a maximum comparable to the "coffee cup's" horizontal
+dimension. We raise the problem of proving this behavior analytically.
+</summary>
+    <author>
+      <name>Scott Aaronson</name>
+    </author>
+    <author>
+      <name>Sean M. Carroll</name>
+    </author>
+    <author>
+      <name>Lauren Ouellette</name>
+    </author>
+    <arxiv:comment xmlns:arxiv="http://arxiv.org/schemas/atom">22 pages, lots of figures</arxiv:comment>
+    <link href="http://arxiv.org/abs/1405.6903v1" rel="alternate" type="text/html"/>
+    <link title="pdf" href="http://arxiv.org/pdf/1405.6903v1" rel="related" type="application/pdf"/>
+    <arxiv:primary_category xmlns:arxiv="http://arxiv.org/schemas/atom" term="cond-mat.stat-mech" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cond-mat.stat-mech" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="gr-qc" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="nlin.CG" scheme="http://arxiv.org/schemas/atom"/>
+  </entry>
+</feed>
+
