@@ -51,5 +51,6 @@ clean:
 	rm -f test/smoke/query1
 	rm -f test/smoke/arx
 	rm -f test/smoke/result1
+	rm -f tmp/*.pdf
 
 build: $(tests) $(SUBSRC)
