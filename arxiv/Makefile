@@ -16,7 +16,7 @@ INC  = -i./src -i$(SUTDIR) -itest/suite
 
 smoke:	$(SMOKEDIR)/query1 \
 	$(SMOKEDIR)/result1 \
-	$(SMOKEDIR)/arx
+	$(SMOKEDIR)/arxiv
 
 $(SMOKEDIR)/op:	$(SMOKEDIR)/op.hs $(SUBSRC)
 		$(GHC) $(FLGS) $(INC) $@
@@ -26,7 +26,7 @@ suite:	$(TDIR)/tstArxiv
 $(TDIR)/tstArxiv:	$(TDIR)/tstArxiv.hs $(SUBSRC)
 			$(GHC) $(FLGS) $(INC) $@
 
-$(SMOKEDIR)/arx:	$(SMOKEDIR)/arx.hs $(SUBSRC)
+$(SMOKEDIR)/arxiv:	$(SMOKEDIR)/arxiv.hs $(SUBSRC)
 			$(GHC) $(FLGS) $(INC) $@
 
 $(SMOKEDIR)/query1:	$(SMOKEDIR)/query1.hs $(SUBSRC)
@@ -49,7 +49,7 @@ clean:
 	rm -f test/bin/*.o
 	rm -f test/bin/*.hi
 	rm -f test/smoke/query1
-	rm -f test/smoke/arx
+	rm -f test/smoke/arxiv
 	rm -f test/smoke/result1
 	rm -f tmp/*.pdf
 

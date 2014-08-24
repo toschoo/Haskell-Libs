@@ -8,33 +8,99 @@
 -------------------------------------------------------------------------------
 module Network.Api.Arxiv (
                -- * Request 
+               -- $RequestOv
                baseUrl, apiUrl, apiQuery,
                Field(..), Expression(..),
                (/*/), (/+/), (/-/),
-               Query(..), mkQuery, parseQuery, 
-               exp2str, qry2str, items2str,
+
+               -- * Expression Example
+               -- $ExpExample
+
+               -- * Queries
+               Query(..), nextQuery,
+               parseQuery, preprocess, parseIds,
+               mkQuery, exp2str, items2str, ids2str,
                itemControl,
 
                -- * Response
-               Author(..), Link(..), Category(..),
+               -- $ResponseOv
                totalResults, startIndex, itemsPerPage,
                getEntry, forEachEntry, forEachEntryM, forEachEntryM_,
-               getId, getUpdated, getPublished, getYear,
+               checkForError,
+               getId, getIdUrl, getUpdated, getPublished, getYear,
                getTitle, getSummary,
                getComment, getJournal, getDoi,
+               Link(..), 
                getLinks, getPdfLink, getPdf,
+               Category(..),
                getCategories, getPrimaryCategory,
-               getAuthors, getAuthorNames)
+               Author(..), 
+               getAuthors, getAuthorNames
+
+               -- * A complete Example using http-conduit
+               -- $CompleteExample
+               )
 where
 
-  import Text.HTML.TagSoup
-  import Text.Parsec
-  import Data.Char (isDigit)
-  import Data.Maybe (fromMaybe)
-  import Data.List  (find, intercalate)
-  import Control.Applicative ((<$>))
-  import Control.Monad (void)
-  import Debug.Trace (trace)
+  import           Text.HTML.TagSoup
+  import           Text.Parsec
+  import           Data.Char (isDigit)
+  import           Data.Maybe (fromMaybe)
+  import           Data.List  (find, intercalate)
+  import qualified Data.List.Split as S 
+  import           Control.Applicative ((<$>))
+  import           Control.Monad (void)
+  
+  ------------------------------------------------------------------------
+  -- import Debug.Trace (trace)
+  ------------------------------------------------------------------------
+
+  {- $ExpExample
+
+     Expressions are intended to ease the construction
+     of well-formed expressions in user code. 
+     A simple example:
+
+     > let au = Exp $ Au ["Knuth"]
+     >     t1 = Exp $ Ti ["The Art of Computer Programming"]
+     >     t2 = Exp $ Ti ["Concrete Mathematics"]
+     >     ex = au /*/ (t1 /+/ t2)
+     >  in ...
+  -}
+
+  {- $RequestOv
+  
+     Requests are URL parameter,
+     either \"search_query\" or \"id_list\".
+     This module provides functions
+     to build and parse these parameters,
+     to create the full request string
+     and to navigate through a multi-page request
+     with a maximum number of items per page.
+    
+     For details of the Arxiv request format,
+     please refer to the Arxiv documentation.
+  -}
+
+  {- $ResponseOv
+     
+     Response processing expects [Tag String] as input (see TagSoup).
+     The result produced by your http library
+     (such as http-conduit) must be converted to [Tag String]
+     before the result is passed to the response functions 
+     defined here (see also the example below).
+
+     The response functions extract information from the tag soup,
+     either in 'String', 'Int' or TagSoup format.
+
+     For details of the Arxiv Feed format, please refer 
+     to the Arxiv documentation.
+  -}
+
+  {- $CompleteExample
+     
+      
+  -}
 
   ------------------------------------------------------------------------ 
   -- | The Arxiv base URL \"arxiv.org\"
@@ -46,14 +112,14 @@ where
   -- | The Arxiv API URL \"export.arxiv.org/api\"
   ------------------------------------------------------------------------ 
   apiUrl :: String
-  apiUrl =  "http://export.arxiv.org/api/"
+  apiUrl =  "http://export.arxiv.org/api/query?"
 
   ------------------------------------------------------------------------ 
-  -- | The query string (\"query?search_query=\")
-  --   TODO: id_list!
+  -- | The query string (\"search_query=\" or \"id_list=\")
   ------------------------------------------------------------------------ 
-  apiQuery :: String
-  apiQuery =  "query?search_query="
+  apiQuery,apiIdList :: String
+  apiQuery  = "search_query="
+  apiIdList = "id_list=" 
 
   ------------------------------------------------------------------------ 
   -- | Field data type;
@@ -186,12 +252,27 @@ where
   innerExp2str (Exp f)   = exp2str (Exp f)
   innerExp2str e         = "%28" ++ exp2str e ++ "%29"
 
+  type Identifier = String
+
   ------------------------------------------------------------------------
-  -- | Query data type
+  -- | Query data type.
+  --
+  --   You usually want to create a query like:
+  --
+  --   > let e = (Exp $ Au ["Aaronson"]) /*/ (
+  --   >           (Exp $ Ti ["quantum"]) /+/
+  --   >           (Exp $ Ti ["complexity"]))
+  --   >  in Query {
+  --   >        qExp   = Just e,
+  --   >        qIds   = ["0902.3175v2","1406.2858v1","0912.3825v1"],
+  --   >        qStart = 0,
+  --   >        qItems = 10}
   ------------------------------------------------------------------------
   data Query = Query {
                  -- | The query expression
-                 qExp   :: Expression,
+                 qExp   :: Maybe Expression,
+                 -- | Id List
+                 qIds :: [Identifier],
                  -- | The first item we want to see
                  qStart :: Int,
                  -- | The number of items we want to see
@@ -199,18 +280,86 @@ where
     deriving (Eq, Show)
 
   -------------------------------------------------------------------------
-  -- | Converts the query including item control to string
+  -- | Creates the next query by adding items per page to start index.
   -------------------------------------------------------------------------
-  qry2str :: Query -> String
-  qry2str q = exp2str (qExp q) ++ items2str q
+  nextQuery :: Query -> Query
+  nextQuery q = let s = qStart q
+                    i = qItems q
+                 in q{qStart = s + i} 
 
   -------------------------------------------------------------------------
-  -- | Converts the query including url, query expression and item control
+  -- | Parses an expression from a string
+  -------------------------------------------------------------------------
+  parseQuery :: String -> Either String Expression
+  parseQuery s = case parse expression "" $ preprocess s of
+                   Left  e -> Left $ show e
+                   Right e -> Right e
+
+  -------------------------------------------------------------------------
+  -- | Converts a string containing comma-separated identifiers 
+  --   into a list of 'Identifier's 
+  -------------------------------------------------------------------------
+  parseIds :: String -> [Identifier]
+  parseIds = S.endBy "," 
+
+  -------------------------------------------------------------------------
+  -- | This is an internal function used by 'parseQuery'.
+  --   It may be occasionally useful for direct use:
+  --   It replaces \" \", \"(\", \")\" and \"\"\" 
+  --   with \"+\", \"%28\", \"%29\" and \"%22\"
+  --   respectively.
+  --
+  --   Usually, these substitutions are performed
+  --   when transforming a string to an URL, which should be done
+  --   by your http library anyway (e.g. http-conduit).
+  --   But this step is usually after parsing has been performed
+  --   on the input string. (Considering a work flow like:
+  --   parseQuery >>= mkQuery >>= parseUrl >>= execQuery.)
+  --   The parser, however, accepts
+  --   only the URL-encoded characters and, thus, some preprocessing
+  --   may be necessary.
+  --   The other way round, this means 
+  --   that you may use parentheses, spaces and quotation marks
+  --   instead of the URL encodings.
+  -------------------------------------------------------------------------
+  preprocess :: String -> String
+  preprocess = concatMap s2s . map tos
+    where s2s "("  = "%28"
+          s2s ")"  = "%29"
+          s2s "\"" = "%22"
+          s2s " "  = "+"
+          s2s c    = c
+          tos c    = [c]
+
+  -------------------------------------------------------------------------
+  -- | Generates the complete query string 
+  --   including URL, 
+  --             query expression,
+  --             id list and 
+  --             item control
   -------------------------------------------------------------------------
   mkQuery :: Query -> String
-  mkQuery q   = apiUrl ++ apiQuery ++ x ++ itm
-    where x   = qry2str   q
+  mkQuery q   = apiUrl ++ qry ++ x ++ plus ++ apiIdList ++ is ++ itm
+    where x   = case qExp q of
+                  Nothing -> ""
+                  Just e  -> exp2str e
+          plus = case qExp q of
+                   Nothing -> ""
+                   Just _  -> "&"  
+          qry = case qExp q of
+                  Nothing -> ""
+                  Just _  -> apiQuery
+          is  = ids2str $ qIds q
           itm = items2str q
+
+  -------------------------------------------------------------------------
+  -- | Converts a list of 'Identifier' 
+  --   to a string with comma-separated identifiers
+  -------------------------------------------------------------------------
+  ids2str :: [Identifier] -> String
+  ids2str = foldr i2s "" 
+    where i2s i [] = i 
+          i2s i s  = i ++ "," ++ s
 
   -------------------------------------------------------------------------
   -- | Converts the query to a string containing only the item control
@@ -220,93 +369,243 @@ where
 
   -------------------------------------------------------------------------
   -- | Generates the item control of a query string according
-  --   to first item and number of items
+  --   to first item and results per page:
+  --
+  --   * 'Int': Start index for this page
+  --   
+  --   * 'Int': Number of results per page.
   -------------------------------------------------------------------------
   itemControl :: Int -> Int -> String
-  itemControl s m = "&amp;start="      ++ show s ++
-                    "&amp;maxResults=" ++ show m
+  itemControl s m = "&amp;start="       ++ show s ++
+                    "&amp;max_results=" ++ show m
 
-  -------------------------------------------------------------------------
-  -- | Parses an expression from a string
-  --   (without item control)
-  -------------------------------------------------------------------------
-  parseQuery :: String -> Either String Expression
-  parseQuery s = case parse expression "" s of
-                   Left  e -> Left $ show e
-                   Right e -> Right e
-
-  -------------------------------------------------------------------------
+  -- ======================================================================
   -- result
-  -------------------------------------------------------------------------
-  data Author = Author {
-                  auName :: String,
-                  auFil  :: String}
-    deriving (Show, Eq)
+  -- ======================================================================
 
-  data Link = Link {
-                lnkHref  :: String,
-                lnkType  :: String, -- could be Mime
-                lnkTitle :: String,
-                lnkRel   :: String}
-    deriving (Show, Eq)
-
-  data Category = Category {
-                    catTerm   :: String,
-                    catScheme :: String}
-    deriving (Show, Eq)
-
+  ------------------------------------------------------------------------
+  -- | Total results of the query
+  ------------------------------------------------------------------------
   totalResults :: [Tag String] -> Int
   totalResults = getN "opensearch:totalResults" 
 
+  ------------------------------------------------------------------------
+  -- | Start index of this page of results
+  ------------------------------------------------------------------------
   startIndex :: [Tag String] -> Int
   startIndex = getN "opensearch:startIndex"
 
+  ------------------------------------------------------------------------
+  -- | Number of items per page
+  ------------------------------------------------------------------------
   itemsPerPage :: [Tag String] -> Int
   itemsPerPage = getN "opensearch:itemsPerPage"
 
+  ------------------------------------------------------------------------
+  -- | Checks if the feed contains an error message, i.e.
+  --
+  --   * it has only one entry,
+  --
+  --   * the title of this entry is \"Error\" and
+  --
+  --   * its id field contains an error message,
+  --         which is returned as 'Left'.
+  --
+  --   Apparently, this function is not necessary,
+  --   since the Arxiv site returns error feeds
+  --   with status code 400 ("bad request"), 
+  --   which should be handled by your http library anyway.
+  ------------------------------------------------------------------------
+  checkForError :: [Tag String] -> Either String ()
+  checkForError ts = case totalResults ts of
+                       1 -> head $ forEachEntry ts $ \e ->
+                              if getTitle e == "Error"
+                                then Left $ getError e
+                                else Right ()
+                       _ -> Right ()
+                    
+
+  ------------------------------------------------------------------------
+  -- | Get the first entry in the tag soup.
+  --   The function returns a tuple of
+  --
+  --   * The entry (if any)
+  --
+  --   * The rest of the tag soup following the first entry.
+  --
+  --   With getEntry, we can build a loop through all entries
+  --   in the result (which is actually implemented in 'forEachEntry').
+  ------------------------------------------------------------------------
   getEntry :: [Tag String] -> ([Tag String],[Tag String])
   getEntry = element "entry"
 
+  ------------------------------------------------------------------------
+  -- | Loop through all entries in the result feed
+  --   applying a function on each one.
+  --   The results are returned as list.
+  --   The function is similar to 'map' 
+  --   with the arguments swapped (as in Foldable 'forM').
+  --
+  --   Arguments:
+  --
+  --   * ['Tag' 'String']: The TagSoup through which we are looping
+  --
+  --   * ['Tag' 'String'] -> r: The function we are applying per entry;
+  --                            The TagSoup passed in to the function
+  --                            represents the current entry.
+  --
+  --   Example:
+  --
+  --   > forEachEntry soup $ \e ->
+  --   >   let y = case getYear e of
+  --   >             "" -> "s.a."
+  --   >             x  -> x
+  --   >       a = case getAuthors e of
+  --   >             [] -> "Anonymous"
+  --   >             as -> head as ++ 
+  --   >    in a ++ " (" ++ y ++ ")"
+  --
+  --   Would retrieve the name of the first author 
+  --   and the year of publication (like "Aaronson (2013)") 
+  --   from all entries.
+  ------------------------------------------------------------------------
   forEachEntry :: [Tag String] -> ([Tag String] -> r) -> [r]
   forEachEntry = forEach "entry"
 
+  ------------------------------------------------------------------------
+  -- | Variant of 'forEachEntry' for monadic actions.
+  ------------------------------------------------------------------------
   forEachEntryM :: Monad m =>
                    [Tag String] -> ([Tag String] -> m r) -> m [r]
   forEachEntryM = forEachM "entry"
                    
+  ------------------------------------------------------------------------
+  -- | Variant of 'forEachEntryM' for actions 
+  --   that do not return a result.
+  ------------------------------------------------------------------------
   forEachEntryM_ :: Monad m =>
                     [Tag String] -> ([Tag String] -> m ()) -> m ()
   forEachEntryM_ = forEachM_ "entry"
 
-  getId :: [Tag String] -> String
-  getId = getString "id"
+  ------------------------------------------------------------------------
+  -- | Gets the full contents of the id field 
+  --   (which contains an URL before the article identifier).
+  --   Expects an entry.
+  ------------------------------------------------------------------------
+  getIdUrl :: [Tag String] -> String
+  getIdUrl = getString "id"
 
+  ------------------------------------------------------------------------
+  -- | Gets the article identifier as it can be used
+  --   in an \"id_list\" query, i.e. without the URL.
+  --   Expects an entry.
+  ------------------------------------------------------------------------
+  getId :: [Tag String] -> String
+  getId = pureId . getString "id"
+
+  ------------------------------------------------------------------------
+  -- Extract the pure article identifier from the id string
+  ------------------------------------------------------------------------
+  pureId :: String -> String
+  pureId s = let i = toSlash 2 (reverse s) 
+                 z = drop 6 i
+              in case z of
+                   ""    -> reverse i
+                   '.':_ -> reverse $ toSlash 1 i
+                   _     -> reverse i
+    where toSlash :: Int -> String -> String
+          toSlash i m = let x = takeWhile (/= '/') m
+                         in if i == 1 then x 
+                            else x ++ ('/' :
+                                 toSlash (i-1) (drop (length x + 1) m))
+
+  ------------------------------------------------------------------------
+  -- Get the error message
+  ------------------------------------------------------------------------
+  getError :: [Tag String] -> String
+  getError = pureError . getString "id"
+
+  ------------------------------------------------------------------------
+  -- Extract the pure error message from the id string
+  ------------------------------------------------------------------------
+  pureError :: String -> String
+  pureError = drop 1 . dropWhile (/= '#')
+
+  ------------------------------------------------------------------------
+  -- | Gets the contents of the \"update\" field in this entry, i.e.
+  --   the date when the article was last updated.
+  ------------------------------------------------------------------------
   getUpdated :: [Tag String] -> String
   getUpdated = getString "updated"
 
+  ------------------------------------------------------------------------
+  -- | Gets the contents of the \"published\" field in this entry, i.e.
+  --   the date when the article was last uploaded.
+  ------------------------------------------------------------------------
   getPublished :: [Tag String] -> String
   getPublished = getString "published"
 
+  ------------------------------------------------------------------------
+  -- | Gets the year of the \"published\" field in this entry.
+  ------------------------------------------------------------------------
   getYear :: [Tag String] -> String
   getYear sp = case getPublished sp of
                  "" -> "s.a."
                  s  -> takeWhile (/= '-') s
 
+  ------------------------------------------------------------------------
+  -- | Gets the title of this entry.
+  ------------------------------------------------------------------------
   getTitle :: [Tag String] -> String
   getTitle = getString "title"
 
+  ------------------------------------------------------------------------
+  -- | Gets the summary of this entry.
+  ------------------------------------------------------------------------
   getSummary :: [Tag String] -> String
   getSummary = getString "summary"
 
+  ------------------------------------------------------------------------
+  -- | Gets author''s comment (in \"arxiv:comment\") of this entry.
+  ------------------------------------------------------------------------
   getComment :: [Tag String] -> String
   getComment = getString "arxiv:comment"
 
+  ------------------------------------------------------------------------
+  -- | Gets the journal information (in \"arxiv:journal_ref\")
+  --   of this entry.
+  ------------------------------------------------------------------------
   getJournal :: [Tag String] -> String
   getJournal = getString "arxiv:journal_ref"
 
+  ------------------------------------------------------------------------
+  -- | Gets the digital object identifier (in \"arxiv:doi\") 
+  --   of this entry.
+  ------------------------------------------------------------------------
   getDoi :: [Tag String] -> String
   getDoi = getString "arxiv:doi"
 
+  ------------------------------------------------------------------------
+  -- | The Link data type
+  ------------------------------------------------------------------------
+  data Link = Link {
+                -- | The hyperlink
+                lnkHref  :: String,
+                -- | The link type (a MIME type)
+                lnkType  :: String, 
+                -- | The link title (e.g. \"pdf\" would be the link
+                --                        where we find the article 
+                --                        in PDF format)
+                lnkTitle :: String,
+                -- | the link relation (e.g. \"related\" would point
+                --                           to the related information,
+                --                           such as the pdf document)
+                lnkRel   :: String}
+    deriving (Show, Eq)
+
+  ------------------------------------------------------------------------
+  -- | Gets all links in the entry.
+  ------------------------------------------------------------------------
   getLinks :: [Tag String] -> [Link]
   getLinks soup = case element "link" soup of
                     ([],_)     -> []
@@ -318,32 +617,70 @@ where
                        lnkRel   = fromMaybe "" $ getAt "rel"   l,
                        lnkType  = fromMaybe "" $ getAt "type"  l}
 
+  ------------------------------------------------------------------------
+  -- | Gets the pdf link only of this entry (if any).
+  ------------------------------------------------------------------------
   getPdfLink :: [Tag String] -> Maybe Link
   getPdfLink soup = case getLinks soup of
                       [] -> Nothing
                       ls -> find (\l -> lnkTitle l == "pdf") ls
 
+  ------------------------------------------------------------------------
+  -- | Gets the hyperlink to the pdf document of this entry (if any).
+  ------------------------------------------------------------------------
   getPdf :: [Tag String] -> String
   getPdf soup = case getPdfLink soup of
                   Nothing -> ""
                   Just l  -> lnkHref l
 
+  ------------------------------------------------------------------------
+  -- | Category data type
+  ------------------------------------------------------------------------
+  data Category = Category {
+                    -- | The category term (e.g. \"math-ph\")
+                    catTerm   :: String,
+                    -- | The category scheme
+                    catScheme :: String}
+    deriving (Show, Eq)
+
+  ------------------------------------------------------------------------
+  -- Make category from TagSoup
+  ------------------------------------------------------------------------
+  mkCat :: Tag String -> Category
+  mkCat c = Category {
+              catTerm   = fromMaybe "" $ getAt "term"   c,
+              catScheme = fromMaybe "" $ getAt "scheme" c}
+
+  ------------------------------------------------------------------------
+  -- | Gets the categories of this entry.
+  ------------------------------------------------------------------------
   getCategories :: [Tag String] -> [Category]
   getCategories soup = case element "category" soup of
                          ([],_)   -> []
                          (x:_,[]) -> [mkCat x]
                          (x:_,rs) -> mkCat x : getCategories rs
 
+  ------------------------------------------------------------------------
+  -- | Gets the primary category of this entry (if any).
+  ------------------------------------------------------------------------
   getPrimaryCategory :: [Tag String] -> Maybe Category
   getPrimaryCategory soup = case element "arxiv:primary_category" soup of
                               ([],_)  -> Nothing
                               (x:_,_) -> Just (mkCat x)
 
-  mkCat :: Tag String -> Category
-  mkCat c = Category {
-              catTerm   = fromMaybe "" $ getAt "term"   c,
-              catScheme = fromMaybe "" $ getAt "scheme" c}
+  ------------------------------------------------------------------------
+  -- | The Author data type
+  ------------------------------------------------------------------------
+  data Author = Author {
+                  -- | Author name
+                  auName :: String,
+                  -- | Author Affiliation
+                  auFil  :: String}
+    deriving (Show, Eq)
 
+  ------------------------------------------------------------------------
+  -- | Gets the authors of this entry.
+  ------------------------------------------------------------------------
   getAuthors :: [Tag String] -> [Author]
   getAuthors soup = case element "author" soup of
                       ([],_)     -> []
@@ -358,6 +695,9 @@ where
                            auName = nm,
                            auFil  = fl}
 
+  ------------------------------------------------------------------------
+  -- | Gets the names of all authors of this entry.
+  ------------------------------------------------------------------------
   getAuthorNames :: [Tag String] -> [String]
   getAuthorNames = go 
     where go s = case element "author" s of
@@ -365,31 +705,51 @@ where
                    (a,[])  -> [getString "name" a]
                    (a,r)   ->  getString "name" a : go r
 
+  ------------------------------------------------------------------------
+  -- Lookup attribute by name
+  ------------------------------------------------------------------------
   getAt :: String -> Tag String -> Maybe String
   getAt a (TagOpen _ as) = lookup a as 
   getAt _ _              = Nothing
 
+  ------------------------------------------------------------------------
+  -- Find a 'TagText' and return the content
+  ------------------------------------------------------------------------
   getString :: String -> [Tag String] -> String
   getString n soup = let (i,_) = element n soup 
                       in if null i then "" else findTxt i
 
+  ------------------------------------------------------------------------
+  -- Find a 'TagText' and return the contentas a 'Int'.
+  -- If the tag is not found or the content is not a number,
+  -- -1 is returned.
+  ------------------------------------------------------------------------
   getN :: String -> [Tag String] -> Int
   getN key soup = case element key soup of
                     (k,_) -> case findTxt k of
                                "" -> -1
                                t  -> if all isDigit t then read t else -1
 
+  ------------------------------------------------------------------------
+  -- Get the content of a 'TagText'
+  ------------------------------------------------------------------------
   findTxt :: [Tag String] -> String
   findTxt [] = ""
   findTxt (t:ts) = case t of
                      TagText x -> x
                      _         -> findTxt ts
 
+  ------------------------------------------------------------------------
+  -- Map a function to all occurences of an element in the soup
+  ------------------------------------------------------------------------
   forEach :: String -> [Tag String] -> ([Tag String] -> r) -> [r]
   forEach nm soup f = case element nm soup of
                         ([],_) -> []
                         (e,rs) -> f e : forEach nm rs f
 
+  ------------------------------------------------------------------------
+  -- Variant of forEach for monadic actions
+  ------------------------------------------------------------------------
   forEachM :: Monad m => 
               String  -> [Tag String] -> ([Tag String] -> m r) -> m [r]
   forEachM nm soup f = case element nm soup of
@@ -398,12 +758,20 @@ where
                                       rr <- forEachM nm rs f
                                       return (r:rr)
 
+  ------------------------------------------------------------------------
+  -- Variant of forEachM for actions that do not return anything
+  ------------------------------------------------------------------------
   forEachM_ :: Monad m => 
                String  -> [Tag String] -> ([Tag String] -> m ()) -> m ()
   forEachM_ nm soup f = case element nm soup of
                           ([],_) -> return ()
                           (e,rs) -> f e >> forEachM_ nm rs f 
 
+  ------------------------------------------------------------------------
+  -- Find occurrence of an element and
+  -- return this element (open tag to close tag) and
+  --        the rest of the soup behind the element.
+  ------------------------------------------------------------------------
   element :: String -> [Tag String] -> ([Tag String], [Tag String])
   element _  []     = ([],[])
   element nm (t:ts) | isTagOpenName nm t = let (r,rs) = closeEl 0 ts
@@ -420,12 +788,21 @@ where
                       | otherwise          = let (r,rs) = closeEl i     xs 
                                               in (x:r,rs)
 
-  -- Parser --------------------------------------------------------------
+  ------------------------------------------------------------------------
+  -- Expression Parser
+  ------------------------------------------------------------------------
   type Parser a = Parsec String () a
 
+  ------------------------------------------------------------------------
+  -- Expression is something in parentheses or something
+  --            that starts with a field
+  ------------------------------------------------------------------------
   expression :: Parser Expression
   expression = try parentheses <|> fieldOperator
 
+  ------------------------------------------------------------------------
+  -- A field potentially followed by an operator
+  ------------------------------------------------------------------------
   fieldOperator :: Parser Expression
   fieldOperator = do
     f <- field
@@ -433,6 +810,9 @@ where
     if c == ' ' then return   f
                 else opAndArg f
  
+  ------------------------------------------------------------------------
+  -- Find an operator and an expression
+  ------------------------------------------------------------------------
   opAndArg :: Expression -> Parser Expression
   opAndArg f = do
     o <- op
@@ -440,12 +820,18 @@ where
     e <- expression
     return (o f e)
 
+  ------------------------------------------------------------------------
+  -- A field consists of a fieldId and a list of terms
+  ------------------------------------------------------------------------
   field :: Parser Expression
   field = do 
     i  <- fieldId 
     ts <- terms
     return (Exp $ i ts)
      
+  ------------------------------------------------------------------------
+  -- The field ids
+  ------------------------------------------------------------------------
   fieldId :: Parser ([Term] -> Field)
   fieldId =   try (void (string "au:" ) >> return Au)
           <|> try (void (string "ti:" ) >> return Ti)
@@ -457,6 +843,11 @@ where
           <|> try (void (string "id:" ) >> return Id)
           <|>     (void (string "all:") >> return All)
 
+  ------------------------------------------------------------------------
+  -- A term may be quoted,
+  -- otherwise we build terms as list of strings
+  -- separated by '+'
+  ------------------------------------------------------------------------
   terms :: Parser [String]
   terms = do
     t <- try quoted <|> term
@@ -468,12 +859,18 @@ where
                      else void (char c) >> (t:) <$> terms
       _   -> fail $ "unexpected symbol: '" ++ [c] ++ "'"
 
+  ------------------------------------------------------------------------
+  -- Checks if an operator follows without consuming input
+  ------------------------------------------------------------------------
   isOp :: Parser Bool
   isOp =     try (void (lookAhead (string "+ANDNOT+")) >> return True)
          <|> try (void (lookAhead (string "+AND+"))    >> return True)
          <|> try (void (lookAhead (string "+OR+"))     >> return True)
          <|> return False
 
+  ------------------------------------------------------------------------
+  -- A quoted term
+  ------------------------------------------------------------------------
   quoted :: Parser String
   quoted = do
     void $ string "%22"
@@ -482,11 +879,14 @@ where
             t <- term
             s <- try (string "%22") <|> return ""
             if not (null s) then return [t] 
-                            else do c <- anyChar -- void (char '+') -- could be '%' as well
+                            else do c <- anyChar 
                                     let t' = if c == '+' then t 
                                                          else t ++ [c]
                                     (t':) <$> go
     
+  ------------------------------------------------------------------------
+  -- A single term 
+  ------------------------------------------------------------------------
   term :: Parser String
   term = do 
     c <- try (lookAhead anyChar) <|> onEof '%'
@@ -494,10 +894,17 @@ where
       then return ""
       else do x <- char c
               (x:) <$> term
-
+  
+  ------------------------------------------------------------------------
+  -- Signal EOF by returning the specified char
+  ------------------------------------------------------------------------
   onEof :: Char -> Parser Char
   onEof c = eof >> return c
 
+  ------------------------------------------------------------------------
+  -- An expression in parentheses,
+  -- which may be followed by another expression
+  ------------------------------------------------------------------------
   parentheses :: Parser Expression
   parentheses = do
     void $ string "%28"
@@ -508,9 +915,12 @@ where
       '+' -> opAndArg e
       _   -> return   e
 
+  ------------------------------------------------------------------------
+  -- Parse operator (note that it is essential to 
+  -- to process "ANDNOT" before "AND"!
+  ------------------------------------------------------------------------
   op :: Parser (Expression -> Expression -> Expression)
   op =       try (void (string "ANDNOT") >> return AndNot) 
          <|> try (void (string "OR")     >> return Or) 
          <|>     (void (string "AND")    >> return And)
-      
 

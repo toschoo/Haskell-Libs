@@ -18,6 +18,7 @@ Description:
 Library
   Build-Depends:   base        >= 4.0 && <= 5.0,
                    parsec      >= 3.1.5,
+                   split       >= 0.2.2,
                    tagsoup     >= 0.13
 
   hs-source-dirs: src, .

@@ -26,6 +26,8 @@ where
   import           System.FilePath.Posix
   import           System.Directory
 
+  import           Debug.Trace (trace)
+
   usage :: a
   usage = error "I need a query!"
 
@@ -34,15 +36,17 @@ where
     os <- getArgs
     case os of
       [] -> usage
-      q  -> execCommand q -- execQuery $ makeQuery q
+      q  -> execCommand q 
 
-  makeQuery :: String -> Query
-  makeQuery s = case Ax.parseQuery s of
-                  Left  e -> error e
-                  Right x -> Query {
-                               qExp   = x,
-                               qStart = 0,
-                               qItems = 25}
+  makeQuery :: String -> String -> Query
+  makeQuery "" i = Query Nothing (Ax.parseIds i) 0 25
+  makeQuery q  i = case Ax.parseQuery q of
+                     Left  e -> error e
+                     Right x -> Query {
+                                  qExp   = Just x,
+                                  qIds   = Ax.parseIds i,
+                                  qStart = 0,
+                                  qItems = 25}
 
   type Soup = Tag String
 
@@ -56,11 +60,9 @@ where
   execCountQuery :: Query -> IO ()
   execCountQuery q = withManager $ \m -> countEntries m q $$ countC =$ outSnk
 
-  -- (\m -> searchAxv m (Query (Exp (Au ["Knuth"])) 0 25)  $$ pdfUrl =$ savePdf m "tmp")
-
   execCommand :: [String] -> IO ()
   execCommand []              = usage
-  execCommand [x]             = usage
+  execCommand [_]             = usage
   execCommand ("count":xs)    = execCount xs
   execCommand ("get":xs)      = execGetSearch xs
   execCommand ("info":xs)     = execInfoSearch showResults  xs
@@ -70,36 +72,51 @@ where
 
   execGetSearch :: [String] -> IO ()
   execGetSearch []  = usage
-  execGetSearch [x] = usage
+  execGetSearch [_] = usage
   execGetSearch ("query":xs) = 
-    let q  = makeQuery $ head xs
+    let q  = makeQuery (head xs) ""
         d' = makeDir   $ tail xs
         d  = if null d' then "." else d'
      in do t <- doesDirectoryExist d
            if not t then error $ d ++ " is not a directory or does not exist."
                     else execGetQuery q d
-  execGetSearch ("ids":xs) = undefined
-  execGetSearch (x:xs) = error $ "Unknown identifier " ++ x
+  execGetSearch ("ids":xs) = 
+    let qs = getFilterQuery $ tail xs
+        q  = makeQuery qs   $ head xs
+        d' = if null qs then makeDir $ tail xs
+                        else makeDir $ drop 2 xs
+        d  = if null d' then "." else d'
+     in do t <- doesDirectoryExist d
+           if not t then error $ d ++ " is not a directory or does not exist."
+                    else execGetQuery q d
+  execGetSearch (x:_) = error $ "Unknown identifier " ++ x
+
+  getFilterQuery :: [String] -> String
+  getFilterQuery ("filter":[]) = error "Missing filter!"
+  getFilterQuery ("filter":xs) = head xs
+  getFilterQuery _             = ""
 
   execInfoSearch :: C.Conduit [Soup] RIO String -> [String] -> IO ()
   execInfoSearch _ []           = usage
-  execInfoSearch _ [x]          = usage
-  execInfoSearch c ("query":xs) = execInfoQuery c (makeQuery $ head xs) 
-  execInfoSearch c ("ids":xs)   = undefined
+  execInfoSearch _ [_]          = usage
+  execInfoSearch c ("query":xs) = execInfoQuery c $ makeQuery (head xs) ""
+  execInfoSearch c ("ids":xs)   = let qs = getFilterQuery $ tail xs
+                                   in execInfoQuery c $ makeQuery qs (head xs)
   execInfoSearch _ (x:_)        = error $ "Unknown identifier " ++ x
 
   execCount :: [String] -> IO ()
   execCount []           = usage
-  execCount [x]          = usage
-  execCount ("query":xs) = execCountQuery (makeQuery $ head xs)
-  execCount ("ids":xs)   = undefined
+  execCount [_]          = usage
+  execCount ("query":xs) = execCountQuery $ makeQuery (head xs) ""
+  execCount ("ids":xs)   = let qs = getFilterQuery $ tail xs
+                            in execCountQuery $ makeQuery qs (head xs)
   execCount (x:_)        = error $ "Unknown identifier " ++ x
 
   makeDir :: [String] -> String
-  makeDir []        = ""
+  makeDir []        = "."
   makeDir [_]       = usage
   makeDir ("to":xs) = head xs
-  makeDir (x:xs)    = error $ "unknown identifier: " ++ x
+  makeDir (x:_)     = "."
 
   searchEntries :: MonadResource m =>
                    Manager -> Ax.Query -> C.Source m [Soup]
@@ -113,7 +130,7 @@ where
                ([Soup] -> C.Source m [Soup]) ->
                Manager -> Ax.Query -> C.Source m [Soup]
   searchAxv src m q = do
-     rq  <- liftIO (mkRequest $ Ax.mkQuery q)
+     rq  <- {- trace (Ax.mkQuery q) $ -} liftIO (mkRequest $ Ax.mkQuery q)
      rsp <- http rq m -- catch
      case responseStatus rsp of
        (Status 200 _) -> getSoup rsp >>= src -- resultSource m q 
@@ -122,15 +139,19 @@ where
   resultSource :: MonadResource m => 
                   Manager -> Ax.Query -> [Soup] -> C.Source m [Soup]
   resultSource m q sp = 
-    let x = Ax.totalResults sp
-        i = Ax.startIndex   sp
-        e = Ax.itemsPerPage sp
-     in when (x /= 0 && x >= i) $ do
-          Ax.forEachEntryM_ sp C.yield
-          searchEntries m q{Ax.qStart = i + e}
+    case Ax.checkForError sp of
+      Left  r  -> error $ "Error: " ++ r
+      Right () -> let x = Ax.totalResults sp
+                      i = Ax.startIndex   sp
+                      e = Ax.itemsPerPage sp
+                   in when (x /= 0 && x >= i) $ do
+                        Ax.forEachEntryM_ sp C.yield
+                        searchEntries m $ Ax.nextQuery q
 
   blobSource :: MonadResource m => [Soup] -> C.Source m [Soup]
-  blobSource = C.yield 
+  blobSource sp = case Ax.checkForError sp of
+                    Left r   -> error $ "Error: " ++ r
+                    Right () -> C.yield sp
 
   countC :: MonadResource m => C.Conduit [Soup] m String
   countC = C.awaitForever (C.yield . showRes . Ax.totalResults)
@@ -180,7 +201,7 @@ where
   showFormat f = C.awaitForever (C.yield . formatString f)
 
   outSnk :: MonadResource m => C.Sink String m ()
-  outSnk = C.awaitForever (liftIO . putStrLn)
+  outSnk = C.awaitForever (liftIO . putStr)
 
   type RIO = ResourceT IO
 
@@ -197,18 +218,17 @@ where
                     tmp = Ax.getTitle sp
                     ti  = if null tmp then "No title" else tmp
                  in i ++ " - " ++ intercalate ", " aus ++ 
-                    " (" ++ y ++ "): " ++ ti
+                    " (" ++ y ++ "): " ++ ti ++ "\n"
 
   mkAbstract :: [Soup] -> String
   mkAbstract sp = let i   = Ax.getId sp
-                      aus = Ax.getAuthorNames sp
                       a   = mainAuthor sp
                       y   = Ax.getYear sp
                       tmp = take 25 $ Ax.getTitle sp
                       ti  = if null tmp then "No title" else tmp
                       ab  = Ax.getSummary sp
                    in i ++ " - " ++ a ++ 
-                      " (" ++ y ++ "): " ++ ti ++ "\n" ++ ab
+                      " (" ++ y ++ "): " ++ ti ++ "\n" ++ ab ++ "\n"
 
   formatString :: String -> [Soup] -> String
   formatString s sp = go s
@@ -222,6 +242,7 @@ where
                                      drop 3 xs)
                    | "au"   <| xs = (mainAuthor sp, drop 2 xs)
                    | "ti"   <| xs = (Ax.getTitle sp, drop 2 xs)
+                   | "idu"  <| xs = (Ax.getIdUrl sp, drop 3 xs)
                    | "id"   <| xs = (Ax.getId sp, drop 2 xs)
                    | "upd"  <| xs = (Ax.getUpdated sp, drop 3 xs)
                    | "pub"  <| xs = (Ax.getPublished sp, drop 3 xs)
@@ -239,7 +260,7 @@ where
                         0 -> "Anonymous"
                         1 -> head aus
                         _ -> head aus ++ " et. al."
-                   
+
   infix <|
   (<|) :: String -> String -> Bool
   (<|) = isPrefixOf

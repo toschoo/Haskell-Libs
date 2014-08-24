@@ -4,6 +4,7 @@ where
   import Test.QuickCheck
   import Test.QuickCheck.Monadic
   import Data.List ((\\), intercalate)
+  import Data.List.Utils (replace)
   import System.Exit
   import Debug.Trace (trace)
   import Control.Applicative ((<$>))
@@ -164,12 +165,36 @@ where
                     Left  e -> trace e $ False
                     Right x -> exp2str x == q
 
+  prpParse9 :: Bool
+  prpParse9 = let q = "au:Knuth+AND" ++
+                      "+(ti:\"The+Art+of+Computer+Programming\"" ++
+                      "+OR" ++
+                      "+ti:%22Concrete+Mathematics%22)"
+               in case parseQuery q of
+                    Left  e -> trace e $ False
+                    Right x -> exp2str x == preprocess q 
+
   prpParseAny :: Expression -> Bool
   prpParseAny e = let q = exp2str e
                    in case parseQuery q of
                         Left  r -> trace ("\n" ++ r ++ ":\n" ++
                                              show e ++ ":\n" ++ q) False
                         Right x -> exp2str x == q
+
+  preprocessx :: String -> String
+  preprocessx = replace " " "+"   . 
+                replace "(" "%28" . 
+                replace ")" "%29" . 
+                replace "\"" "%22"
+
+  prpPre1 :: Bool
+  prpPre1 = let s = "hello+world" in s == preprocess s
+
+  prpPre2 :: Bool
+  prpPre2 = preprocess "(hello) world" == "%28hello%29+world"
+
+  prpPre3 :: String -> Bool
+  prpPre3 s = preprocess s == preprocessx s
 
   type Soup = Tag String
 
@@ -290,7 +315,11 @@ where
          deepCheck prpParse6    ?>
          deepCheck prpParse7    ?>
          deepCheck prpParse8    ?>
+         deepCheck prpParse9    ?>
          deepCheck prpParseAny  ?>
+         oneCheck  prpPre1      ?>
+         oneCheck  prpPre2      ?>
+         deepCheck prpPre3      ?>
          oneCheck  (prpCountEntries txt)  ?>
          oneCheck  (prpCountEntriesM txt) ?>
          oneCheck  (prpAuthors txt)       ?>
@@ -307,7 +336,7 @@ where
          oneCheck  (prpJournal    txt)    ?>
          oneCheck  (prpDoi        txt)    ?> 
          oneCheck  (prpLinks      txt)    ?> 
-         oneCheck  (prpCategories txt)     
+         oneCheck  (prpCategories txt)    
     case r of
       Success {}-> do
         putStrLn good
