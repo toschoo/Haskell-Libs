@@ -17,7 +17,7 @@ module Network.Api.Arxiv (
                -- $ExpExample
 
                -- * Queries
-               Query(..), nextQuery,
+               Query(..), nextPage, 
                parseQuery, preprocess, parseIds,
                mkQuery, exp2str, items2str, ids2str,
                itemControl,
@@ -26,7 +26,7 @@ module Network.Api.Arxiv (
                -- $ResponseOv
                totalResults, startIndex, itemsPerPage,
                getEntry, forEachEntry, forEachEntryM, forEachEntryM_,
-               checkForError,
+               checkForError, exhausted,
                getId, getIdUrl, getUpdated, getPublished, getYear,
                getTitle, getSummary,
                getComment, getJournal, getDoi,
@@ -98,8 +98,101 @@ where
   -}
 
   {- $CompleteExample
-     
-      
+
+     > module Main
+     > where
+     > 
+     >   import qualified Network.Api.Arxiv as Ax
+     >   import           Network.Api.Arxiv (Expression(..), 
+     >                                       Field(..), (/*/), (/+/))
+     >   import           Network (withSocketsDo)
+     >   import           Network.HTTP.Conduit
+     >   import           Network.HTTP.Types.Status
+     >   import           Data.List (intercalate)
+     >   import qualified Data.ByteString as B hiding (unpack) 
+     >   import qualified Data.ByteString.Char8 as B  (unpack) 
+     >   import           Data.Conduit (($$+-), (=$), ($$))
+     >   import qualified Data.Conduit as C
+     >   import qualified Data.Conduit.List as CL
+     >   import           Text.HTML.TagSoup
+     >   import           Control.Monad.Trans (liftIO)
+     >   import           Control.Monad.Trans.Resource (MonadResource)
+     >   import           Control.Applicative ((<$>))
+     > 
+     >   main :: IO ()
+     >   main = withSocketsDo (execQuery makeQuery)
+     >     
+     >   makeQuery :: Ax.Query
+     >   makeQuery = 
+     >     let au = Exp $ Au ["Aaronson"]
+     >         t1 = Exp $ Ti ["quantum"]
+     >         t2 = Exp $ Ti ["complexity"]
+     >         x  = au /*/ (t1 /+/ t2)
+     >      in Ax.Query {
+     >           Ax.qExp   = Just x,
+     >           Ax.qIds   = [],
+     >           Ax.qStart = 0,
+     >           Ax.qItems = 25}
+     > 
+     >   type Soup = Tag String
+     > 
+     >   execQuery :: Ax.Query -> IO ()
+     >   execQuery q = withManager $ \m -> searchAxv m q $$ outSnk
+     > 
+     >   -----------------------------------------------------------------
+     >   -- Execute query and start a source
+     >   -----------------------------------------------------------------
+     >   searchAxv :: MonadResource m =>
+     >                Manager -> Ax.Query -> C.Source m String
+     >   searchAxv m q = 
+     >     let s = Ax.mkQuery q
+     >      in do u   <- liftIO (parseUrl s)
+     >            rsp <- http u m 
+     >            case responseStatus rsp of
+     >              (Status 200 _) -> getSoup rsp >>= results m q 
+     >              st             -> error $ "Error:" ++ show st
+     > 
+     >   -----------------------------------------------------------------
+     >   -- Consume page by page
+     >   -----------------------------------------------------------------
+     >   getSoup :: MonadResource m => 
+     >              Response (C.ResumableSource m B.ByteString) -> m [Soup]
+     >   getSoup rsp = concat <$> (responseBody rsp $$+- 
+     >                                       toSoup =$ CL.consume)
+     > 
+     >   -----------------------------------------------------------------
+     >   -- Receive a ByteString and yield Soup
+     >   -----------------------------------------------------------------
+     >   toSoup :: MonadResource m => C.Conduit B.ByteString m [Soup] 
+     >   toSoup = C.awaitForever (C.yield . parseTags . B.unpack)
+     > 
+     >   ------------------------------------------------------------------
+     >   -- Yield all entries and fetch next page
+     >   ------------------------------------------------------------------
+     >   results :: MonadResource m => 
+     >              Manager -> Ax.Query -> [Soup] -> C.Source m String
+     >   results m q sp = 
+     >      if Ax.exhausted sp 
+     >        then C.yield ("EOT: " ++ show (Ax.totalResults sp) ++ 
+     >                      " results")
+     >        else Ax.forEachEntryM_ sp (C.yield . mkResult) 
+     >             >> searchAxv m (Ax.nextPage q)
+     >   
+     >   ------------------------------------------------------------------
+     >   -- Get data and format somehow
+     >   ------------------------------------------------------------------
+     >   mkResult :: [Soup] -> String
+     >   mkResult sp = let aus = Ax.getAuthorNames sp
+     >                     y   = Ax.getYear sp
+     >                     tmp = Ax.getTitle sp
+     >                     ti  = if null tmp then "No title" else tmp
+     >                  in intercalate ", " aus ++ " (" ++ y ++ "): " ++ ti
+     > 
+     >   ------------------------------------------------------------------
+     >   -- Sink results 
+     >   ------------------------------------------------------------------
+     >   outSnk :: MonadResource m => C.Sink String m ()
+     >   outSnk = C.awaitForever (liftIO . putStrLn) 
   -}
 
   ------------------------------------------------------------------------ 
@@ -236,10 +329,10 @@ where
   --   Note that we create redundant parentheses,
   --   for instance \"a AND b OR c\" will be encoded as
   --   \"a+AND+%28b+OR+c%29\".
-  --   The reason is that the API specification is not clear
+  --   The rationale is that the API specification is not clear
   --   on how expressions are parsed.
   --   The above expression could be understood as
-  --   \"a AND (b OR c)\" or \"(a AND b) or c\".
+  --   \"a AND (b OR c)\" or as \"(a AND b) OR c\".
   --   To avoid confusion, one should always use parentheses
   --   to group boolean expressions - even if some of these parentheses
   --   appear to be redundant under one or the other parsing strategy.
@@ -280,15 +373,42 @@ where
     deriving (Eq, Show)
 
   -------------------------------------------------------------------------
-  -- | Creates the next query by adding items per page to start index.
+  -- | Fetches the next page by adding items per page to start index.
   -------------------------------------------------------------------------
-  nextQuery :: Query -> Query
-  nextQuery q = let s = qStart q
+  nextPage :: Query -> Query
+  nextPage  q = let s = qStart q
                     i = qItems q
                  in q{qStart = s + i} 
 
   -------------------------------------------------------------------------
-  -- | Parses an expression from a string
+  -- | Checks whether the query is exhausted or not, i.e.
+  --   whether all pages have been fetched already.
+  --   The first argument is the entire response (not just a part of it).
+  -------------------------------------------------------------------------
+  exhausted :: [Tag String] -> Bool
+  exhausted sp = startIndex sp >= totalResults sp
+
+  -------------------------------------------------------------------------
+  -- | Parses an expression from a string.
+  --   Please refer to the Arxiv documentation for details
+  --   on query format.
+  --
+  --   Just a minor remark here:
+  --   The operators OR, AND and ANDNOT are case sensitive.
+  --   \"or\" would be interpreted as part of a title, for instance:
+  --   \"ti:object+oriented+or+functional\" is one title;
+  --   \"ti:object+oriented+OR+functional\" would cause an error,
+  --   because a field identifier (ti, au, etc.) is expected after
+  --   \"+OR+\".
+  --
+  --   The other way round: the field content itself 
+  --   is not case sensitive, i.e. 
+  --   \"ti:complexity\" or \"au:aaronson\" is the same as
+  --   \"ti:Complexity\" and \"au:Aaronson\" respectively.
+  --
+  --   You may want to refer to the comments under
+  --   |preprocess| and |exp2str| for some more details
+  --   on our interpretation of the Arxiv documentation.
   -------------------------------------------------------------------------
   parseQuery :: String -> Either String Expression
   parseQuery s = case parse expression "" $ preprocess s of
@@ -297,7 +417,8 @@ where
 
   -------------------------------------------------------------------------
   -- | Converts a string containing comma-separated identifiers 
-  --   into a list of 'Identifier's 
+  --   into a list of 'Identifier's.
+  --   As stated already: No whitespace! 
   -------------------------------------------------------------------------
   parseIds :: String -> [Identifier]
   parseIds = S.endBy "," 
@@ -306,7 +427,7 @@ where
   -- | This is an internal function used by 'parseQuery'.
   --   It may be occasionally useful for direct use:
   --   It replaces \" \", \"(\", \")\" and \"\"\" 
-  --   with \"+\", \"%28\", \"%29\" and \"%22\"
+  --   by \"+\", \"%28\", \"%29\" and \"%22\"
   --   respectively.
   --
   --   Usually, these substitutions are performed
@@ -318,9 +439,12 @@ where
   --   The parser, however, accepts
   --   only the URL-encoded characters and, thus, some preprocessing
   --   may be necessary.
+  --
   --   The other way round, this means 
   --   that you may use parentheses, spaces and quotation marks
   --   instead of the URL encodings.
+  --   But be careful! Do not introduce two successive spaces -
+  --   we do not check for whitespace!
   -------------------------------------------------------------------------
   preprocess :: String -> String
   preprocess = concatMap s2s . map tos
@@ -451,7 +575,7 @@ where
   --   * ['Tag' 'String']: The TagSoup through which we are looping
   --
   --   * ['Tag' 'String'] -> r: The function we are applying per entry;
-  --                            The TagSoup passed in to the function
+  --                            the TagSoup passed in to the function
   --                            represents the current entry.
   --
   --   Example:
@@ -490,7 +614,7 @@ where
   ------------------------------------------------------------------------
   -- | Gets the full contents of the id field 
   --   (which contains an URL before the article identifier).
-  --   Expects an entry.
+  --   The [Tag String] argument is expected to be a single entry.
   ------------------------------------------------------------------------
   getIdUrl :: [Tag String] -> String
   getIdUrl = getString "id"
@@ -498,7 +622,7 @@ where
   ------------------------------------------------------------------------
   -- | Gets the article identifier as it can be used
   --   in an \"id_list\" query, i.e. without the URL.
-  --   Expects an entry.
+  --   The [Tag String] argument is expected to be a single entry.
   ------------------------------------------------------------------------
   getId :: [Tag String] -> String
   getId = pureId . getString "id"
@@ -595,7 +719,7 @@ where
                 lnkType  :: String, 
                 -- | The link title (e.g. \"pdf\" would be the link
                 --                        where we find the article 
-                --                        in PDF format)
+                --                        in pdf format)
                 lnkTitle :: String,
                 -- | the link relation (e.g. \"related\" would point
                 --                           to the related information,
@@ -618,7 +742,7 @@ where
                        lnkType  = fromMaybe "" $ getAt "type"  l}
 
   ------------------------------------------------------------------------
-  -- | Gets the pdf link only of this entry (if any).
+  -- | Gets only the pdf link of this entry (if any).
   ------------------------------------------------------------------------
   getPdfLink :: [Tag String] -> Maybe Link
   getPdfLink soup = case getLinks soup of

@@ -144,9 +144,9 @@ where
       Right () -> let x = Ax.totalResults sp
                       i = Ax.startIndex   sp
                       e = Ax.itemsPerPage sp
-                   in when (x /= 0 && x >= i) $ do
+                   in unless (Ax.exhausted sp) $ do 
                         Ax.forEachEntryM_ sp C.yield
-                        searchEntries m $ Ax.nextQuery q
+                        searchEntries m $ Ax.nextPage q
 
   blobSource :: MonadResource m => [Soup] -> C.Source m [Soup]
   blobSource sp = case Ax.checkForError sp of

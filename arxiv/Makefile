@@ -15,6 +15,7 @@ FLGS = -DTEST -Wall --make
 INC  = -i./src -i$(SUTDIR) -itest/suite
 
 smoke:	$(SMOKEDIR)/query1 \
+	$(SMOKEDIR)/query2 \
 	$(SMOKEDIR)/result1 \
 	$(SMOKEDIR)/arxiv
 
@@ -30,6 +31,9 @@ $(SMOKEDIR)/arxiv:	$(SMOKEDIR)/arxiv.hs $(SUBSRC)
 			$(GHC) $(FLGS) $(INC) $@
 
 $(SMOKEDIR)/query1:	$(SMOKEDIR)/query1.hs $(SUBSRC)
+			$(GHC) $(FLGS) $(INC) $@
+
+$(SMOKEDIR)/query2:	$(SMOKEDIR)/query2.hs $(SUBSRC)
 			$(GHC) $(FLGS) $(INC) $@
 
 $(SMOKEDIR)/result1:	$(SMOKEDIR)/result1.hs $(SUBSRC)
@@ -49,6 +53,7 @@ clean:
 	rm -f test/bin/*.o
 	rm -f test/bin/*.hi
 	rm -f test/smoke/query1
+	rm -f test/smoke/query2
 	rm -f test/smoke/arxiv
 	rm -f test/smoke/result1
 	rm -f tmp/*.pdf
