@@ -5,6 +5,25 @@
 -- License    : LGPL 
 -- Stability  : experimental
 -- Portability: portable
+--
+-- The ArXiv API is split in two parts:
+-- Request and Response.
+-- The Request part contains
+-- a simple language to define queries,
+-- a query parser and some helpers to navigate
+-- through the results of a mutlipage query
+-- (which, in fact, induces a new query).
+-- 
+-- The Response part contains
+-- an API to access the fields of the result
+-- based on TagSoup.
+--
+-- This library does not contain functions
+-- to actually execute and manage http requests.
+-- It is intended to be used with existing
+-- http libraries such as http-conduit.
+-- An example how to use the ArXiv library
+-- with http-conduit is included in this documentation.
 -------------------------------------------------------------------------------
 module Network.Api.Arxiv (
                -- * Request 
@@ -58,7 +77,7 @@ where
   {- $ExpExample
 
      Expressions are intended to ease the construction
-     of well-formed expressions in user code. 
+     of well-formed queries in application code. 
      A simple example:
 
      > let au = Exp $ Au ["Knuth"]
@@ -70,7 +89,7 @@ where
 
   {- $RequestOv
   
-     Requests are URL parameter,
+     Requests are URL parameters,
      either \"search_query\" or \"id_list\".
      This module provides functions
      to build and parse these parameters,
@@ -144,13 +163,12 @@ where
      >   -----------------------------------------------------------------
      >   searchAxv :: MonadResource m =>
      >                Manager -> Ax.Query -> C.Source m String
-     >   searchAxv m q = 
-     >     let s = Ax.mkQuery q
-     >      in do u   <- liftIO (parseUrl s)
-     >            rsp <- http u m 
-     >            case responseStatus rsp of
-     >              (Status 200 _) -> getSoup rsp >>= results m q 
-     >              st             -> error $ "Error:" ++ show st
+     >   searchAxv m q = do
+     >      u   <- liftIO (parseUrl $ mkQuery q)
+     >      rsp <- http u m 
+     >      case responseStatus rsp of
+     >        (Status 200 _) -> getSoup rsp >>= results m q 
+     >        st             -> error $ "Error:" ++ show st
      > 
      >   -----------------------------------------------------------------
      >   -- Consume page by page
@@ -373,7 +391,8 @@ where
     deriving (Eq, Show)
 
   -------------------------------------------------------------------------
-  -- | Fetches the next page by adding items per page to start index.
+  -- | Prepares the query to fetch 
+  --   the next page adding \"items per page\" to \"start index\".
   -------------------------------------------------------------------------
   nextPage :: Query -> Query
   nextPage  q = let s = qStart q
@@ -395,19 +414,20 @@ where
   --
   --   Just a minor remark here:
   --   The operators OR, AND and ANDNOT are case sensitive.
-  --   \"or\" would be interpreted as part of a title, for instance:
-  --   \"ti:object+oriented+or+functional\" is one title;
-  --   \"ti:object+oriented+OR+functional\" would cause an error,
+  --   \"andnot\" would be interpreted as part of a title, for instance:
+  --   \"ti:functional+andnot+object+oriented\" is just one title;
+  --   \"ti:functional+ANDNOT+object+oriented\" would cause an error,
   --   because a field identifier (ti, au, etc.) is expected after
-  --   \"+OR+\".
+  --   \"+ANDNOT+\".
   --
   --   The other way round: the field content itself 
   --   is not case sensitive, i.e. 
   --   \"ti:complexity\" or \"au:aaronson\" is the same as
   --   \"ti:Complexity\" and \"au:Aaronson\" respectively.
+  --   This is a feature of the very arXiv API.
   --
   --   You may want to refer to the comments under
-  --   |preprocess| and |exp2str| for some more details
+  --   'preprocess' and 'exp2str' for some more details
   --   on our interpretation of the Arxiv documentation.
   -------------------------------------------------------------------------
   parseQuery :: String -> Either String Expression
@@ -584,7 +604,7 @@ where
   --   >   let y = case getYear e of
   --   >             "" -> "s.a."
   --   >             x  -> x
-  --   >       a = case getAuthors e of
+  --   >       a = case getAuthorNames e of
   --   >             [] -> "Anonymous"
   --   >             as -> head as ++ 
   --   >    in a ++ " (" ++ y ++ ")"

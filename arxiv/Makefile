@@ -11,7 +11,7 @@ SUTDIR = src/Network/Api
 SUBSRC = $(SUTDIR)/Arxiv.hs 
 
 GHC = ghc
-FLGS = -DTEST -Wall --make
+FLGS = -DTEST -Wall -rtsopts -prof -auto-all -caf-all -Ltest/suite --make 
 INC  = -i./src -i$(SUTDIR) -itest/suite
 
 smoke:	$(SMOKEDIR)/query1 \
@@ -24,8 +24,13 @@ $(SMOKEDIR)/op:	$(SMOKEDIR)/op.hs $(SUBSRC)
 
 suite:	$(TDIR)/tstArxiv
 
+mem:	$(TDIR)/mem1
+
 $(TDIR)/tstArxiv:	$(TDIR)/tstArxiv.hs $(SUBSRC)
 			$(GHC) $(FLGS) $(INC) $@
+
+$(TDIR)/mem1:		$(TDIR)/mem1.hs $(SUBSRC)
+			$(GHC) $(FLGS) $(INC) test/suite/phelp.o $@ 
 
 $(SMOKEDIR)/arxiv:	$(SMOKEDIR)/arxiv.hs $(SUBSRC)
 			$(GHC) $(FLGS) $(INC) $@
@@ -46,6 +51,7 @@ clean:
 	rm -f $(TDIR)/*.hi
 	rm -f $(TDIR)/*.o
 	rm -f $(TDIR)/tstArxiv
+	rm -f $(TDIR)/mem1
 	rm -f $(SMOKEDIR)/*.hi
 	rm -f $(SMOKEDIR)/*.o
 	rm -f $(SUTDIR)/*.hi
