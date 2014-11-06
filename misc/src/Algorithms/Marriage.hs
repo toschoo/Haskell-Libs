@@ -1,11 +1,13 @@
+--------------------------------------------------------------------------
+-- Gale-Shapley Algorithm
+--------------------------------------------------------------------------
 module Algorithms.Marriage
 where
 
   import qualified Data.Sequence as S
-  import           Data.Sequence ((|>), (<|), (><), Seq, ViewL(..), ViewR(..))
-  import           Data.List (delete, find, findIndex)
-  import           Data.Maybe (fromJust)
-  import           Control.Applicative ((<$>))
+  import           Data.Sequence ((|>), (<|), Seq, ViewL(..))
+  import           Data.List (delete, find, elemIndex)
+  import           Data.Maybe (fromJust,fromMaybe)
 
   type Pid     = String
   data Partner = Partner {
@@ -86,7 +88,5 @@ where
                         
   pref :: Partner -> Pid -> Int
   pref w oid = length (pPref w) - idx
-    where idx = case findIndex (==oid) $ pPref w of
-                  Nothing -> error $ "not in preferences of " ++ 
-                                     show w ++ ": " ++ oid
-                  Just i  -> i
+    where idx = fromMaybe err $ elemIndex oid (pPref w)
+          err = error $ "not in preferences of " ++ show w ++ ": " ++ oid

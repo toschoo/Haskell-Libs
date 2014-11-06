@@ -29,8 +29,11 @@ mem:	$(TDIR)/mem1
 $(TDIR)/tstArxiv:	$(TDIR)/tstArxiv.hs $(SUBSRC)
 			$(GHC) $(FLGS) $(INC) $@
 
+# $(TDIR)/mem1:		$(TDIR)/mem1.hs $(SUBSRC)
+#			$(GHC) $(FLGS) $(INC) test/suite/phelp.o $@ 
+
 $(TDIR)/mem1:		$(TDIR)/mem1.hs $(SUBSRC)
-			$(GHC) $(FLGS) $(INC) test/suite/phelp.o $@ 
+			$(GHC) $(FLGS) $(INC) $@ 
 
 $(SMOKEDIR)/arxiv:	$(SMOKEDIR)/arxiv.hs $(SUBSRC)
 			$(GHC) $(FLGS) $(INC) $@
@@ -63,5 +66,9 @@ clean:
 	rm -f test/smoke/arxiv
 	rm -f test/smoke/result1
 	rm -f tmp/*.pdf
+	rm -f *.hp 
+	rm -f *.aux 
+	rm -f *.prof 
+	rm -f *.ps 
 
 build: $(tests) $(SUBSRC)

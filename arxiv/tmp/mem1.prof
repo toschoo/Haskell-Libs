@@ -1,0 +1,49 @@
+	Sun Oct  5 12:48 2014 Time and Allocation Profiling Report  (Final)
+
+	   mem1 +RTS -hc -p -K100M -RTS
+
+	total time  =       22.79 secs   (22790 ticks @ 1000 us, 1 processor)
+	total alloc = 1,597,855,056 bytes  (excludes profiling overheads)
+
+COST CENTRE MODULE  %time %alloc
+
+main.\      Main     99.7   99.0
+
+
+                                                                             individual     inherited
+COST CENTRE               MODULE                           no.     entries  %time %alloc   %time %alloc
+
+MAIN                      MAIN                             333           0    0.0    0.0   100.0  100.0
+ main                     Main                             669           0    0.0    0.0     0.4    0.1
+  main.\                  Main                             671           0    0.4    0.1     0.4    0.1
+ CAF:main                 :Main                            665           0    0.0    0.0    99.5   99.9
+  main                    Main                             667           0    0.2    0.9    99.5   99.9
+   main.\                 Main                             670           1   99.2   98.8    99.3   99.0
+    unstream/resize       Data.Text.Internal.Fusion        672        6340    0.1    0.1     0.1    0.1
+ CAF:main                 Main                             664           0    0.0    0.0     0.0    0.0
+  main                    Main                             666           1    0.0    0.0     0.0    0.0
+ CAF:$dMonadResource_r2UC Main                             663           0    0.0    0.0     0.0    0.0
+ CAF:$dMonadIO1_r2UB      Main                             662           0    0.0    0.0     0.0    0.0
+ CAF:$dMonadIO_r2UA       Main                             661           0    0.0    0.0     0.0    0.0
+ CAF:$dMonadBase_r2Uy     Main                             659           0    0.0    0.0     0.0    0.0
+ CAF:$dMonad_r2Uw         Main                             657           0    0.0    0.0     0.0    0.0
+ CAF                      Network.HTTP.Client.TLS          652           0    0.0    0.0     0.0    0.0
+ CAF                      Network.HTTP.Client.Connection   651           0    0.0    0.0     0.0    0.0
+ CAF                      Network.HTTP.Client.Request      648           0    0.0    0.0     0.0    0.0
+ CAF                      Network.HTTP.Client.Response     647           0    0.0    0.0     0.0    0.0
+ CAF                      Network.HTTP.Client.Util         645           0    0.0    0.0     0.0    0.0
+ CAF                      Network.HTTP.Client.Headers      642           0    0.0    0.0     0.0    0.0
+ CAF                      System.X509.Unix                 626           0    0.0    0.0     0.0    0.0
+ CAF                      Network.Socket                   532           0    0.0    0.0     0.0    0.0
+ CAF                      Network.Socket.Internal          530           0    0.0    0.0     0.0    0.0
+ CAF                      Network.URI                      529           0    0.0    0.0     0.0    0.0
+ CAF                      GHC.IO.Encoding                  389           0    0.0    0.0     0.0    0.0
+ CAF                      GHC.IO.Handle.FD                 387           0    0.0    0.0     0.0    0.0
+ CAF                      GHC.IO.Encoding.Iconv            374           0    0.0    0.0     0.0    0.0
+ CAF                      Data.Unique                      363           0    0.0    0.0     0.0    0.0
+ CAF                      GHC.Conc.Signal                  356           0    0.0    0.0     0.0    0.0
+ CAF                      GHC.IO.FD                        354           0    0.0    0.0     0.0    0.0
+ CAF                      GHC.TopHandler                   352           0    0.0    0.0     0.0    0.0
+ CAF                      System.Timeout                   351           0    0.0    0.0     0.0    0.0
+  main                    Main                             668           0    0.0    0.0     0.0    0.0
+   main.\                 Main                             673           0    0.0    0.0     0.0    0.0

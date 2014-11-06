@@ -6,7 +6,7 @@ License:         LGPL
 license-file:    license/lgpl-3.0.txt
 Author:          Tobias Schoofs
 Maintainer:      Tobias Schoofs <tobias dot schoofs at gmx dot net>
-Homepage:        http://github.com/toschoo/libs
+Homepage:        http://github.com/toschoo/Haskell-Libs
 Category:        Network, API, NetworkAPI, Arxiv
 Build-Type:      Simple
 Synopsis:        A client for the Arxiv API
