@@ -84,8 +84,7 @@ where
   -------------------------------------------------------------------------
   candidates :: StopwordsMap -> String -> [Text] -> [WordScore]
   candidates m nsp ps = let ks = concatMap (kfinder m nsp) ps
-                            ws = wordScores ks 
-                         in sortByScore $ nub (kwScores ws ks)
+                         in sortByScore $ nub (kwScores ks)
 
   -------------------------------------------------------------------------
   -- | The 'keywords' function is a convenience interface
@@ -185,12 +184,7 @@ where
           go t (w:ws) | stopword m w = if null t then         go [] ws
                                                  else mkk t : go [] ws
                       | otherwise    = go (w:t) ws
-          mkk = {- T.intercalate space . -} reverse
-
-  -------------------------------------------------------------------------
-  -- Keyword and its frequency and degree
-  -------------------------------------------------------------------------
-  type WordFreq  = (Text,Double,Double)
+          mkk = reverse
 
   -------------------------------------------------------------------------
   -- Map of Text and frequency,degree
@@ -200,8 +194,8 @@ where
   -------------------------------------------------------------------------
   -- To calculate the scores we map 'kwScore' on all phrases
   -------------------------------------------------------------------------
-  kwScores :: ScoreMap -> [[Text]] -> [WordScore]
-  kwScores m = map (kwScore m)
+  kwScores :: [[Text]] -> [WordScore]
+  kwScores s = map (kwScore $ wordScores s) s
 
   -------------------------------------------------------------------------
   -- The keyword score is the sum of the individual scores 
@@ -211,7 +205,7 @@ where
   kwScore :: ScoreMap -> [Text] -> WordScore
   kwScore m s = let ws = wFilter 0 s 
                  in (conc s,sum $ map findScore ws)
-    where conc        = T.intercalate space
+    where conc = T.intercalate space
           findScore w = case M.lookup w m of
                           Nothing    -> 0
                           Just (f,d) -> (d+f) / f
@@ -222,28 +216,19 @@ where
   --     and       d as d+d for each instance of the word
   -------------------------------------------------------------------------
   wordScores :: [[Text]] -> ScoreMap 
-  wordScores = foldl' score M.empty . foldl' wordScore []
-    where score m (x,f,d) = M.insertWith add x (f,d) m
-          add (f1,d1) (_,d2) = (f1+1,d1+d2)
+  wordScores = foldl' wordScore M.empty 
 
   -------------------------------------------------------------------------
   -- Computing the keyword score as the number of words in the keyword.
   -- The addition of frequency (f+1) and degree (d+d) is folded on
   -- the table of all keywords.
   -------------------------------------------------------------------------
-  wordScore :: [WordFreq] -> [Text] -> [WordFreq]
-  wordScore wf s = let ws = wFilter 0 s 
-                       f  = fromIntegral $ length ws
-                       d  = f-1
-                    in foldl' (inswf d) wf ws
-
-  -------------------------------------------------------------------------
-  -- List of words, no duplicates
-  -------------------------------------------------------------------------
-  inswf :: Double -> [WordFreq] -> Text -> [WordFreq]
-  inswf d [] s = [(s,1,d)]
-  inswf d' ((w,f,d):ws) s | w == s    = (w,f+1,d'+d):ws
-                          | otherwise = (w,f,d) : inswf d' ws s 
+  wordScore :: ScoreMap -> [Text] -> ScoreMap
+  wordScore sm s = let ws = wFilter 0 s 
+                       d  = fromIntegral (length ws-1)
+                    in foldl' (score d) sm ws 
+    where score d m x  = M.insertWith add x (1,d) m
+          add (_,d1) (f2,d2) = (f2+1,d1+d2) 
   
   -------------------------------------------------------------------------
   -- Filter words that may appear as part of keywords,
