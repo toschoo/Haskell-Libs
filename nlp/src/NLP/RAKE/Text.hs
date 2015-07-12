@@ -84,8 +84,8 @@ where
   -------------------------------------------------------------------------
   candidates :: StopwordsMap -> String -> [Text] -> [WordScore]
   candidates m nsp ps = let ks = concatMap (kfinder m nsp) ps
-                            ws = wordScores nsp ks 
-                         in sortByScore $ nub (kwScores ws nsp ks) 
+                            ws = wordScores ks 
+                         in sortByScore $ nub (kwScores ws ks)
 
   -------------------------------------------------------------------------
   -- | The 'keywords' function is a convenience interface
@@ -129,7 +129,11 @@ where
   --   Note that this list is based on English. 
   -------------------------------------------------------------------------
   defaultNosplit :: String
-  defaultNosplit = ['a'..'z'] ++ ['A'..'Z'] ++ ['0'..'9'] ++ "+-/"
+  defaultNosplit = enNosplit ++ latin1Nosplit
+
+  enNosplit, latin1Nosplit :: String
+  enNosplit = ['a'..'z'] ++ ['A'..'Z'] ++ ['0'..'9'] ++ "+-/"
+  latin1Nosplit = ['À'..'Ö'] ++ ['\216'..'ö'] ++ ['\248'..'\255']
 
   -------------------------------------------------------------------------
   -- List of Chars containing exceptions from 'isPunctuation'
@@ -172,16 +176,16 @@ where
           punctuation c = isPunctuation c && c `notElem` nopunc
 
   -------------------------------------------------------------------------
-  -- Continues adding words to a keywords until a stopword is found
+  -- Adding words to a keyword until a stopword is found
   -------------------------------------------------------------------------
-  kfinder :: StopwordsMap -> String -> Text -> [Text]
+  kfinder :: StopwordsMap -> String -> Text -> [[Text]]
   kfinder m nosplit = go [] . wSplitter nosplit . T.toLower
     where go [] [] = []
           go t  [] = [mkk t]
           go t (w:ws) | stopword m w = if null t then         go [] ws
                                                  else mkk t : go [] ws
                       | otherwise    = go (w:t) ws
-          mkk = T.intercalate space . reverse
+          mkk = {- T.intercalate space . -} reverse
 
   -------------------------------------------------------------------------
   -- Keyword and its frequency and degree
@@ -196,18 +200,19 @@ where
   -------------------------------------------------------------------------
   -- To calculate the scores we map 'kwScore' on all phrases
   -------------------------------------------------------------------------
-  kwScores :: ScoreMap -> String -> [Text] -> [WordScore]
-  kwScores m nsp = map (kwScore m nsp)
+  kwScores :: ScoreMap -> [[Text]] -> [WordScore]
+  kwScores m = map (kwScore m)
 
   -------------------------------------------------------------------------
   -- The keyword score is the sum of the individual scores 
   -- of all words contained in the keyword.
   -- The score per word is computed as (d+f)/f.
   -------------------------------------------------------------------------
-  kwScore :: ScoreMap -> String -> Text -> WordScore
-  kwScore m nsp s = let ws = splitWords nsp 0 s
-                     in (s,sum $ map findScore ws)
-    where findScore w = case M.lookup w m of
+  kwScore :: ScoreMap -> [Text] -> WordScore
+  kwScore m s = let ws = wFilter 0 s 
+                 in (conc s,sum $ map findScore ws)
+    where conc        = T.intercalate space
+          findScore w = case M.lookup w m of
                           Nothing    -> 0
                           Just (f,d) -> (d+f) / f
     
@@ -216,8 +221,8 @@ where
   -- and computing f as f+1 for each instance of the word
   --     and       d as d+d for each instance of the word
   -------------------------------------------------------------------------
-  wordScores :: String -> [Text] -> ScoreMap 
-  wordScores nsp = foldl' score M.empty . foldl' (wordScore nsp) []
+  wordScores :: [[Text]] -> ScoreMap 
+  wordScores = foldl' score M.empty . foldl' wordScore []
     where score m (x,f,d) = M.insertWith add x (f,d) m
           add (f1,d1) (_,d2) = (f1+1,d1+d2)
 
@@ -226,31 +231,26 @@ where
   -- The addition of frequency (f+1) and degree (d+d) is folded on
   -- the table of all keywords.
   -------------------------------------------------------------------------
-  wordScore :: String -> [WordFreq] -> Text -> [WordFreq]
-  wordScore nsp wf s = let ws = splitWords nsp 0 s
-                           f  = fromIntegral $ length ws
-                           d  = f-1
-                        in foldl' (inswf d) wf ws
+  wordScore :: [WordFreq] -> [Text] -> [WordFreq]
+  wordScore wf s = let ws = wFilter 0 s 
+                       f  = fromIntegral $ length ws
+                       d  = f-1
+                    in foldl' (inswf d) wf ws
 
+  -------------------------------------------------------------------------
+  -- List of words, no duplicates
+  -------------------------------------------------------------------------
   inswf :: Double -> [WordFreq] -> Text -> [WordFreq]
   inswf d [] s = [(s,1,d)]
   inswf d' ((w,f,d):ws) s | w == s    = (w,f+1,d'+d):ws
                           | otherwise = (w,f,d) : inswf d' ws s 
   
   -------------------------------------------------------------------------
-  -- To compute keyword scores we use a wrapped wSplitter.
+  -- Filter words that may appear as part of keywords,
+  -- but do not enter the score calculation
   -------------------------------------------------------------------------
-  -- One might wonder why we split strings into words,
-  -- instead of using data type [Text] instead of Text
-  -- in the first place.
-  -- However, splitWords adds some additional criteria
-  -- (such as not being numeric) that influence the scoring
-  -- of keywords, but not the selection in keywords.
-  -- We therefore stick to this somewhat suboptimal construction
-  -- of creating Text and then splitting it to [Text] again.
-  -------------------------------------------------------------------------
-  splitWords :: String -> Int -> Text -> [Text]
-  splitWords nsp m s = filter flt $ wSplitter nsp s
+  wFilter :: Int -> [Text] -> [Text]
+  wFilter m = filter flt
     where flt w = T.compareLength w m == GT &&
                   not (T.null w) &&
                   not (numeric w)
@@ -263,7 +263,8 @@ where
   numeric s | T.null s          = False
             | not (hasDigits s) = False
             | otherwise = let h = T.head s
-                           in (isDigit h || h == '-') && pnumeric (T.tail s)
+                           in (isDigit h || (h == '-' && hasDigits s)) && 
+                              pnumeric (T.tail s)
     where pnumeric cs | T.null cs = True
                       | otherwise = 
                         let h = T.head cs 
@@ -272,4 +273,3 @@ where
           hasDigits cs | T.null cs           = False
                        | isDigit (T.head cs) = True
                        | otherwise           = hasDigits (T.tail cs)
-
