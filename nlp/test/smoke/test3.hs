@@ -14,7 +14,7 @@ where
       _   -> error "I need a file..."
 
   test :: FilePath -> IO ()
-  test = do
+  test f = do
     t <- TIO.readFile f
-    print (filter (\(_,s) -> s > 1.0) $ candidates m $ pSplitter t) 
+    print (filter (\(_,s) -> s > 1.0) $ keywords t) 
 

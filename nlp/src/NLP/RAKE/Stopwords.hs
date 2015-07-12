@@ -4,8 +4,7 @@ module NLP.RAKE.Stopwords (StopwordsMap,
                            stopword,
                            defaultStoplist,
                            smartStoplist, foxStoplist,
-                           loadStopWords,
-                           nolist)
+                           loadStopWords)
                            
 where
 
@@ -16,38 +15,73 @@ where
   import qualified Data.Text as T
   import qualified Data.Text.IO as TIO
 
+  -------------------------------------------------------------------------
+  -- | Search tree for stop words
+  -------------------------------------------------------------------------
   type StopwordsMap = Map Text ()
 
+  -------------------------------------------------------------------------
+  -- | Make 'StopwordsMap' starting from a list of stop words
+  --   encoded as 'Text'
+  -------------------------------------------------------------------------
   mkStopwords :: [Text] -> StopwordsMap
   mkStopwords = foldl' (\m w -> M.insert w () m) M.empty
 
+  -------------------------------------------------------------------------
+  -- | Make 'StopwordsMap' starting from a list of stop words
+  --   encoded as 'String'
+  -------------------------------------------------------------------------
   mkStopwordsStr :: [String] -> StopwordsMap
   mkStopwordsStr = mkStopwords . map T.pack
 
+  -------------------------------------------------------------------------
+  -- | Search for a chunk of 'Text' in the 'StopwordsMap'.
+  --   Note that there is a list of symbols, the /nolist/,
+  --   that still count as stop words (e.g. \"-\").
+  -------------------------------------------------------------------------
   stopword :: StopwordsMap -> Text -> Bool
   stopword m s = case M.lookup s m of
                    Nothing -> s `elem` nolist
                    Just _  -> True
 
+  -------------------------------------------------------------------------
+  -- | Load a stop word list from a file.
+  -------------------------------------------------------------------------
   loadStopWords :: FilePath -> IO StopwordsMap
   loadStopWords f = do
     !c <- TIO.readFile f 
     return (mkStopwords $ filter flt $ norm $ T.lines c)
     where flt l = not(chash `T.isPrefixOf` l) && not (T.null l)
-          norm = map (T.toLower) . map ignoreWhitespace
+          norm = map (T.toLower . ignoreWhitespace)
 
+  -------------------------------------------------------------------------
+  -- | The default stop word list ('smartStoplist').
+  -------------------------------------------------------------------------
   defaultStoplist :: StopwordsMap
   defaultStoplist = smartStoplist
 
+  -------------------------------------------------------------------------
+  -- The \"nolist\". Symbols in this list count as stop words
+  -- independently from individual stop word lists.
+  -------------------------------------------------------------------------
   nolist :: [Text]
   nolist = map T.pack ["-"]
 
+  -------------------------------------------------------------------------
+  -- The hash character encoded as 'Text'
+  -------------------------------------------------------------------------
   chash :: Text
   chash = T.singleton '#'
 
+  -------------------------------------------------------------------------
+  -- Whitespace
+  -------------------------------------------------------------------------
   ignoreWhitespace :: Text -> Text
   ignoreWhitespace = T.takeWhile (/= ' ') . T.dropWhile (== ' ')
 
+  -------------------------------------------------------------------------
+  -- | The \"smart\" stop word list
+  -------------------------------------------------------------------------
   smartStoplist :: StopwordsMap
   smartStoplist = mkStopwordsStr [
     "a","a's","able","about","above","according","accordingly",
@@ -119,6 +153,9 @@ where
     "you'd","you'll","you're","you've","your","yours","yourself","yourselves",
     "z","zero"]
 
+  -------------------------------------------------------------------------
+  -- | The \"Fox\" stop word list
+  -------------------------------------------------------------------------
   foxStoplist :: StopwordsMap
   foxStoplist = mkStopwordsStr [
     "a","about","above","across","after","again","against","all","almost",
