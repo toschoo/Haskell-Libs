@@ -4,7 +4,8 @@ module NLP.RAKE.Stopwords (StopwordsMap,
                            stopword,
                            defaultStoplist,
                            smartStoplist, foxStoplist,
-                           loadStopWords)
+                           loadStopWords,
+                           NoList,defaultNolist)
                            
 where
 
@@ -36,13 +37,14 @@ where
 
   -------------------------------------------------------------------------
   -- | Search for a chunk of 'Text' in the 'StopwordsMap'.
-  --   Note that there is a list of symbols, the /nolist/,
-  --   that still count as stop words (e.g. \"-\").
+  --   Note that, if a word or symbol does not appear in the stop word list,
+  --   it may still be on the  the /nolist/
+  --   and, then, still counts as stop word (e.g. \"-\").
   -------------------------------------------------------------------------
-  stopword :: StopwordsMap -> Text -> Bool
-  stopword m s = case M.lookup s m of
-                   Nothing -> s `elem` nolist
-                   Just _  -> True
+  stopword :: StopwordsMap -> NoList -> Text -> Bool
+  stopword m nl s = case M.lookup s m of
+                      Nothing -> s `elem` nl
+                      Just _  -> True
 
   -------------------------------------------------------------------------
   -- | Load a stop word list from a file.
@@ -61,11 +63,18 @@ where
   defaultStoplist = smartStoplist
 
   -------------------------------------------------------------------------
-  -- The \"nolist\". Symbols in this list count as stop words
-  -- independently from individual stop word lists.
+  -- | The /nolist/: Symbols in this list count as stop words
+  --   independently from the chosen stop word list.
+  --   This list can be used to exclude very specific \"words\" 
+  --   that may occur in a given domain like, for instance,
+  --   mathematical formulas and symbols.
   -------------------------------------------------------------------------
-  nolist :: [Text]
-  nolist = map T.pack ["-"]
+  type NoList = [Text]
+  -------------------------------------------------------------------------
+  -- | Currently, the default /nolist/ contains only the symbol \"-\".
+  -------------------------------------------------------------------------
+  defaultNolist :: NoList
+  defaultNolist = map T.pack ["-"]
 
   -------------------------------------------------------------------------
   -- The hash character encoded as 'Text'

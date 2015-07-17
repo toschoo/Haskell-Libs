@@ -9,7 +9,8 @@ SRCDIR = src
 SUTDIR = src/NLP/RAKE
 
 SUBSRC = $(SUTDIR)/Text.hs \
-	 $(SUTDIR)/Stopwords.hs
+	 $(SUTDIR)/Stopwords.hs \
+	 $(SUTDIR)/Resources.hs
 
 GHC = ghc
 FLGS = -DTEST -Wall -rtsopts -prof -auto-all -caf-all -Ltest/suite --make 

@@ -10,6 +10,7 @@ Homepage:        http://github.com/toschoo/Haskell-Libs
 Category:        Natural Language Processing, NLP, keyword extractor, RAKE
 Build-Type:      Simple
 Synopsis:        Rapid Automatic Keyword Extraction (RAKE)
+extra-source-files: changelog.md
 Description:
   
   Rapid Automatic Keyword Extraction (RAKE)
@@ -22,12 +23,11 @@ Description:
   the domain of the content and
   the purpose of the keywords.
   
-
   .
 
   The implementation in this library is mainly aimed at English. 
-  With additional resources, it is also applicable to other European language.
-  The library is inspired by a similar implementation in Python by Aneesha 
+  With additional resources, it is also applicable to other language.
+  The library is inspired by a similar implementation in Python 
   (<https://github.com/aneesha/RAKE>).
 
   .
@@ -42,8 +42,7 @@ Description:
 
   .
 
-  More information on this haskell library, 
-  examples and a test suite are available 
+  More information on this haskell library is available 
   on <https://github.com/toschoo/Haskell-Libs>.
 
 Library
@@ -54,4 +53,4 @@ Library
   hs-source-dirs: src, .
                    
   Exposed-Modules: NLP.RAKE.Text 
-  other-modules: NLP.RAKE.Stopwords
+  other-modules: NLP.RAKE.Stopwords,NLP.RAKE.Resources

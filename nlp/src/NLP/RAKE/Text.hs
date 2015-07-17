@@ -5,26 +5,34 @@
 -- License    : LGPL 
 -- Stability  : experimental
 -- Portability: portable
--- The RAKE Text interface 
+-- The RAKE Text interface. (Currently the only one...)
 -------------------------------------------------------------------------------
 module NLP.RAKE.Text (
                       -- * Keywords
                       WordScore, 
-                      candidates, keywords, rawKeywords,
+                      candidates, keywords, 
 
                       -- * Utitlities
                       sortByScore, sortByWord,
                       pSplitter,
+
+                      -- * Resources
+                      NoSplit,
                       defaultNosplit,
+                      enNosplit, numNosplit, othNosplit,
+                      latin1Nosplit, latinExAnosplit, latinExBnosplit,
+                      greekNosplit,cyrillicNosplit,
 
                       -- * Stopwords
                       -- $Stopwords
                       StopwordsMap,
                       mkStopwords, mkStopwordsStr,
+                      loadStopWords,
                       stopword,
                       defaultStoplist,
                       smartStoplist, foxStoplist,
-                      loadStopWords)
+                      NoList,
+                      defaultNolist)
                       
 where
 
@@ -36,6 +44,7 @@ where
   import qualified Data.Map as M
 
   import           NLP.RAKE.Stopwords
+  import           NLP.RAKE.Resources
 
   -------------------------------------------------------------------------
   -- import Debug.Trace (trace)
@@ -48,7 +57,7 @@ where
      Stop words are frequent words in a language that are considered
      to be void of specific semantics. They, of course, have 
      an important role in the language, but they do not
-     identify the topic a specific document is about, e.g.
+     help to determine the topic a specific document is about, e.g.
      \"is\", \"the\", \"of\" and so on.
      Stop words depend on the specific context of the documents
      to be analysed; there are, however, frequently used lists
@@ -77,37 +86,34 @@ where
   -------------------------------------------------------------------------
   -- | This interface provides most flexibility.
   --   It expects a 'Map' of stop words, a /nosplit/ list
-  --   used by the word splitter and a text split into phrases.
+  --   used by the word splitter,
+  --   an additional list of words or symbols 
+  --   you want to exclude for a specific document
+  --   and a text split into phrases.
   --   Users may pass in their own stop word list 
   --   (e.g. by loading it from a file, see 'loadStopWords')
   --   or one of the predefined lists ('smartStopwords', 'foxStopwords').
   -------------------------------------------------------------------------
-  candidates :: StopwordsMap -> String -> [Text] -> [WordScore]
-  candidates m nsp ps = let ks = concatMap (kfinder m nsp) ps
-                         in sortByScore $ nub (kwScores ks)
+  candidates :: StopwordsMap -> NoSplit -> NoList -> [Text] -> [WordScore]
+  candidates m nsp nl ps = let ks = concatMap (kfinder m nsp nl) ps
+                            in sortByScore $ nub (kwScores ks)
 
   -------------------------------------------------------------------------
   -- | The 'keywords' function is a convenience interface
   --   that takes a couple of decisions internally:
-  --   it uses the 'defaultStoplist' and the English language 
-  --   /nosplit/ list and it splits the text
+  --   it uses the 'defaultStoplist', the English language 
+  --   /nosplit/ list, the default 'nolist' and it splits the text
   --   into phrases using the 'pSplitter'.
   --
   --   The function is equivalent to
   --  
-  --   > candidates defaultStoplist defaultNosplit . pSplitter
+  --   > candidates defaultStoplist defaultNosplit defaultNolist . pSplitter
   --
   -------------------------------------------------------------------------
   keywords :: Text -> [WordScore]
-  keywords = candidates defaultStoplist defaultNosplit . pSplitter
-
-  -------------------------------------------------------------------------
-  -- | Given a 'WordScore' list 'rawKeywords' 
-  --   yields a list of the keywords without the score
-  --   (it, hence, maps 'fst' to the 'WordScore' list).
-  -------------------------------------------------------------------------
-  rawKeywords :: [WordScore] -> [Text]
-  rawKeywords = map fst
+  keywords = candidates defaultStoplist 
+                        defaultNosplit 
+                        defaultNolist   . pSplitter
 
   -------------------------------------------------------------------------
   -- | Sort the 'WordScore' list by scores (descending!)
@@ -122,17 +128,6 @@ where
   sortByWord :: [WordScore] -> [WordScore]
   sortByWord = sortBy byFst
     where byFst (a1,_) (a2,_) = compare a1 a2
-
-  -------------------------------------------------------------------------
-  -- | List containing 'Char' at which we do not split words.
-  --   Note that this list is based on English. 
-  -------------------------------------------------------------------------
-  defaultNosplit :: String
-  defaultNosplit = enNosplit ++ latin1Nosplit
-
-  enNosplit, latin1Nosplit :: String
-  enNosplit = ['a'..'z'] ++ ['A'..'Z'] ++ ['0'..'9'] ++ "+-/"
-  latin1Nosplit = ['À'..'Ö'] ++ ['\216'..'ö'] ++ ['\248'..'\255']
 
   -------------------------------------------------------------------------
   -- List of Chars containing exceptions from 'isPunctuation'
@@ -169,7 +164,8 @@ where
   pSplitter = go []
     where go t cs | T.null cs && null t     = []
                   | T.null cs               = [mkp t]
-                  | punctuation (T.head cs) = mkp t : go [] (T.tail cs)
+                  | punctuation (T.head cs) = if null t then go [] (T.tail cs)
+                                                else mkp t : go [] (T.tail cs)
                   | otherwise               = go (T.head cs:t) (T.tail cs)
           mkp = T.dropWhile (== ' ') . T.pack . reverse
           punctuation c = isPunctuation c && c `notElem` nopunc
@@ -177,13 +173,13 @@ where
   -------------------------------------------------------------------------
   -- Adding words to a keyword until a stopword is found
   -------------------------------------------------------------------------
-  kfinder :: StopwordsMap -> String -> Text -> [[Text]]
-  kfinder m nosplit = go [] . wSplitter nosplit . T.toLower
+  kfinder :: StopwordsMap -> NoSplit -> NoList -> Text -> [[Text]]
+  kfinder m nosplit nl = go [] . wSplitter nosplit . T.toLower
     where go [] [] = []
           go t  [] = [mkk t]
-          go t (w:ws) | stopword m w = if null t then         go [] ws
-                                                 else mkk t : go [] ws
-                      | otherwise    = go (w:t) ws
+          go t (w:ws) | stopword m nl w = if null t then         go [] ws
+                                                    else mkk t : go [] ws
+                      | otherwise       = go (w:t) ws
           mkk = reverse
 
   -------------------------------------------------------------------------
