@@ -223,7 +223,7 @@ where
   -- | The Arxiv API URL \"export.arxiv.org/api\"
   ------------------------------------------------------------------------ 
   apiUrl :: String
-  apiUrl =  "http://export.arxiv.org/api/query?"
+  apiUrl =  "https://export.arxiv.org/api/query?"
 
   ------------------------------------------------------------------------ 
   -- | The query string (\"search_query=\" or \"id_list=\")

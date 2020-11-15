@@ -10,3 +10,6 @@ salat/test/tex/tmp
 salat/test/tex/tmp2
 salat/test/tex/math
 salat/src/old
+**/.cabal-sandbox
+**/cabal.sandbox.config
+**/dist

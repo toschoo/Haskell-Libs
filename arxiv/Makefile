@@ -10,8 +10,11 @@ SUTDIR = src/Network/Api
 
 SUBSRC = $(SUTDIR)/Arxiv.hs 
 
+PKG = -package-db .cabal-sandbox/x86_64-linux-ghc-8.0.2-packages.conf.d
+
 GHC = ghc
-FLGS = -DTEST -Wall -rtsopts -prof -auto-all -caf-all -Ltest/suite --make 
+# FLGS = -DTEST -Wall -rtsopts -prof -auto-all -caf-all -Ltest/suite --make 
+FLGS = -DTEST -Wall -rtsopts -Ltest/suite $(PKG) --make 
 INC  = -i./src -i$(SUTDIR) -itest/suite
 
 smoke:	$(SMOKEDIR)/query1 \
@@ -44,6 +47,9 @@ $(SMOKEDIR)/query1:	$(SMOKEDIR)/query1.hs $(SUBSRC)
 $(SMOKEDIR)/query2:	$(SMOKEDIR)/query2.hs $(SUBSRC)
 			$(GHC) $(FLGS) $(INC) $@
 
+$(SMOKEDIR)/example:	$(SMOKEDIR)/example.hs $(SUBSRC)
+			$(GHC) $(FLGS) $(INC) $@
+
 $(SMOKEDIR)/result1:	$(SMOKEDIR)/result1.hs $(SUBSRC)
 			$(GHC) $(FLGS) $(INC) $@
 
@@ -63,6 +69,7 @@ clean:
 	rm -f test/bin/*.hi
 	rm -f test/smoke/query1
 	rm -f test/smoke/query2
+	rm -f test/smoke/example
 	rm -f test/smoke/arxiv
 	rm -f test/smoke/result1
 	rm -f tmp/*.pdf

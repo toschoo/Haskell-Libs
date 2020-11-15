@@ -306,7 +306,7 @@ where
     txt <- readFile "test/suite/result1.feed"
     let good = "OK. All Tests passed."
     let bad  = "Bad. Some Tests failed."
-    r <- deepCheck prpDslSimple ?>
+    r <- deepCheck prpDslSimple ?> 
          deepCheck prpParse1    ?>
          deepCheck prpParse2    ?>
          deepCheck prpParse3    ?>
@@ -327,16 +327,16 @@ where
          oneCheck  (prpPdf        txt)    ?>
          oneCheck  (prpPrimaryCat txt)    ?>
          oneCheck  (prpId      txt)       ?>
-         oneCheck  (prpYear    txt)       ?>
+         oneCheck  (prpYear    txt)       ?> 
          oneCheck  (prpUpdated txt)       ?>
-         oneCheck  (prpPublished  txt)    ?>
+         oneCheck  (prpPublished  txt)    ?> 
          oneCheck  (prpTitle      txt)    ?>
          oneCheck  (prpSummary    txt)    ?>
          oneCheck  (prpComment    txt)    ?>
          oneCheck  (prpJournal    txt)    ?>
          oneCheck  (prpDoi        txt)    ?> 
          oneCheck  (prpLinks      txt)    ?> 
-         oneCheck  (prpCategories txt)    
+         oneCheck  (prpCategories txt)
     case r of
       Success {}-> do
         putStrLn good
