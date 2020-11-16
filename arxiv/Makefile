@@ -77,5 +77,6 @@ clean:
 	rm -f *.aux 
 	rm -f *.prof 
 	rm -f *.ps 
+	rm -rf doc
 
 build: $(tests) $(SUBSRC)

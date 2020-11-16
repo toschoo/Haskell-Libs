@@ -1,4 +1,3 @@
-{-# LANGUAGE OverloadedStrings #-}
 module Main
 where
 
@@ -47,9 +46,7 @@ where
   searchAxv :: MonadResource m => Ax.Query -> C.ConduitT () String m ()
   searchAxv q = 
     let s = Ax.mkQuery q
-     in do u   <- liftIO (parseRequest s)
-           -- rsp <- HT.httpSource u return
-           rsp <- HT.httpBS u
+     in do rsp <- HT.httpBS =<< liftIO (parseRequest s)
            case getResponseStatus rsp of
              (Status 200 _) -> getSoup (getResponseBody rsp) >>= results q
              st             -> error $ "Error:" ++ show st
@@ -70,7 +67,8 @@ where
   ------------------------------------------------------------------------
   -- Yield all entries and fetch next page
   ------------------------------------------------------------------------
-  results :: MonadResource m => Ax.Query -> [Soup] -> C.ConduitT () String m ()
+  results :: MonadResource m =>
+             Ax.Query -> [Soup] -> C.ConduitT () String m ()
   results q sp = 
      if Ax.exhausted sp 
        then C.yield ("EOT: " ++ show (Ax.totalResults sp) ++ " results")
@@ -83,12 +81,12 @@ where
   mkResult :: [Soup] -> String
   mkResult sp = let aus = Ax.getAuthorNames sp
                     y   = Ax.getYear sp
-                    tmp = Ax.getTitle sp & cleanLn ['\n', '\r', '\t']
+                    tmp = Ax.getTitle sp & clean ['\n', '\r', '\t']
                     ti  = if null tmp then "No title" else tmp
                  in intercalate ", " aus ++ " (" ++ y ++ "): " ++ ti
-    where cleanLn _ [] = []
-          cleanLn d (c:cs) | c `elem` d =   cleanLn d cs
-                           | otherwise  = c:cleanLn d cs
+    where clean _ [] = []
+          clean d (c:cs) | c `elem` d =   clean d cs
+                         | otherwise  = c:clean d cs
 
   ------------------------------------------------------------------------
   -- Sink results 
