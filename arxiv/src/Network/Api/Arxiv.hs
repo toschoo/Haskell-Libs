@@ -579,9 +579,6 @@ where
   --   * The entry (if any)
   --
   --   * The rest of the tag soup following the first entry.
-  --
-  --   With getEntry, we can build a loop through all entries
-  --   in the result (which is actually implemented in 'forEachEntry').
   ------------------------------------------------------------------------
   getEntry :: [Tag String] -> ([Tag String],[Tag String])
   getEntry = element "entry"

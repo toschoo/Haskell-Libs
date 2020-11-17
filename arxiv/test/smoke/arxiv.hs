@@ -5,7 +5,7 @@ where
   import           Network.Api.Arxiv (Query(..), Field (..), 
                                       Expression(..))
 
-  import           Network (withSocketsDo)
+  import           Network.Socket (withSocketsDo)
   import           Network.HTTP.Conduit
   import           Network.HTTP.Types.Status
   import           Network.HTTP.Types.Header

@@ -1,7 +1,7 @@
 Name:            arxiv
-Version:         0.0.1
-Cabal-Version:   >= 1.8
-Copyright:       Copyright (c) Tobias Schoofs, 2014
+Version:         0.0.2
+Cabal-Version:   >= 1.10
+Copyright:       Copyright (c) Tobias Schoofs, 2014 -- 2020
 License:         LGPL
 license-file:    license/lgpl-3.0.txt
 Author:          Tobias Schoofs
@@ -10,6 +10,7 @@ Homepage:        http://github.com/toschoo/Haskell-Libs
 Category:        Network, API, NetworkAPI, Arxiv
 Build-Type:      Simple
 Synopsis:        A client for the Arxiv API
+extra-source-files: changelog.md
 Description:
   
   The arXiv is a repository of electronic preprints, known as e-prints, 
@@ -42,6 +43,7 @@ Library
                    tagsoup     >= 0.13
 
   hs-source-dirs: src, .
+  default-language: Haskell98
                    
   Exposed-Modules: Network.Api.Arxiv
   other-modules: 
