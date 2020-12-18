@@ -1,9 +1,9 @@
 Name:            arxiv
-Version:         0.0.2
+Version:         0.0.3
 Cabal-Version:   >= 1.10
-Copyright:       Copyright (c) Tobias Schoofs, 2014 -- 2020
+Copyright:       Copyright (c) Tobias Schoofs, 2014 - 2020
 License:         LGPL
-license-file:    license/lgpl-3.0.txt
+license-file:    license/lgpl-3.0ex.txt
 Author:          Tobias Schoofs
 Maintainer:      Tobias Schoofs <tobias dot schoofs at gmx dot net>
 Homepage:        http://github.com/toschoo/Haskell-Libs

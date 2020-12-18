@@ -6,13 +6,14 @@ where
                                       Expression(..))
 
   import           Network.Socket (withSocketsDo)
-  import           Network.HTTP.Conduit
+  import qualified Network.HTTP.Simple as HT
+  import           Network.HTTP.Conduit (Request(..), Response(..), parseRequest)
   import           Network.HTTP.Types.Status
   import           Network.HTTP.Types.Header
   import           Data.List (intercalate, isPrefixOf)
   import qualified Data.ByteString as B hiding (pack,unpack) 
   import qualified Data.ByteString.Char8 as B  (pack,unpack) 
-  import           Data.Conduit (($$+-), (=$), ($$))
+  import           Data.Conduit ((.|))
   import qualified Data.Conduit as C
   import           Data.Conduit.Binary (sinkFile) 
   import qualified Data.Conduit.List as CL
@@ -50,26 +51,31 @@ where
 
   type Soup = Tag String
 
-  execInfoQuery :: C.Conduit [Soup] RIO String -> Query -> IO ()
-  execInfoQuery c q = withManager $ \m -> searchEntries m q $$ c =$ outSnk
+  {-
+  execInfoQuery :: MonadResource m => C.ConduitT () String m () -> Query -> IO ()
+  execInfoQuery c q = C.runConduitRes (searchEntries q .| outSnk)
 
   execGetQuery :: Query -> FilePath -> IO ()
-  execGetQuery q d = withManager $ \m -> 
-    searchEntries m q $$ pdfUrl =$ savePdf m d
+  execGetQuery q d = C.runConduitRes $
+    searchEntries q .| pdfUrl .| savePdf d
+  -}
 
   execCountQuery :: Query -> IO ()
-  execCountQuery q = withManager $ \m -> countEntries m q $$ countC =$ outSnk
+  execCountQuery q = C.runConduitRes (countEntries q .| countC .| outSnk)
 
   execCommand :: [String] -> IO ()
   execCommand []              = usage
   execCommand [_]             = usage
   execCommand ("count":xs)    = execCount xs
+  {-
   execCommand ("get":xs)      = execGetSearch xs
   execCommand ("info":xs)     = execInfoSearch showResults  xs
   execCommand ("abstract":xs) = execInfoSearch showAbstract xs 
   execCommand ("format":xs)   = execInfoSearch (showFormat (head xs)) $ tail xs
   execCommand (x:_)           = error $ "Unknown command: " ++ x
+  -}
 
+  {-
   execGetSearch :: [String] -> IO ()
   execGetSearch []  = usage
   execGetSearch [_] = usage
@@ -90,19 +96,23 @@ where
            if not t then error $ d ++ " is not a directory or does not exist."
                     else execGetQuery q d
   execGetSearch (x:_) = error $ "Unknown identifier " ++ x
+  -}
 
   getFilterQuery :: [String] -> String
   getFilterQuery ("filter":[]) = error "Missing filter!"
   getFilterQuery ("filter":xs) = head xs
   getFilterQuery _             = ""
 
-  execInfoSearch :: C.Conduit [Soup] RIO String -> [String] -> IO ()
+  {-
+  execInfoSearch :: C.ConduitT [Soup] String m () -> [String] -> IO ()
   execInfoSearch _ []           = usage
   execInfoSearch _ [_]          = usage
   execInfoSearch c ("query":xs) = execInfoQuery c $ makeQuery (head xs) ""
   execInfoSearch c ("ids":xs)   = let qs = getFilterQuery $ tail xs
                                    in execInfoQuery c $ makeQuery qs (head xs)
+
   execInfoSearch _ (x:_)        = error $ "Unknown identifier " ++ x
+  -}
 
   execCount :: [String] -> IO ()
   execCount []           = usage
@@ -119,26 +129,23 @@ where
   makeDir (x:_)     = "."
 
   searchEntries :: MonadResource m =>
-                   Manager -> Ax.Query -> C.Source m [Soup]
-  searchEntries m q = searchAxv (resultSource m q) m q
+                   Ax.Query -> C.ConduitT () [Soup] m ()
+  searchEntries q = searchAxv (resultSource q) q
 
-  countEntries :: MonadResource m =>
-                   Manager -> Ax.Query -> C.Source m [Soup]
+  countEntries :: MonadResource m => Ax.Query -> C.ConduitT () [Soup] m ()
   countEntries = searchAxv blobSource
 
-  searchAxv :: MonadResource m =>
-               ([Soup] -> C.Source m [Soup]) ->
-               Manager -> Ax.Query -> C.Source m [Soup]
-  searchAxv src m q = do
-     rq  <- {- trace (Ax.mkQuery q) $ -} liftIO (mkRequest $ Ax.mkQuery q)
-     rsp <- http rq m -- catch
+  -- searchAxv :: MonadResource m =>
+  --              ([Soup] -> C.ConduitT () [Soup] m ()) -> Ax.Query -> C.ConduitT () [Soup] m () 
+  searchAxv src q = do
+     rsp <- HT.httpBS =<< liftIO (mkRequest $ Ax.mkQuery q)
      case responseStatus rsp of
-       (Status 200 _) -> getSoup rsp >>= src -- resultSource m q 
+       (Status 200 _) -> getSoup (responseBody rsp) >>= src
        st             -> error $ "Error:" ++ show st
 
   resultSource :: MonadResource m => 
-                  Manager -> Ax.Query -> [Soup] -> C.Source m [Soup]
-  resultSource m q sp = 
+                  Ax.Query -> [Soup] -> C.ConduitT () [Soup] m ()
+  resultSource q sp = 
     case Ax.checkForError sp of
       Left  r  -> error $ "Error: " ++ r
       Right () -> let x = Ax.totalResults sp
@@ -146,14 +153,14 @@ where
                       e = Ax.itemsPerPage sp
                    in unless (Ax.exhausted sp) $ do 
                         Ax.forEachEntryM_ sp C.yield
-                        searchEntries m $ Ax.nextPage q
+                        searchEntries $ Ax.nextPage q
 
-  blobSource :: MonadResource m => [Soup] -> C.Source m [Soup]
+  blobSource :: MonadResource m => [Soup] -> C.ConduitT () [Soup] m ()
   blobSource sp = case Ax.checkForError sp of
                     Left r   -> error $ "Error: " ++ r
                     Right () -> C.yield sp
 
-  countC :: MonadResource m => C.Conduit [Soup] m String
+  countC :: MonadResource m => C.ConduitT [Soup] String m ()
   countC = C.awaitForever (C.yield . showRes . Ax.totalResults)
     where showRes = show 
 
@@ -167,48 +174,50 @@ where
   -- Create Request
   ------------------------------------------------------------------------
   mkRequest :: String -> IO Request
-  mkRequest u = addAgent <$> parseUrl u
+  mkRequest u = addAgent <$> parseRequest u
 
   getSoup :: MonadResource m => 
-             Response (C.ResumableSource m B.ByteString) -> m [Soup]
-  getSoup rsp = concat <$> (responseBody rsp $$+- toSoup =$ CL.consume)
+             B.ByteString -> (C.ConduitT () String m [Soup])
+  getSoup b = concat <$> (C.yield b .| toSoup .| CL.consume)
 
-  toSoup :: MonadResource m => C.Conduit B.ByteString m [Soup] 
+  toSoup :: MonadResource m => C.ConduitT B.ByteString [Soup] m ()
   toSoup = C.awaitForever (C.yield . parseTags . B.unpack)
 
   pdfUrl :: MonadResource m => 
-            C.Conduit [Soup] m String
+            C.ConduitT [Soup] String m ()
   pdfUrl = C.awaitForever $ \e -> let p = Ax.getPdf e 
                                    in unless (null p) $ C.yield p
 
-  savePdf :: Manager -> FilePath -> C.Sink String RIO ()
-  savePdf m d = C.awaitForever $ \l -> C.handleC ignoreEx $ 
+  {-
+  savePdf :: MonadResource m => FilePath -> C.ConduitT String String m ()
+  savePdf d = C.awaitForever $ \l -> C.handleC ignoreEx $ 
     let f = takeFileName l <.> "pdf"
      in do rq  <- liftIO (mkRequest l)
-           rsp <- http rq m
+           rsp <- HT.httpBS rq 
            case responseStatus rsp of 
-             (Status 200 _) -> responseBody rsp $$+- sinkFile (d </> f)
+             (Status 200 _) -> C.yield (responseBody rsp) .| sinkFile (d </> f)
              st             -> liftIO (putStrLn $ "Status ('save'): " ++ 
                                                   show st)
+  -}
 
-  showResults :: C.Conduit [Soup] RIO String
+  showResults :: MonadResource m => C.ConduitT [Soup] String m ()
   showResults = C.awaitForever (C.yield . mkResult)
 
-  showAbstract :: C.Conduit [Soup] RIO String
+  showAbstract :: MonadResource m => C.ConduitT [Soup] String m ()
   showAbstract = C.awaitForever (C.yield . mkAbstract)
 
-  showFormat :: String -> C.Conduit [Soup] RIO String
+  showFormat :: MonadResource m => String -> C.ConduitT [Soup] String m ()
   showFormat f = C.awaitForever (C.yield . formatString f)
 
-  outSnk :: MonadResource m => C.Sink String m ()
+  outSnk :: MonadResource m => C.ConduitT String C.Void m ()
   outSnk = C.awaitForever (liftIO . putStr)
 
-  type RIO = ResourceT IO
+  -- type RIO = ResourceT IO
 
   ------------------------------------------------------------------------
   -- Log error and continue
   ------------------------------------------------------------------------
-  ignoreEx :: SomeException -> C.ConduitM i o RIO ()
+  ignoreEx :: SomeException -> C.ConduitM i o IO ()
   ignoreEx = liftIO . print -- print to stderr!
 
   mkResult :: [Soup] -> String
