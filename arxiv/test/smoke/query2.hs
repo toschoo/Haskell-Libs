@@ -17,7 +17,7 @@ where
   import           Data.Function ((&))
   import           Text.HTML.TagSoup
   import           Control.Monad.Trans (liftIO)
-  import           Control.Monad.Trans.Resource (MonadResource)
+  import           Control.Monad.IO.Class (MonadIO)
   import           Control.Applicative ((<$>))
 
   main :: IO ()
@@ -43,7 +43,7 @@ where
   ------------------------------------------------------------------------
   -- Execute query and start a source
   ------------------------------------------------------------------------
-  searchAxv :: MonadResource m => Ax.Query -> C.ConduitT () String m ()
+  searchAxv :: MonadIO m => Ax.Query -> C.ConduitT () String m ()
   searchAxv q = 
     let s = Ax.mkQuery q
      in do rsp <- HT.httpBS =<< liftIO (parseRequest s)
@@ -54,20 +54,20 @@ where
   ------------------------------------------------------------------------
   -- Consume page by page
   ------------------------------------------------------------------------
-  getSoup :: MonadResource m =>  
+  getSoup :: MonadIO m =>  
              B.ByteString -> C.ConduitT () String m [Soup]
   getSoup b = concat <$> (C.yield b .| toSoup .| CL.consume)
 
   ------------------------------------------------------------------------
   -- Receive a ByteString and yield Soup
   ------------------------------------------------------------------------
-  toSoup :: MonadResource m => C.ConduitT B.ByteString [Soup] m ()
+  toSoup :: MonadIO m => C.ConduitT B.ByteString [Soup] m ()
   toSoup = C.awaitForever (C.yield . parseTags . B.unpack)
 
   ------------------------------------------------------------------------
   -- Yield all entries and fetch next page
   ------------------------------------------------------------------------
-  results :: MonadResource m =>
+  results :: MonadIO m =>
              Ax.Query -> [Soup] -> C.ConduitT () String m ()
   results q sp = 
      if Ax.exhausted sp 
@@ -91,5 +91,5 @@ where
   ------------------------------------------------------------------------
   -- Sink results 
   ------------------------------------------------------------------------
-  outSnk :: MonadResource m => C.ConduitT String C.Void m ()
+  outSnk :: MonadIO m => C.ConduitT String C.Void m ()
   outSnk = C.awaitForever (liftIO . putStrLn)
