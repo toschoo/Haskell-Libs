@@ -1,21 +1,24 @@
+---------------------------------------------------------------------------
+-- | Expects a query as argument, executes it and presents the result
+--   in some standard format on standard output
+---------------------------------------------------------------------------
 module Main
 where
 
   import qualified Network.Api.Arxiv as Ax
 
-  import           Network (withSocketsDo)
-  import           Network.HTTP.Conduit
+  import           Network.Socket (withSocketsDo)
+  import qualified Network.HTTP.Simple as HT
+  import           Network.HTTP.Conduit (parseRequest)
   import           Network.HTTP.Types.Status
   import           Data.List (intercalate)
   import qualified Data.ByteString as B hiding (unpack) 
   import qualified Data.ByteString.Char8 as B  (unpack) 
-  import           Data.Conduit (($$+-), (=$), ($$))
+  import           Data.Conduit ((.|))
   import qualified Data.Conduit as C
   import qualified Data.Conduit.List as CL
   import           Text.HTML.TagSoup
-  import           Control.Monad.IO.Class (liftIO)
-  import           Control.Monad.Trans.Resource (MonadResource)
-  import           Control.Applicative ((<$>))
+  import           Control.Monad.IO.Class (MonadIO, liftIO)
   import           System.Environment
 
   e1 :: String
@@ -29,6 +32,8 @@ where
       [q] -> execQuery $ makeQuery q
       _   -> print e1
 
+  type Soup = Tag String
+
   makeQuery :: String -> Ax.Query
   makeQuery s = case Ax.parseQuery s of
                   Left  e -> error e
@@ -38,40 +43,50 @@ where
                                Ax.qStart = 0,
                                Ax.qItems = 25}
 
-  type Soup = Tag String
-
   execQuery :: Ax.Query -> IO ()
-  execQuery q = withManager $ \m -> searchAxv m q $$ outSnk
+  execQuery q = C.runConduitRes (searchAxv q .| outSnk)
 
-  searchAxv :: MonadResource m =>
-               Manager -> Ax.Query -> C.Source m String
-  searchAxv m q = 
+  ------------------------------------------------------------------------
+  -- Execute query and start a source
+  ------------------------------------------------------------------------
+  searchAxv :: MonadIO m => Ax.Query -> C.ConduitT () String m ()
+  searchAxv q = 
     let s = Ax.mkQuery q
-     in do u   <- liftIO (parseUrl s)
-           rsp <- http u m -- catch
-           case responseStatus rsp of
-             (Status 200 _) -> getSoup rsp >>= results m q 
+     in do rsp <- HT.httpBS =<< liftIO (parseRequest s)
+           case HT.getResponseStatus rsp of
+             (Status 200 _) -> getSoup (HT.getResponseBody rsp) >>= results q
              st             -> error $ "Error:" ++ show st
 
-  getSoup :: MonadResource m => 
-             Response (C.ResumableSource m B.ByteString) -> m [Soup]
-  getSoup rsp = concat <$> (responseBody rsp $$+- toSoup =$ CL.consume)
+  ------------------------------------------------------------------------
+  -- Consume page by page
+  ------------------------------------------------------------------------
+  getSoup :: MonadIO m =>  
+             B.ByteString -> C.ConduitT () String m [Soup]
+  getSoup b = concat <$> (C.yield b .| toSoup .| CL.consume)
 
-  toSoup :: MonadResource m => C.Conduit B.ByteString m [Soup] 
+  ------------------------------------------------------------------------
+  -- Receive a ByteString and yield Soup
+  ------------------------------------------------------------------------
+  toSoup :: MonadIO m => C.ConduitT B.ByteString [Soup] m ()
   toSoup = C.awaitForever (C.yield . parseTags . B.unpack)
 
-  results :: MonadResource m => 
-             Manager -> Ax.Query -> [Soup] -> C.Source m String
-  results m q sp = 
+  ------------------------------------------------------------------------
+  -- Yield results page by page
+  ------------------------------------------------------------------------
+  results :: MonadIO m => Ax.Query -> [Soup] -> C.ConduitT () String m ()
+  results q sp = 
     let x = Ax.totalResults sp
         i = Ax.startIndex   sp
         e = Ax.itemsPerPage sp
      in if x /= 0 && x >= i
           then do 
             Ax.forEachEntryM_ sp (C.yield . mkResult) 
-            searchAxv m q{Ax.qStart = i + e}
+            searchAxv q{Ax.qStart = i + e} -- could be simple nextPage
           else C.yield ("EOT: " ++ show x ++ " results.")
   
+  ------------------------------------------------------------------------
+  -- Format result
+  ------------------------------------------------------------------------
   mkResult :: [Soup] -> String
   mkResult sp = let aus = Ax.getAuthorNames sp
                     y   = Ax.getYear sp
@@ -79,10 +94,9 @@ where
                     ti  = if null tmp then "No title" else tmp
                  in intercalate ", " aus ++ " (" ++ y ++ "): " ++ ti
 
-  outSnk :: MonadResource m => C.Sink String m ()
+  ------------------------------------------------------------------------
+  -- Print it on stdout
+  ------------------------------------------------------------------------
+  outSnk :: MonadIO m => C.ConduitT String C.Void m ()
   outSnk = C.awaitForever (liftIO . putStrLn)
-
-
-
-
 

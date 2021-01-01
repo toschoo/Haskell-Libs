@@ -1,21 +1,22 @@
+---------------------------------------------------------------------------
+-- | Expects a query as argument, executes it and presents the result as is
+---------------------------------------------------------------------------
 module Main
 where
 
   import qualified Network.Api.Arxiv as Ax
-
-  import           Network (withSocketsDo)
-  import           Network.HTTP.Conduit
+  import           Network.Socket (withSocketsDo)
+  import qualified Network.HTTP.Simple as HT
+  import           Network.HTTP.Conduit (parseRequest)
   import           Network.HTTP.Types.Status
-  import           Data.List (intercalate)
   import qualified Data.ByteString as B hiding (unpack) 
   import qualified Data.ByteString.Char8 as B  (unpack) 
-  import           Data.Conduit (($$+-), (=$), ($$))
+  import           Data.Conduit ((.|))
   import qualified Data.Conduit as C
-  import qualified Data.Conduit.List as CL
-  import           Control.Monad (void)
-  import           Control.Monad.IO.Class (liftIO)
-  import           Control.Monad.Trans.Resource (MonadResource)
-  import           Control.Applicative ((<$>))
+  import           Data.Function ((&))
+  import           Text.HTML.TagSoup
+  import           Control.Monad (unless)
+  import           Control.Monad.IO.Class (MonadIO, liftIO)
   import           System.Environment
 
   e1 :: String
@@ -33,28 +34,29 @@ where
   makeQuery s = case Ax.parseQuery s of
                   Left  e -> error e
                   Right x -> Ax.Query {
-                               Ax.qExp   = x,
+                               Ax.qExp   = Just x,
+                               Ax.qIds   = [],
                                Ax.qStart = 0,
                                Ax.qItems = 25}
 
   execQuery :: Ax.Query -> IO ()
-  execQuery q = withManager $ \m -> searchAxv m q $$ outSnk
+  execQuery q = C.runConduitRes (searchAxv q .| outSnk)
 
-  searchAxv :: MonadResource m =>
-               Manager -> Ax.Query -> C.Source m String
-  searchAxv m q = 
+  searchAxv :: MonadIO m => Ax.Query -> C.ConduitT () String m ()
+  searchAxv q = 
     let s = Ax.mkQuery q
-     in do u   <- liftIO (parseUrl s)
-           rsp <- http u m -- catch
-           case responseStatus rsp of
-             (Status 200 _) -> (responseBody rsp $$+- CL.consume) 
-                                >>= results 
+     in do rsp <- HT.httpBS =<< liftIO (parseRequest s)
+           case HT.getResponseStatus rsp of
+             (Status 200 _) -> results q (HT.getResponseBody rsp)
              st             -> error $ "Error:" ++ show st
 
-  results :: MonadResource m => 
-             [B.ByteString] -> C.Source m String
-  results [] = return ()
-  results (x:xs) = C.yield (B.unpack x) >> results xs
+  results :: MonadIO m => Ax.Query -> B.ByteString -> C.ConduitT () String m ()
+  results q b | B.null b  = return ()
+              | otherwise = let s  = B.unpack b
+                                sp = s & parseTags -- exhausted...
+                             in unless (Ax.exhausted sp) $ 
+                                C.yield s >> searchAxv (Ax.nextPage q)
   
-  outSnk :: MonadResource m => C.Sink String m ()
+  outSnk :: MonadIO m => C.ConduitT String C.Void m ()
   outSnk = C.awaitForever (liftIO . putStrLn)
+

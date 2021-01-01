@@ -1,3 +1,7 @@
+---------------------------------------------------------------------------
+-- | Creates a predefined query, executes it and presents the result
+--   in some standard format on standard output
+---------------------------------------------------------------------------
 module Main
 where
 
@@ -5,7 +9,7 @@ where
   import           Network.Api.Arxiv (Expression(..), 
                                       Field(..), (/*/), (/+/))
   import           Network.Socket (withSocketsDo)
-  import           Network.HTTP.Simple as HT
+  import qualified Network.HTTP.Simple as HT
   import           Network.HTTP.Conduit (parseRequest)
   import           Network.HTTP.Types.Status
   import           Data.List (intercalate)
@@ -47,8 +51,8 @@ where
   searchAxv q = 
     let s = Ax.mkQuery q
      in do rsp <- HT.httpBS =<< liftIO (parseRequest s)
-           case getResponseStatus rsp of
-             (Status 200 _) -> getSoup (getResponseBody rsp) >>= results q
+           case HT.getResponseStatus rsp of
+             (Status 200 _) -> getSoup (HT.getResponseBody rsp) >>= results q
              st             -> error $ "Error:" ++ show st
 
   ------------------------------------------------------------------------
