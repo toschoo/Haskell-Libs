@@ -46,6 +46,7 @@ where
                  ++ "where\n"
                  ++ "\tcommand:\n"
                  ++ "\t\tinfo                  : prints the query result in a standard format.\n"
+                 ++ "\t\t                        equivalent to format \"%id - %aus (%y): %ti\"\n"
                  ++ "\t\tabstract              : prints the abstracts.\n"
                  ++ "\t\tcount                 : counts the number of results.\n"
                  ++ "\t\tformat <format string>: formats the result according to the format string;\n"
@@ -56,7 +57,6 @@ where
                  ++ "\t\t                        would print the author names, colon, title, etc.\n"
                  ++ "\t\t                        Note that 'aus' is not an arxiv field indicator.\n"
                  ++ "\t\t                        'aus' is all author names, 'au' is the first author (main author).\n"
-                 ++ "\t\t                        Escape sequences are not yet handled (todo).\n"
                  ++ "\t\tget [to <directoy>]   : downloads the indicated enries; and stores them in <directory>\n"
                  ++ "\t\t                      : or the current working directory if <directory> is not given.\n"
                  ++ "\t\t                        Note that this is not allowed according to the arXiv terms of use!\n"
@@ -270,7 +270,7 @@ where
   -- Receive a tag soup and transform it into the standard result format
   -------------------------------------------------------------------------
   showResults :: (MonadResource m, MonadIO m) => C.ConduitT [Soup] String m ()
-  showResults = C.awaitForever (C.yield . mkResult)
+  showResults = C.awaitForever (C.yield . formatString "%id - %aus (%y): %ti")
 
   -------------------------------------------------------------------------
   -- Receive a tag soup and transform it into the abstract format
@@ -291,8 +291,7 @@ where
   -- transform into count format (which is just a number)
   -------------------------------------------------------------------------
   countC :: (MonadResource m, MonadIO m) => C.ConduitT [Soup] String m ()
-  countC = C.awaitForever (C.yield . showRes . Ax.totalResults)
-    where showRes = show 
+  countC = C.awaitForever (C.yield . formatString "%res\n")
 
   -------------------------------------------------------------------------
   -- Yield PDF link (for get query)
@@ -324,18 +323,6 @@ where
              st             -> liftIO (putStrLn $ "Status ('save'): " ++ show st)
 
   -------------------------------------------------------------------------
-  -- Transform the soup into the standard format
-  -------------------------------------------------------------------------
-  mkResult :: [Soup] -> String
-  mkResult sp = let i   = Ax.getId sp
-                    aus = Ax.getAuthorNames sp
-                    y   = Ax.getYear sp
-                    tmp = Ax.getTitle sp
-                    ti  = if null tmp then "No title" else tmp
-                 in i ++ " - " ++ intercalate ", " aus ++ 
-                    " (" ++ y ++ "): " ++ ti ++ "\n"
-
-  -------------------------------------------------------------------------
   -- Transform the soup into the abstract format
   -------------------------------------------------------------------------
   mkAbstract :: [Soup] -> String
@@ -351,9 +338,10 @@ where
   -------------------------------------------------------------------------
   -- Use the format string to transform the soup into the custom format
   -- Note that aus/au is not standard arxiv!
+  -- TODO: add possibility to restrict title and abstract to n chars!
   -------------------------------------------------------------------------
   formatString :: String -> [Soup] -> String
-  formatString s sp = go s
+  formatString s sp = escape $ go s
     where go [] = ""
           go ('%':xs) | null xs   = ""
                       | head xs  == '%' = '%' : go (tail xs)
@@ -374,6 +362,17 @@ where
                    | "jr"   <| xs = (Ax.getJournal sp, drop 2 xs)
                    | "doi"  <| xs = (Ax.getDoi sp, drop 3 xs)
                    | otherwise    = ("", xs)
+          escape []        = []
+          escape ['\\']    = []
+          escape ('\\':xs) = eseq (head xs) : escape (tail xs)
+          escape (x:xs)    = x:escape xs
+          eseq 'b'  = '\b'
+          eseq 'f'  = '\f'
+          eseq 'n'  = '\n'
+          eseq 'r'  = '\r'
+          eseq 't'  = '\t'
+          eseq '\\' = '\\'
+          eseq _    = ' ' 
 
   -------------------------------------------------------------------------
   -- Get the main author; this is not an arxiv function!
