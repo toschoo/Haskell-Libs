@@ -24,6 +24,7 @@ where
   import           Network.HTTP.Types.Status
   import           Network.HTTP.Types.Header
   import           Data.List (intercalate, isPrefixOf)
+  import           Data.Char (isDigit, digitToInt)
   import qualified Data.ByteString                     as B hiding (pack,unpack) 
   import qualified Data.ByteString.Char8               as B  (pack,unpack) 
   import           Data.Conduit ((.|))
@@ -48,6 +49,7 @@ where
                  ++ "\t\tinfo                  : prints the query result in a standard format.\n"
                  ++ "\t\t                        equivalent to format \"%id - %aus (%y): %ti\"\n"
                  ++ "\t\tabstract              : prints the abstracts.\n"
+                 ++ "\t\t                        equivalent to format \"%id - %au (%y): %25ti\\n%abs\\n\"\n"
                  ++ "\t\tcount                 : counts the number of results.\n"
                  ++ "\t\tformat <format string>: formats the result according to the format string;\n"
                  ++ "\t\t                        works similar to printf. The format string contains format specifiers\n"
@@ -57,8 +59,12 @@ where
                  ++ "\t\t                        would print the author names, colon, title, etc.\n"
                  ++ "\t\t                        Note that 'aus' is not an arxiv field indicator.\n"
                  ++ "\t\t                        'aus' is all author names, 'au' is the first author (main author).\n"
+                 ++ "\t\t                        The number of characters taken from each field can be limited\n"
+                 ++ "\t\t                        by placing a positive integer between '%' and the indicator, e.g.\n"
+                 ++ "\t\t                        %25abs would limit the abstract to 25 characters.\n"
+                 ++ "\t\t                        0 is ignored; i.e. %0abs is the same as %abs.\n"
                  ++ "\t\tget [to <directoy>]   : downloads the indicated enries; and stores them in <directory>\n"
-                 ++ "\t\t                      : or the current working directory if <directory> is not given.\n"
+                 ++ "\t\t                        or the current working directory if <directory> is not given.\n"
                  ++ "\t\t                        Note that this is not allowed according to the arXiv terms of use!\n"
                  ++ "\tsubcommand:\n"
                  ++ "\t\tquery : executes a query in arXiv format.\n"
@@ -276,7 +282,8 @@ where
   -- Receive a tag soup and transform it into the abstract format
   -------------------------------------------------------------------------
   showAbstract :: (MonadResource m, MonadIO m) => C.ConduitT [Soup] String m ()
-  showAbstract = C.awaitForever (C.yield . mkAbstract)
+  showAbstract = C.awaitForever (C.yield . formatString 
+                         "%id - %au (%y): %25ti\n%abs\n")
 
   -------------------------------------------------------------------------
   -- Receive a tag soup and transform it into the custom format
@@ -323,45 +330,37 @@ where
              st             -> liftIO (putStrLn $ "Status ('save'): " ++ show st)
 
   -------------------------------------------------------------------------
-  -- Transform the soup into the abstract format
-  -------------------------------------------------------------------------
-  mkAbstract :: [Soup] -> String
-  mkAbstract sp = let i   = Ax.getId sp
-                      a   = mainAuthor sp
-                      y   = Ax.getYear sp
-                      tmp = take 25 $ Ax.getTitle sp
-                      ti  = if null tmp then "No title" else tmp
-                      ab  = Ax.getSummary sp
-                   in i ++ " - " ++ a ++ 
-                      " (" ++ y ++ "): " ++ ti ++ "\n" ++ ab ++ "\n"
-
-  -------------------------------------------------------------------------
   -- Use the format string to transform the soup into the custom format
   -- Note that aus/au is not standard arxiv!
-  -- TODO: add possibility to restrict title and abstract to n chars!
   -------------------------------------------------------------------------
   formatString :: String -> [Soup] -> String
   formatString s sp = escape $ go s
     where go [] = ""
           go ('%':xs) | null xs   = ""
                       | head xs  == '%' = '%' : go (tail xs)
-                      | otherwise = let (h, xs') = subst xs in h ++ go xs'
+                      | otherwise = let (f, xs1) = limit 0 xs
+                                        (h, xs2) = subst f xs1
+                                     in h ++ go xs2
           go (x:xs) = x : go xs
-          subst [] = ([], [])
-          subst xs | "aus"  <| xs = (intercalate ", " $ Ax.getAuthorNames sp, drop 3 xs)
-                   | "au"   <| xs = (mainAuthor sp, drop 2 xs)
-                   | "ti"   <| xs = (Ax.getTitle sp, drop 2 xs)
-                   | "idu"  <| xs = (Ax.getIdUrl sp, drop 3 xs)
-                   | "id"   <| xs = (Ax.getId sp, drop 2 xs)
-                   | "upd"  <| xs = (Ax.getUpdated sp, drop 3 xs)
-                   | "pub"  <| xs = (Ax.getPublished sp, drop 3 xs)
-                   | "y"    <| xs = (Ax.getYear sp, drop 1 xs)
-                   | "res"  <| xs = (show $ Ax.totalResults sp, drop 3 xs)
-                   | "idx"  <| xs = (show $ Ax.startIndex   sp, drop 3 xs)
-                   | "abs"  <| xs = (Ax.getSummary sp, drop 3 xs)
-                   | "jr"   <| xs = (Ax.getJournal sp, drop 2 xs)
-                   | "doi"  <| xs = (Ax.getDoi sp, drop 3 xs)
-                   | otherwise    = ("", xs)
+          limit _ [] = (id, [])
+          limit n (x:xs) | isDigit x = limit (10*n + digitToInt x) xs
+                         | n > 0     = (take n, x:xs)
+                         | otherwise = (id, x:xs)
+          subst _ [] = ([], [])
+          subst f xs | "aus"  <| xs = (f $ intercalate ", " $ Ax.getAuthorNames sp, drop 3 xs)
+                     | "au"   <| xs = (f $ mainAuthor sp, drop 2 xs)
+                     | "ti"   <| xs = (f $ Ax.getTitle sp, drop 2 xs)
+                     | "idu"  <| xs = (f $ Ax.getIdUrl sp, drop 3 xs)
+                     | "id"   <| xs = (f $ Ax.getId sp, drop 2 xs)
+                     | "upd"  <| xs = (f $ Ax.getUpdated sp, drop 3 xs)
+                     | "pub"  <| xs = (f $ Ax.getPublished sp, drop 3 xs)
+                     | "y"    <| xs = (f $ Ax.getYear sp, drop 1 xs)
+                     | "res"  <| xs = (f $ show $ Ax.totalResults sp, drop 3 xs)
+                     | "idx"  <| xs = (f $ show $ Ax.startIndex   sp, drop 3 xs)
+                     | "abs"  <| xs = (f $ Ax.getSummary sp, drop 3 xs)
+                     | "jr"   <| xs = (f $ Ax.getJournal sp, drop 2 xs)
+                     | "doi"  <| xs = (f $ Ax.getDoi sp, drop 3 xs)
+                     | otherwise    = ("", xs)
           escape []        = []
           escape ['\\']    = []
           escape ('\\':xs) = eseq (head xs) : escape (tail xs)
