@@ -3,6 +3,7 @@
 ---------------------------------------------------------------------------
 module Algorithms.Dijkstra (Node(..), Path, Rep,
                             mkNode, initNodes, addNeis,
+
                             getNode, updNode, withNode,
                             astar, dijkstra)
 where
@@ -120,10 +121,11 @@ where
                              (Node a -> Node a   -> Integer) -> -- distance
                              (Node a -> Integer)             -> -- heuristics
                              Rep a   -> a        -> Path a
-  astar e d h r s = let w = buildWQueue s (fst <$> M.toList r)
+  astar e d h r s = let wq = buildWQueue s (fst <$> M.toList r)
+                        r' = updNode r s (getNode r s){nodDst = 0} -- update start node to have distance 0
                      in case M.lookup s r of
                           Nothing -> []
-                          Just k  -> shortestPath e d h r w k
+                          Just k  -> shortestPath e d h r' wq k
 
   ----------------------------------------------------------------------------------------------------------------------
   -- Dijkstra is a special case of A*
@@ -136,10 +138,10 @@ where
   ----------------------------------------------------------------------------------------------------------------------
   -- A* shortest path algorithm
   ----------------------------------------------------------------------------------------------------------------------
-  shortestPath:: (Eq a, Ord a) => (Node a -> Bool)                -> -- terminator
-                                  (Node a -> Node a   -> Integer) -> -- distance
-                                  (Node a -> Integer)             -> -- heuristics
-                                  Rep a   -> WQueue a -> Node a   -> Path a
+  shortestPath :: (Eq a, Ord a) => (Node a -> Bool)                -> -- terminator
+                                   (Node a -> Node a   -> Integer) -> -- distance
+                                   (Node a -> Integer)             -> -- heuristics
+                                   Rep a   -> WQueue a -> Node a   -> Path a
   shortestPath _   _ _ _ [] _       = []
   shortestPath e g h r (W _ i:is) s = withNode r i $ \n -> -- visit it
                                         let (is',r') = visit g h r is i n 

@@ -36,7 +36,7 @@ where
   ----------------------------------------------------------------------------------------------------------------------
   funnyKnight :: String -> String -> String -> [String]
   funnyKnight queen knight target =
-    let g = buildGraph (code queen) (code knight)
+    let g = buildGraph $ code queen
      in (label . nodVal) <$> dijkstra end dist g (code knight)
     where end (N i _ _ _ _) = i == code target -- check if we reached the target
           dist _ _ = 1                         -- distance calculator
@@ -189,12 +189,11 @@ where
   -----------------------------------------------------------------------------------------------------------------------
   -- Helper for setting up Dijkstra's algorithm: build the node repository.
   -----------------------------------------------------------------------------------------------------------------------
-  buildGraph :: Square -> Square -> Rep Square
-  buildGraph queen knight = let no    = notAllowed queen -- these squares are not in the graph
-                                nodes = mkNode <$> [0..63] -- the chessboard
-                                r     = updNode (initNodes nodes) knight $ -- the starting node has distance 0
-                                          N knight 0 [] False Nothing
-                             in foldl' (addNeighbours no) r nodes
+  buildGraph :: Square -> Rep Square
+  buildGraph queen = let no    = notAllowed queen   -- these squares are not in the graph
+                         nodes = mkNode <$> [0..63] -- the chessboard
+                         r     = initNodes nodes
+                      in foldl' (addNeighbours no) r nodes
     where addNeighbours l r n | M.member (nodVal n) l = r -- don't add nodes that are not in the graph
                               | otherwise = addNeis r n $ filter ( -- don't add neighbours that are not in the graph
                                               \s -> not $ M.member s l) $ knightMovesFrom (nodVal n)
