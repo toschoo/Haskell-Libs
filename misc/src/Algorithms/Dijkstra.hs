@@ -1,42 +1,57 @@
 ---------------------------------------------------------------------------
--- Dijkstra's Shortest Path Algorithm and
--- A*
+-- A* and Dijkstra's Shortest Path Algorithm
 ---------------------------------------------------------------------------
-module Algorithms.Dijkstra 
+module Algorithms.Dijkstra (Node(..), Path, Rep,
+                            mkNode, initNodes, addNeis,
+                            getNode, updNode, withNode,
+                            astar, dijkstra)
 where
 
   import qualified Data.Map as M
-  import           Data.Map   (Map)
+  import           Data.Map (Map)
+  import           Data.Functor ((<$>))
+  import           Data.List    (delete, sort)
   import           Data.Maybe (fromJust)
-  import           Data.List  (delete)
-
-  -------------------------------------------------------------------------
-  -- Data Type, perhaps an external interface with a standard node type
-  --            would be nice
-  -------------------------------------------------------------------------
+ 
+  ----------------------------------------------------------------------------------------------------------------------
+  -- Data Type representing a node in the graph
+  ----------------------------------------------------------------------------------------------------------------------
   data Node a = N {
-                  nodVal  :: a,
-                  nodDst  :: Integer,
-                  nodNei  :: [Identifier],
-                  nodPath :: Maybe Identifier}
+                  nodVal  :: a,        -- the application data type represented by one node
+                  nodDst  :: Integer,  -- the distance to the target
+                  nodNei  :: [a],      -- the neighbours of this node
+                  nodVis  :: Bool,     -- node was visited
+                  nodPath :: Maybe a}  -- the node belongs to a path and this is the next node on the way
     deriving (Show)
 
   instance (Eq a) => Eq (Node a) where
-    (N x _ _ _) == (N y _ _ _) = x == y
+    (N x _ _ _ _) == (N y _ _ _ _) = x == y
 
+  instance (Ord a) => Ord (Node a) where
+    compare (N a _ _ _ _) (N b _ _ _ _) = compare a b
+
+  ----------------------------------------------------------------------------------------------------------------------
+  -- Standard constructor
+  ----------------------------------------------------------------------------------------------------------------------
   mkNode :: a -> Node a
-  mkNode x = N x infinity [] Nothing
+  mkNode x = N x infinity [] False Nothing 
 
-  initNodes :: [Node a] -> (Rep a, [Identifier])
-  initNodes ns = let is = [1..length ns]
-                  in (M.fromList $ zip is ns, is)
+  ----------------------------------------------------------------------------------------------------------------------
+  -- Init nodes repository from list of nodes
+  ----------------------------------------------------------------------------------------------------------------------
+  initNodes :: (Ord a) => [Node a] -> Rep a
+  initNodes ns = M.fromList $ zip (nodVal <$> ns) ns
 
-  addNeis :: Rep a -> Identifier -> [Identifier] -> Rep a
-  addNeis r i is = withNode r i $ \k -> updNode r i k{nodNei = is}
+  ----------------------------------------------------------------------------------------------------------------------
+  -- Add neighbours to node in repository    
+  ----------------------------------------------------------------------------------------------------------------------
+  addNeis :: (Ord a) => Rep a -> Node a -> [a] -> Rep a
+  addNeis r n ns = let i = nodVal n
+                    in withNode r i $ \k -> updNode r i k{nodNei = ns}
 
-  -------------------------------------------------------------------------
-  -- Integer with Infinity
-  -------------------------------------------------------------------------
+  ----------------------------------------------------------------------------------------------------------------------
+  -- Integer with Infinity for the weight
+  ----------------------------------------------------------------------------------------------------------------------
   infinity :: Integer
   infinity = -1
 
@@ -46,94 +61,116 @@ where
   cmp _    (-1) = LT
   cmp a    b    = compare a b
 
-  -------------------------------------------------------------------------
-  -- Useful type synonyms
-  -------------------------------------------------------------------------
-  type Identifier = Int
-  type Path a     = [Node a]
-
-  -------------------------------------------------------------------------
+  ----------------------------------------------------------------------------------------------------------------------
   -- WIdentifier data structure to represent
   -- a list of weighted Identifiers
   -- where elements are compared for ordering by weight and 
   --                             for equality by identifier
-  -------------------------------------------------------------------------
-  data WIdentifier = W Integer Identifier
+  ----------------------------------------------------------------------------------------------------------------------
+  data WIdentifier a = W Integer a
     deriving (Show)
 
-  instance Eq WIdentifier  where
+  instance (Eq a) => Eq (WIdentifier a) where
     (W _ x) == (W _ y) = x == y
 
-  instance Ord WIdentifier where
-    compare (W i _) (W j _) = compare i j
+  instance (Eq a) => Ord (WIdentifier a) where
+    compare (W i _) (W j _) = cmp i j
 
-  type WQueue = [WIdentifier]
+  type WQueue a = [WIdentifier a]
 
-  -------------------------------------------------------------------------
+  ----------------------------------------------------------------------------------------------------------------------
   -- Maintain list ordered
-  -------------------------------------------------------------------------
-  rebalance :: WIdentifier -> WQueue -> WQueue 
+  ----------------------------------------------------------------------------------------------------------------------
+  rebalance :: (Eq a) => WIdentifier a -> WQueue a -> WQueue a
   rebalance _ [] = [] -- do not add if not in!
   rebalance p (x:xs) | p > x     = x : rebalance p xs
                      | otherwise = p : delete p (x:xs)
 
-  -------------------------------------------------------------------------
-  -- Node repository
-  -------------------------------------------------------------------------
-  type Rep a   = Map Identifier (Node a)
+  ----------------------------------------------------------------------------------------------------------------------
+  -- Useful type synonym
+  ----------------------------------------------------------------------------------------------------------------------
+  type Path a     = [Node a]
 
-  getNode :: Rep a -> Identifier -> Node a
+  ----------------------------------------------------------------------------------------------------------------------
+  -- Node repository
+  ----------------------------------------------------------------------------------------------------------------------
+  type Rep a   = Map a (Node a)
+
+  getNode :: (Ord a) => Rep a -> a -> Node a
   getNode r i = fromJust $ M.lookup i r
 
-  updNode :: Rep a -> Identifier -> Node a -> Rep a
+  updNode :: (Ord a) => Rep a -> a -> Node a -> Rep a
   updNode r i n = M.update (const $ Just n) i r
 
-  withNode :: Rep a -> Identifier -> (Node a -> r) -> r
+  withNode :: (Ord a) => Rep a -> a -> (Node a -> r) -> r
   withNode r i f = f (getNode r i)
 
-  -------------------------------------------------------------------------
+  -----------------------------------------------------------------------------------------------------------------------
+  -- Helper for setting up the algorithm: build a queue that is kept sorted by distance.
+  -----------------------------------------------------------------------------------------------------------------------
+  buildWQueue :: (Eq a, Ord a) => a -> [a] -> WQueue a
+  buildWQueue s ns = sort (makeWInteger <$> ns)
+    where makeWInteger i | i == s    = W 0        i -- the starting node has distance zero
+                         | otherwise = W infinity i -- all others have distance infinity
+ 
+  ----------------------------------------------------------------------------------------------------------------------
+  -- Run A* shortest path algorithm
+  ----------------------------------------------------------------------------------------------------------------------
+  astar  :: (Eq a, Ord a) => (Node a -> Bool)                -> -- terminator
+                             (Node a -> Node a   -> Integer) -> -- distance
+                             (Node a -> Integer)             -> -- heuristics
+                             Rep a   -> a        -> Path a
+  astar e d h r s = let w = buildWQueue s (fst <$> M.toList r)
+                     in case M.lookup s r of
+                          Nothing -> []
+                          Just k  -> shortestPath e d h r w k
+
+  ----------------------------------------------------------------------------------------------------------------------
+  -- Dijkstra is a special case of A*
+  ----------------------------------------------------------------------------------------------------------------------
+  dijkstra :: (Eq a, Ord a) => (Node a -> Bool)                -> -- terminator
+                               (Node a -> Node a   -> Integer) -> -- distance
+                                Rep a  -> a        -> Path a
+  dijkstra e g = astar e g (const 0)
+
+  ----------------------------------------------------------------------------------------------------------------------
   -- A* shortest path algorithm
-  -------------------------------------------------------------------------
-  astar  :: (Eq a) => (Node a -> Bool)              -> 
-                      (Node a -> Node a -> Integer) -> 
-                      (Node a -> Integer)           ->
-                      Rep a   -> Node a -> WQueue   -> Path a
-  astar  _   _ _ _ _ []     = []
-  astar  end g h r s (W _ i:is) = withNode r i $ \n -> 
-     let (is',r') = upd g h r is i n 
-      in if end n then reverse $ makePath r' s n
-                  else astar end g h r' s is'
+  ----------------------------------------------------------------------------------------------------------------------
+  shortestPath:: (Eq a, Ord a) => (Node a -> Bool)                -> -- terminator
+                                  (Node a -> Node a   -> Integer) -> -- distance
+                                  (Node a -> Integer)             -> -- heuristics
+                                  Rep a   -> WQueue a -> Node a   -> Path a
+  shortestPath _   _ _ _ [] _       = []
+  shortestPath e g h r (W _ i:is) s = withNode r i $ \n -> -- visit it
+                                        let (is',r') = visit g h r is i n 
+                                         in if e n then reverse $ makePath r' s n
+                                                   else shortestPath e g h r' is' s
 
-  -------------------------------------------------------------------------
-  -- Dijkstra's is a special case of A*
-  -------------------------------------------------------------------------
-  dijkstra :: (Eq a) => (Node a -> Bool)  -> 
-                        (Node a -> Node a -> Integer) -> 
-                         Rep a  -> Node a -> WQueue   -> Path a
-  dijkstra end g = astar end g (const 0)
+  ----------------------------------------------------------------------------------------------------------------------
+  -- Visit Node
+  ----------------------------------------------------------------------------------------------------------------------
+  visit :: (Eq a, Ord a) => (Node a -> Node a -> Integer) -> 
+                            (Node a -> Integer)           ->
+                            Rep a   -> WQueue a -> a      -> 
+                            Node a  -> (WQueue a, Rep a)
+  visit g h r wq i n | nodVis n  = (wq, r)
+                     | otherwise = go r wq (nodDst n) (nodNei n)
+    where go r' wq' _ []     = (wq', updNode r' (nodVal n) n)
+          go r' wq' w (k:ks) = withNode r' k $ \n' ->
+            let w' | w == infinity = 0
+                   | otherwise     = w
+                d = w' + g n n' + h n'
+             in if d `cmp` nodDst n' == LT -- we need to update the node and rebalance the queue
+                  then let r''  = updNode r' k n'{nodDst  = d, 
+                                                  nodPath = Just i}
+                           wq'' = rebalance (W d k) wq'
+                        in go r'' wq'' w ks
+                  else     go r'  wq'  w ks
 
-  -------------------------------------------------------------------------
-  -- Node update
-  -------------------------------------------------------------------------
-  upd :: (Eq a) => (Node a -> Node a -> Integer)   -> 
-                   (Node a -> Integer)             ->
-                   Rep a   -> WQueue -> Identifier -> 
-                   Node a  -> (WQueue, Rep a)
-  upd g h r wq i n = go r wq (nodDst n) (nodNei n)
-    where go r' wq' _ []     = (wq',r')
-          go r1 wq1 w (k:ks) = withNode r1 k $ \n2 ->
-            let d = w + g n n2 + h n2
-             in if d `cmp` nodDst n2 == LT 
-                  then let r2  = updNode r1 k n2{nodDst  = d, 
-                                                 nodPath = Just i}
-                           wq2 = rebalance (W d k) wq1
-                        in go r2 wq2 w ks
-                  else     go r1 wq1 w ks
-
-  -------------------------------------------------------------------------
+  ----------------------------------------------------------------------------------------------------------------------
   -- Collect solution
-  -------------------------------------------------------------------------
-  makePath :: (Eq a) => Rep a -> Node a -> Node a -> Path a 
+  ----------------------------------------------------------------------------------------------------------------------
+  makePath :: (Eq a, Ord a) => Rep a -> Node a -> Node a -> Path a 
   makePath r s n | n == s    = [n]
                  | otherwise = n : case nodPath n of
                                      Nothing -> [] -- dead end - error?
