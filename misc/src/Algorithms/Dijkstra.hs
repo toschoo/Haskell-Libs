@@ -12,7 +12,6 @@
 ------------------------------------------------------------------------------------------------------------------------
 module Algorithms.Dijkstra (Node(..), Path, Rep,
                             mkNode, initNodes, addNeis,
-
                             getNode, updNode, withNode,
                             astar, dijkstra)
 where
