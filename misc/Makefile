@@ -1,26 +1,23 @@
 TDIR = test/suite
 SMOKEDIR = test/smoke
-COMDIR = src/common
 BNCHDIR = src/test/bench
 
 SRCDIR = src
 SUTDIR = src/Algorithms
 
-SUBSRC = $(SUTDIR)/Types.hs 
-
 GHC = ghc
-FLGS = -DTEST -Wall -rtsopts -Ltest/suite --make # -prof -auto-all -caf-all -
+FLGS = -DTEST -Wall -rtsopts -Ltest/suite --make
+BFLGS = -DTEST -Wall -prof -auto-all -caf-all -rtsopts -Ltest/suite --make
 INC  = -i./src -i$(SUTDIR) -itest/suite -i$(SMOKEDIR)
 
 smoke:	$(SMOKEDIR)/qknight \
         $(SMOKEDIR)/dijkstra1
 
 qknight: $(SMOKEDIR)/qknight
+dijkstra1: $(SMOKEDIR)/dijkstra1
 
-suite:	$(TDIR)/tstAlTypes
-
-$(TDIR)/tstAlTypes:	$(TDIR)/tstAlTypes.hs $(SUBSRC)
-			$(GHC) $(FLGS) $(INC) $@
+run:	$(TDIR)/Spec.hs
+	runhaskell $(INC) $(TDIR)/Spec.hs
 
 $(SMOKEDIR)/qknight:	$(SMOKEDIR)/qknight.hs $(SMOKEDIR)/KnightAndQueen.hs $(SUTDIR)/Dijkstra.hs
 			$(GHC) $(FLGS) $(INC) $@
@@ -30,9 +27,6 @@ $(SMOKEDIR)/dijkstra1:	$(SMOKEDIR)/dijkstra1.hs $(SUTDIR)/Dijkstra.hs
 
 $(TDIR)/Spec:	$(TDIR)/Spec.hs
 		$(GHC) $(FLGS) $(INC) $@
-
-run:	$(suite) $(SUBSRC)
-	$(TDIR)/tstAlTypes
 
 clean:
 	rm -f $(TDIR)/*.hi
@@ -51,5 +45,3 @@ clean:
 	rm -f *.aux 
 	rm -f *.prof 
 	rm -f *.ps 
-
-build: $(tests) $(SUBSRC)
