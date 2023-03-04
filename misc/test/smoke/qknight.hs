@@ -13,8 +13,8 @@ where
   main = do
     initOpts
     c <- getGlobalComplete
-    if c then mapM_ print knightTour 
-         else do 
+    if c then mapM_ print knightTour -- complete knight tour
+         else do                     -- one path between two squares
            q <- getGlobalQueen
            k <- getGlobalKnight
            t <- getGlobalTarget
@@ -29,10 +29,10 @@ where
   -- Commandline Options
   ---------------------------------------------------------------------------
   data Opts = Opts {
-    complete :: Bool,
-    queen    :: Maybe String,
-    knight   :: Maybe String,
-    target   :: Maybe String
+    complete :: Bool,         -- complete tour?
+    queen    :: Maybe String, -- queen  position
+    knight   :: Maybe String, -- knight position
+    target   :: Maybe String  -- target position
   } deriving Show
 
   {-# NOINLINE mopts #-}
@@ -71,7 +71,7 @@ where
     <$> switch
         (long "complete" <> short 'c' <> help "complete knight tour with queen on d5")
     <*> optional (strOption
-        (long "queen" <> short 'q' <> showDefault <> value "d5" <> help "queen position"))
+        (long "queen"  <> short 'q' <> showDefault <> value "d5" <> help "queen position"))
     <*> optional (strOption
         (long "knight" <> short 'k' <> showDefault <> value "h8" <> help "initial knight position"))
     <*> optional (strOption
