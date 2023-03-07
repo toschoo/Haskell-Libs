@@ -19,6 +19,9 @@ dijkstra1: $(SMOKEDIR)/dijkstra1
 run:	$(TDIR)/Spec.hs
 	runhaskell $(INC) $(TDIR)/Spec.hs
 
+doc:	$(SUTDIR)/Dijkstra.hs
+	haddock -h -o ./doc $(SUTDIR)/Dijkstra.hs
+
 $(SMOKEDIR)/qknight:	$(SMOKEDIR)/qknight.hs $(SMOKEDIR)/KnightAndQueen.hs $(SUTDIR)/Dijkstra.hs
 			$(GHC) $(FLGS) $(INC) $@
 

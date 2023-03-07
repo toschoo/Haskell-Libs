@@ -33,11 +33,11 @@ where
                   nodPath :: Maybe a}  -- ^ The node belongs to a path and this is the next node on the way
     deriving (Show)
 
-  -- | 'a' needs to derive `Eq` 
+  -- | /a/ needs to derive /Eq/ 
   instance (Eq a) => Eq (Node a) where
     (N x _ _ _ _) == (N y _ _ _ _) = x == y
 
-  -- | 'a' needs to derive `Ord` 
+  -- | /a/ needs to derive /Ord/ 
   instance (Ord a) => Ord (Node a) where
     compare (N a _ _ _ _) (N b _ _ _ _) = compare a b
 
@@ -65,7 +65,7 @@ where
   --   > addNeis rep n ["Stanislaw Ulam", "Alfred Tarski"]
   --
   -- Care must be taken to ensure that the correponding nodes exist in the repository.
-  -- This is not tested by the path finding functions!
+  -- This is not checked by the path finding functions!
   ----------------------------------------------------------------------------------------------------------------------
   addNeis :: (Ord a) => Rep a -> Node a -> [a] -> Rep a
   addNeis r n ns = let i = nodVal n
@@ -156,12 +156,15 @@ where
   --                     the data contain a numerical value that surpasses a certain threshold).
   --
   --   * The distance calculator: a function that calculates the distance between two nodes (e.g.
-  --     kilometres, travel time or ticket cost). 
+  --     kilometres, travel time or ticket cost). The function may be arbitrarily complex and compute, for example,
+  --     a ratio of all available information like kilometres, travel time and ticket cost. 
   --     To just count the steps between nodes, one can pass /(\_ _ -> 1)/.
+  --     The nodes passed in to the function are the currently visited node and the neighbour visited next.
   -- 
-  --   * The heuristics calculator: a function that computes a heuristic value for a node. It is this function that
-  --     distinguishes Dijkstra from A*. A* with /const 0/ is equivalent to Dijkstra.
-  --     The node passed in to the function is the neightbour of the currently visited node.
+  --   * The heuristics calculator: a function that computes a heuristic value for two nodes (e.g.
+  --     one may use the cardinal direction to decide which neighbour to choose). It is this function that
+  --     distinguishes Dijkstra from A*. A* with /(\_ _ -> 0)/ is equivalent to Dijkstra.
+  --     The nodes passed in to the function are the currently visited node and the neighbour visited next.
   --
   --   * A previously created repository (which can be reused for other searches).
   --
@@ -171,7 +174,7 @@ where
   --
   --   > astar (\n -> nodVal a == "Paul Erdös")
   --   >       (\_ _ -> 1)
-  --   >       (const 0)
+  --   >       (\_ _ -> 0)
   --   >       rep
   --   >       "Terence Tao"
   --
@@ -188,12 +191,12 @@ where
   --
   --  * If start and target nodes are identical the result contains only the start node
   --
-  --  * If a neighbour of any node in the graph does not exist (i.e. is corresponding node is not in the repository)
+  --  * If a neighbour of any node in the graph does not exist (i.e. its corresponding node is not in the repository)
   --    the function throws an exception.
   ----------------------------------------------------------------------------------------------------------------------
   astar  :: (Eq a, Ord a) => (Node a -> Bool)                -> -- terminator
                              (Node a -> Node a   -> Integer) -> -- distance
-                             (Node a -> Integer)             -> -- heuristics
+                             (Node a -> Node a   -> Integer) -> -- heuristics
                              Rep a   -> a        -> Path a
   astar e d h r s = let wq = buildWQueue s (fst <$> M.toList r)
                         r' = updNode r s (getNode r s){nodDst = 0} -- update start node to have distance 0
@@ -204,20 +207,20 @@ where
   ----------------------------------------------------------------------------------------------------------------------
   -- | Dijkstra is a special case of A*. It is implemented as:
   --
-  --   > dijkstra e d = astar e d (const 0)
+  --   > dijkstra e d = astar e d (\_ _ -> 0)
   --
   ----------------------------------------------------------------------------------------------------------------------
   dijkstra :: (Eq a, Ord a) => (Node a -> Bool)                -> -- terminator
                                (Node a -> Node a   -> Integer) -> -- distance
                                 Rep a  -> a        -> Path a
-  dijkstra e g = astar e g (const 0)
+  dijkstra e g = astar e g (\_ _ -> 0)
 
   ----------------------------------------------------------------------------------------------------------------------
   -- A* shortest path algorithm
   ----------------------------------------------------------------------------------------------------------------------
   shortestPath :: (Eq a, Ord a) => (Node a -> Bool)                -> -- terminator
                                    (Node a -> Node a   -> Integer) -> -- distance
-                                   (Node a -> Integer)             -> -- heuristics
+                                   (Node a -> Node a   -> Integer) -> -- heuristics
                                    Rep a   -> WQueue a -> Node a   -> Path a
   shortestPath _   _ _ _ [] _       = []
   shortestPath e g h r (W _ i:is) s = withNode r i $ \n -> -- visit it
@@ -228,8 +231,8 @@ where
   ----------------------------------------------------------------------------------------------------------------------
   -- Visit Node
   ----------------------------------------------------------------------------------------------------------------------
-  visit :: (Eq a, Ord a) => (Node a -> Node a -> Integer) -> 
-                            (Node a -> Integer)           ->
+  visit :: (Eq a, Ord a) => (Node a -> Node a -> Integer) ->  -- distance
+                            (Node a -> Node a -> Integer) ->  -- heuristics
                             Rep a   -> WQueue a -> a      -> 
                             Node a  -> (WQueue a, Rep a)
   visit g h r wq i n | nodVis n  = (wq, r)
@@ -238,7 +241,7 @@ where
           go r' wq' w (k:ks) = withNode r' k $ \n' ->
             let w' | w == infinity = 1
                    | otherwise     = w
-                d = w' + g n n' + h n'
+                d = w' + g n n' + h n n'
              in if d `cmp` nodDst n' == LT -- we need to update the node and rebalance the queue
                   then let r''  = updNode r' k n'{nodDst  = d, 
                                                   nodPath = Just i}

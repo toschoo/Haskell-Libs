@@ -10,8 +10,8 @@ where
   dst :: Node Int -> Node Int -> Integer
   dst _ _ = 1
 
-  heu :: Node Int -> Integer
-  heu _ = 0
+  heu :: Node Int -> Node Int -> Integer
+  heu _ _ = 0
 
   a,b,c,d,e,f,g,h,i :: Node Int
   a = N 1 0 [] False Nothing

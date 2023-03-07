@@ -173,7 +173,7 @@ start _             = False
 dst :: Node Int -> Node Int -> Integer
 dst _ _ = 1
 
-heu :: Node Int -> Integer
-heu _ = 0
+heu :: Node Int -> Node Int -> Integer
+heu _ _ = 0
 
 
